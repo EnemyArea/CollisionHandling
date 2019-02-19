@@ -506,7 +506,7 @@ namespace CollisionFloatTestNewMono.Engine
             ////));
 
             this.shapes.Add(new CircleShape("JungeFrau", new Vector2(314 + 15, 1271 + 15), 15));
-            this.shapes.Add(new CircleShape("Mara", new Vector2(1737 + 15, 1533 + 15), 15));
+            this.shapes.Add(new CircleShape("Mara", new Vector2(1737 + 15, 1400 + 15), 15));
             this.shapes.Add(new CircleShape("Anja", new Vector2(1737 + 15, 1565 + 15), 15));
             this.shapes.Add(new CircleShape("Tomy", new Vector2(1344 + 15, 1384 + 15), 15));
             this.shapes.Add(new CircleShape("Mimi", new Vector2(1372 + 15, 1420 + 15), 15));
@@ -701,7 +701,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             // Bewegen....
             var time = GameHelper.GetTotalSecondsFromGameTime(gameTime);
-            var shake = MathHelper.Lerp(-15, 15, Mathf.PingPong(time, 1));
+            var shake = MathHelper.Lerp(0, 150, Mathf.PingPong(time, 1));
 
             var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(2).ToArray();
             foreach (var circleShape in shapesToMove)
