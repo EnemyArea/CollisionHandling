@@ -703,7 +703,7 @@ namespace CollisionFloatTestNewMono.Engine
             var time = GameHelper.GetTotalSecondsFromGameTime(gameTime);
             var shake = MathHelper.Lerp(-15, 15, Mathf.PingPong(time, 1));
 
-            var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(3).ToArray();
+            var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(2).ToArray();
             foreach (var circleShape in shapesToMove)
             {
                 var firstCircleShape = circleShape;
@@ -741,7 +741,6 @@ namespace CollisionFloatTestNewMono.Engine
             foreach (var shape in allShapesAround)
             {
                 var iterations = 0;
-                var contacts = new List<Contact>();
                 bool hasCollison;
                 do
                 {
@@ -770,7 +769,7 @@ namespace CollisionFloatTestNewMono.Engine
 
                                             var depth = sumOfRadii - distance;
                                             direction.Normalize();
-                                            contacts.Add(new Contact(circleShape, circleShapeObs, direction * depth));
+                                            circleShape.Velocity +=  direction * depth;
                                             circleShapeObs.Color = Color.Red;
                                         }
 
@@ -812,7 +811,7 @@ namespace CollisionFloatTestNewMono.Engine
                                         if (nearestVector != Vector2.Zero)
                                         {
                                             lineShape.Color = Color.Red;
-                                            contacts.Add(new Contact(circleShape, lineShape, nearestVector));
+                                            circleShape.Velocity += nearestVector;
                                             hasCollison = true;
                                         }
 
@@ -822,20 +821,10 @@ namespace CollisionFloatTestNewMono.Engine
                                 break;
                         }
                     }
-
-                    var contactsFiltered = contacts.ToArray();
-                    foreach (var contact in contactsFiltered)
-                    {
-                        contact.Shape.Velocity += contact.Vector;
-                        contacts.Remove(contact);
-                    }
-
+                    
                     iterations++;
                 }
-                while (hasCollison && iterations < 10);
-
-                //if (iterations >= 10)
-                //    Debug.WriteLine(iterations);
+                while (hasCollison && iterations <= 10);
             }
 
             // Bewegen
