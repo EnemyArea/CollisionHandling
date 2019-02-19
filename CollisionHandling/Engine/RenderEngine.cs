@@ -442,15 +442,19 @@ namespace CollisionFloatTestNewMono.Engine
             this.camera.SetZoomLevel(1);
             this.camera.SetFocusPosition(Vector2.Zero);
 
-            //this.playerShape = new CircleShape("P", new Vector2(10 + 30 + ((100 / 2f) - (60 / 2f)), 40 + 10 + (100 / 2f - 60 / 2f)), 30);
+            this.playerShape = new CircleShape("P", new Vector2(10 + 30 + ((100 / 2f) - (60 / 2f)), 40 + 10 + (100 / 2f - 60 / 2f)), 30);
 
             //this.playerShape = new CircleShape("P", new Vector2(2464 + (100 / 2f - 60 / 2f), 512 + (100 / 2f - 60 / 2f)), 15);
-            this.playerShape = new CircleShape("P", new Vector2(1629 + (100 / 2f - 60 / 2f), 1525 + (100 / 2f - 60 / 2f)), 15);
+            //this.playerShape = new CircleShape("P", new Vector2(1629 + (100 / 2f - 60 / 2f), 1525 + (100 / 2f - 60 / 2f)), 15);
             this.shapes.Add(this.playerShape);
 
             //this.playerShape = new CircleShape("P", new Vector2(205 + (100 / 2f - 60 / 2f), 103 + (100 / 2f - 60 / 2f)), 30);
             //this.shapes.Add(new CircleShape("C1", new Vector2(100 + 50, 100 + 50), 50));
             //this.shapes.Add(new CircleShape("C2", new Vector2(250 + 50, 100 + 50), 50));
+
+
+            this.shapes.Add(new RectangleShape("TestArea", new Rectangle(100, 100, 256, 256)));
+
 
             //var offset = new Vector2(120, 140);
 
@@ -505,60 +509,72 @@ namespace CollisionFloatTestNewMono.Engine
             ////    new Vector2(350 + offset.X, 100 + offset.Y)
             ////));
 
-            this.shapes.Add(new CircleShape("JungeFrau", new Vector2(314 + 15, 1271 + 15), 15));
-            this.shapes.Add(new CircleShape("Mara", new Vector2(1737 + 15, 1400 + 15), 15));
-            this.shapes.Add(new CircleShape("Anja", new Vector2(1737 + 15, 1565 + 15), 15));
-            this.shapes.Add(new CircleShape("Tomy", new Vector2(1344 + 15, 1384 + 15), 15));
-            this.shapes.Add(new CircleShape("Mimi", new Vector2(1372 + 15, 1420 + 15), 15));
-            this.shapes.Add(new CircleShape("Lilly", new Vector2(1313 + 15, 1409 + 15), 15));
-            this.shapes.Add(new CircleShape("Händler", new Vector2(1566 + 15, 476 + 15), 15));
-            this.shapes.Add(new CircleShape("Will", new Vector2(1376 + 15, 192 + 15), 15));
-            this.shapes.Add(new CircleShape("Wache2", new Vector2(2275 + 15, 1528 + 15), 15));
-            this.shapes.Add(new CircleShape("Wache3", new Vector2(1313 + 15, 2383 + 15), 15));
-            this.shapes.Add(new CircleShape("AlteFrau", new Vector2(289 + 15, 863 + 15), 15));
-            this.shapes.Add(new CircleShape("Neko", new Vector2(320 + 15, 864 + 15), 15));
-            this.shapes.Add(new CircleShape("Lilly2", new Vector2(1498 + 15, 57 + 15), 15));
-            this.shapes.Add(new CircleShape("Mimi2", new Vector2(1499 + 15, -9.536743E-07f + 15), 15));
-            this.shapes.Add(new CircleShape("Tomy2", new Vector2(1498 + 15, 28 + 15), 15));
-            this.shapes.Add(new CircleShape("Ben", new Vector2(416 + 15, 480 + 15), 15));
-            this.shapes.Add(new CircleShape("Frau2", new Vector2(2560 + 15, 2208 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel2", new Vector2(674 + 15, 607 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel3", new Vector2(1044 + 15, 1126 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel4", new Vector2(1415 + 15, 961 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel5", new Vector2(618 + 15, 1719 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel6", new Vector2(1312 + 15, 1897 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel7", new Vector2(576 + 15, 2457 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel8", new Vector2(1683 + 15, 2315 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel9", new Vector2(2348 + 15, 1983 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel10", new Vector2(2287 + 15, 1422 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel11", new Vector2(1505 + 15, 1614 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel12", new Vector2(1876 + 15, 810 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel13", new Vector2(1174 + 15, 677 + 15), 15));
-            this.shapes.Add(new CircleShape("Vogel1", new Vector2(2368 + 15, 512 + 15), 15));
-            this.shapes.Add(new CircleShape("AlterMann", new Vector2(572 + 15, 1926 + 15), 15));
-            this.shapes.Add(new CircleShape("Pater", new Vector2(736 + 15, 2368 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling2", new Vector2(961.9999f + 15, 2114 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling5", new Vector2(1338 + 15, 595.9999f + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling1", new Vector2(460 + 15, 1054 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling4", new Vector2(1782 + 15, 1712 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling6", new Vector2(668 + 15, 446 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling9", new Vector2(2576 + 15, 1596 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling10", new Vector2(1356 + 15, 2412 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling11", new Vector2(2134 + 15, 452 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling12", new Vector2(2274 + 15, 877.9999f + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling13", new Vector2(1450 + 15, 2334 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling7", new Vector2(592 + 15, 1606 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling3", new Vector2(1758 + 15, 1086 + 15), 15));
-            this.shapes.Add(new CircleShape("Schmetterling8", new Vector2(2056 + 15, 2080 + 15), 15));
+            //this.shapes.Add(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
+            //this.shapes.Add(new RectangleShape("EventGate", new Rectangle(1376, 96, 192, 32)));
+            //this.shapes.Add(new RectangleShape("EventPater", new Rectangle(640, 2336, 224, 160)));
+            //this.shapes.Add(new RectangleShape("EventPaterChildrenCrash", new Rectangle(1440, 384, 160, 192)));
 
-            var lines = CreateHullForBody(this.mapWith, this.mapHeight, mapData, true);
-            this.shapes.AddRange(lines);
+
+            //this.shapes.Add(new CircleShape("JungeFrau", new Vector2(314 + 15, 1271 + 15), 15));
+            //this.shapes.Add(new CircleShape("Mara", new Vector2(1737 + 15, 1400 + 15), 15));
+            //this.shapes.Add(new CircleShape("Anja", new Vector2(1737 + 15, 1565 + 15), 15));
+            //this.shapes.Add(new CircleShape("Tomy", new Vector2(1344 + 15, 1384 + 15), 15));
+            //this.shapes.Add(new CircleShape("Mimi", new Vector2(1372 + 15, 1420 + 15), 15));
+            //this.shapes.Add(new CircleShape("Lilly", new Vector2(1313 + 15, 1409 + 15), 15));
+            //this.shapes.Add(new CircleShape("Händler", new Vector2(1566 + 15, 476 + 15), 15));
+            //this.shapes.Add(new CircleShape("Will", new Vector2(1376 + 15, 192 + 15), 15));
+            //this.shapes.Add(new CircleShape("Wache2", new Vector2(2275 + 15, 1528 + 15), 15));
+            //this.shapes.Add(new CircleShape("Wache3", new Vector2(1313 + 15, 2383 + 15), 15));
+            //this.shapes.Add(new CircleShape("AlteFrau", new Vector2(289 + 15, 863 + 15), 15));
+            //this.shapes.Add(new CircleShape("Neko", new Vector2(320 + 15, 864 + 15), 15));
+            //this.shapes.Add(new CircleShape("Lilly2", new Vector2(1498 + 15, 57 + 15), 15));
+            //this.shapes.Add(new CircleShape("Mimi2", new Vector2(1499 + 15, -9.536743E-07f + 15), 15));
+            //this.shapes.Add(new CircleShape("Tomy2", new Vector2(1498 + 15, 28 + 15), 15));
+            //this.shapes.Add(new CircleShape("Ben", new Vector2(416 + 15, 480 + 15), 15));
+            //this.shapes.Add(new CircleShape("Frau2", new Vector2(2560 + 15, 2208 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel2", new Vector2(674 + 15, 607 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel3", new Vector2(1044 + 15, 1126 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel4", new Vector2(1415 + 15, 961 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel5", new Vector2(618 + 15, 1719 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel6", new Vector2(1312 + 15, 1897 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel7", new Vector2(576 + 15, 2457 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel8", new Vector2(1683 + 15, 2315 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel9", new Vector2(2348 + 15, 1983 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel10", new Vector2(2287 + 15, 1422 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel11", new Vector2(1505 + 15, 1614 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel12", new Vector2(1876 + 15, 810 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel13", new Vector2(1174 + 15, 677 + 15), 15));
+            //this.shapes.Add(new CircleShape("Vogel1", new Vector2(2368 + 15, 512 + 15), 15));
+            //this.shapes.Add(new CircleShape("AlterMann", new Vector2(572 + 15, 1926 + 15), 15));
+            //this.shapes.Add(new CircleShape("Pater", new Vector2(736 + 15, 2368 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling2", new Vector2(961.9999f + 15, 2114 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling5", new Vector2(1338 + 15, 595.9999f + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling1", new Vector2(460 + 15, 1054 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling4", new Vector2(1782 + 15, 1712 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling6", new Vector2(668 + 15, 446 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling9", new Vector2(2576 + 15, 1596 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling10", new Vector2(1356 + 15, 2412 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling11", new Vector2(2134 + 15, 452 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling12", new Vector2(2274 + 15, 877.9999f + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling13", new Vector2(1450 + 15, 2334 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling7", new Vector2(592 + 15, 1606 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling3", new Vector2(1758 + 15, 1086 + 15), 15));
+            //this.shapes.Add(new CircleShape("Schmetterling8", new Vector2(2056 + 15, 2080 + 15), 15));
+
+            //var lines = CreateHullForBody(this.mapWith, this.mapHeight, mapData, true);
+            //this.shapes.AddRange(lines);
+
             this.grid = new CollisionGrid<Shape>(this.mapWith, this.mapHeight, this.mapWith * GameHelper.TileSize, this.mapHeight * GameHelper.TileSize);
 
             foreach (var shape in this.shapes)
             {
                 switch (shape)
                 {
+                    case RectangleShape rectangleShape:
+
+                        this.grid.Add(rectangleShape, rectangleShape.Rectangle);
+
+                        break;
                     case CircleShape circleShape:
 
                         this.grid.Add(circleShape, circleShape.TilePosition);
@@ -699,23 +715,23 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.oldState = newState;
 
-            // Bewegen....
-            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime);
-            var shake = MathHelper.Lerp(0, 150, Mathf.PingPong(time, 1));
+            //// Bewegen....
+            //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime);
+            //var shake = MathHelper.Lerp(0, 150, Mathf.PingPong(time, 1));
 
-            var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(2).ToArray();
-            foreach (var circleShape in shapesToMove)
-            {
-                var firstCircleShape = circleShape;
-                firstCircleShape.Velocity = Vector2.Zero;
+            //var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(2).ToArray();
+            //foreach (var circleShape in shapesToMove)
+            //{
+            //    var firstCircleShape = circleShape;
+            //    firstCircleShape.Velocity = Vector2.Zero;
 
-                var firstCircleShapeVelocity = new Vector2(0, shake);
-                if (firstCircleShapeVelocity != Vector2.Zero)
-                {
-                    firstCircleShapeVelocity.Normalize();
-                    firstCircleShape.Velocity += firstCircleShapeVelocity;
-                }
-            }
+            //    var firstCircleShapeVelocity = new Vector2(0, shake);
+            //    if (firstCircleShapeVelocity != Vector2.Zero)
+            //    {
+            //        firstCircleShapeVelocity.Normalize();
+            //        firstCircleShape.Velocity += firstCircleShapeVelocity;
+            //    }
+            //}
 
             var playerCircleShape = (CircleShape)this.playerShape;
             playerCircleShape.Color = Color.Fuchsia;
@@ -816,6 +832,11 @@ namespace CollisionFloatTestNewMono.Engine
                                         }
 
                                         break;
+                                    case RectangleShape rectangleShape:
+
+
+
+                                        break;
                                 }
 
                                 break;
@@ -876,6 +897,9 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                     case LineShape lineShape:
                         spriteBatch.DrawLine(lineShape.Start, lineShape.End, lineShape.Color);
+                        break;
+                    case RectangleShape rectangleShape:
+                        spriteBatch.FillRectangle(rectangleShape.Rectangle, rectangleShape.Color*0.5f);
                         break;
                 }
             }
