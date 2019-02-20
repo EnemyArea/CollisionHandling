@@ -37,11 +37,36 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
+        /// <param name="coordinate"></param>
+        /// <returns></returns>
+        public static int ConvertPositionToTilePosition(double coordinate)
+        {
+            return (int)(coordinate / TileSize);
+        }
+
+
+        /// <summary>
+        /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
         public static Point ConvertPositionToTilePosition(Vector2 position)
         {
             return new Point((int)(position.X / TileSize), (int)(position.Y / TileSize));
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public static Rectangle ConvertPositionToTilePosition(Rectangle rectangle)
+        {
+            return new Rectangle(
+                ConvertPositionToTilePosition(rectangle.X),
+                ConvertPositionToTilePosition(rectangle.Y),
+                ConvertPositionToTilePosition(rectangle.Width), 
+                ConvertPositionToTilePosition(rectangle.Height));
         }
     }
 }
