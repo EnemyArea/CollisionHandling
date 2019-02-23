@@ -47,6 +47,7 @@
     <Compile Include="Engine\Contact.cs" />
     <Compile Include="Engine\GameHelper.cs" />
     <Compile Include="Engine\Mathf.cs" />
+    <Compile Include="Engine\Vertices.cs" />
     <Compile Include="GameClass.cs" />
     <Compile Include="Engine\LineShape.cs" />
     <Compile Include="Engine\Primitives2D.cs" />

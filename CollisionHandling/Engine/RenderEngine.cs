@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
@@ -54,7 +53,7 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        private Shape playerShape;
+        private CircleShape playerShape;
 
         /// <summary>
         /// </summary>
@@ -95,6 +94,10 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         private bool showTexture;
+
+        /// <summary>
+        /// </summary>
+        private GraphicsDevice graphicsDevice;
 
 
         /// <summary>
@@ -341,6 +344,8 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="content"></param>
         public void LoadMap(GraphicsDevice graphicsDevice, ContentManager content)
         {
+            this.graphicsDevice = graphicsDevice;
+
             this.playerSpeed = 300;
             this.playerTexture = content.Load<Texture2D>("playersprite");
             this.font = content.Load<SpriteFont>("Fonts/interfaceFontSmall");
@@ -673,7 +678,6 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="position"></param>
         /// <param name="radius"></param>
@@ -900,7 +904,7 @@ namespace CollisionFloatTestNewMono.Engine
                                             rectangleShape.Color = Color.Red;
                                             hasCollison = true;
                                         }
-                                        
+
                                         break;
                                 }
 
@@ -940,6 +944,26 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        private static IEnumerable<int> CreateIndicies(int count)
+        {
+            for (var i = 0; i < count; i++)
+            {
+                var offset = 4 * i;
+
+                yield return (ushort)(offset + 0);
+                yield return (ushort)(offset + 1);
+                yield return (ushort)(offset + 2);
+                yield return (ushort)(offset + 1);
+                yield return (ushort)(offset + 3);
+                yield return (ushort)(offset + 2);
+            }
+        }
+
+
+        /// <summary>
+        /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="spriteBatch"></param>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -968,6 +992,41 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                 }
             }
+
+
+            // Test, drawing a polygon :)
+            var polyOffset = this.playerShape.Position;
+            var sightSize = new Vector2(150, 190);
+            var vertices = new Vertices
+            {
+                -new Vector2(-15, 0),
+                -new Vector2(15, 0),
+                -new Vector2(-sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
+                -new Vector2(sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45)
+            };
+            var vert = new[]
+            {
+                new VertexPositionColor(new Vector3(vertices[0].X+polyOffset.X, vertices[0].Y+polyOffset.Y, 0), Color.Fuchsia),
+                new VertexPositionColor(new Vector3(vertices[1].X+polyOffset.X, vertices[1].Y+polyOffset.Y, 0), Color.Fuchsia),
+                new VertexPositionColor(new Vector3(vertices[2].X+polyOffset.X, vertices[2].Y+polyOffset.Y, 0), Color.Fuchsia),
+                new VertexPositionColor(new Vector3(vertices[3].X+polyOffset.X, vertices[3].Y+polyOffset.Y, 0), Color.Fuchsia)
+            };
+
+            var ind = CreateIndicies(1).ToArray();
+
+            var basicEffect = new BasicEffect(this.graphicsDevice);
+            basicEffect.VertexColorEnabled = true;
+            basicEffect.Projection = Matrix.CreateOrthographicOffCenter(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, 0, 1);
+            basicEffect.View = this.camera.ViewMatrixWithOffset;
+            this.graphicsDevice.DepthStencilState = DepthStencilState.None;
+            this.graphicsDevice.RasterizerState = RasterizerState.CullNone;
+
+            foreach (var effectPass in basicEffect.CurrentTechnique.Passes)
+            {
+                effectPass.Apply();
+                this.graphicsDevice.DrawUserIndexedPrimitives(PrimitiveType.TriangleList, vert, 0, vert.Length, ind, 0, ind.Length / 3);
+            }
+
 
             switch (this.playerShape)
             {
