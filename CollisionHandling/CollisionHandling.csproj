@@ -44,10 +44,9 @@
     <Compile Include="Engine\CollisionGrid.cs" />
     <Compile Include="Engine\Camera2D.cs" />
     <Compile Include="Engine\CircleShape.cs" />
-    <Compile Include="Engine\Contact.cs" />
     <Compile Include="Engine\GameHelper.cs" />
     <Compile Include="Engine\Mathf.cs" />
-    <Compile Include="Engine\Vertices.cs" />
+    <Compile Include="Engine\PrimitiveBatch.cs" />
     <Compile Include="GameClass.cs" />
     <Compile Include="Engine\LineShape.cs" />
     <Compile Include="Engine\Primitives2D.cs" />
