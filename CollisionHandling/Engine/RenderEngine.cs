@@ -398,82 +398,74 @@ namespace CollisionFloatTestNewMono.Engine
             this.shapes.Add(new RectangleShape("TestArea2", new Rectangle(150, 100, 50, 50)));
             this.shapes.Add(new RectangleShape("TestArea3", new Rectangle(100, 150, 50, 50)));
             this.shapes.Add(new RectangleShape("TestArea4", new Rectangle(150, 150, 50, 50)));
-            
 
-            //var polyOffset = new Vector2(400, 400);
-            //var sightSize = new Vector2(150, 190);
-            //this.vertices = new[]
-            //{
-            //    polyOffset - new Vector2(-15, 0),
-            //    polyOffset - new Vector2(-sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
-            //    polyOffset - new Vector2(sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
-            //    polyOffset - new Vector2(15, 0),
-            //};
+            this.shapes.Add(new CircleShape("C1", new Vector2(300, 500), 50));
+            this.shapes.Add(new CircleShape("C2", new Vector2(500, 500), 50));
 
-            //for (var index = 0; index < this.vertices.Length - 1; index++)
-            //{
-            //    var vertex = this.vertices[index];
-            //    var vertexNext = this.vertices[index + 1];
+            var polyOffset = new Vector2(700, 400);
+            var sightSize = new Vector2(150, 190);
+            this.vertices = new[]
+            {
+                polyOffset - new Vector2(-15, 0),
+                polyOffset - new Vector2(-sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
+                polyOffset - new Vector2(sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
+                polyOffset - new Vector2(15, 0),
+            };
+            this.shapes.Add(new PolygonShape(this.vertices));
 
-            //    this.shapes.Add(new LineShape(
-            //        new Vector2(vertex.X, vertex.Y),
-            //        new Vector2(vertexNext.X, vertexNext.Y)
-            //    ));
-            //}
+            var offset = new Vector2(120, 140);
 
+            this.shapes.Add(new LineShape(
+                new Vector2(100 + offset.X, 100 + offset.Y),
+                new Vector2(200 + offset.X, 100 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(200 + offset.X, 100 + offset.Y),
+                new Vector2(200 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(200 + offset.X, 200 + offset.Y),
+                new Vector2(100 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(100 + offset.X, 200 + offset.Y),
+                new Vector2(100 + offset.X, 100 + offset.Y)
+            ));
 
-            //var offset = new Vector2(120, 140);
+            this.shapes.Add(new LineShape(
+                new Vector2(250 + offset.X, 100 + offset.Y),
+                new Vector2(350 + offset.X, 100 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(350 + offset.X, 100 + offset.Y),
+                new Vector2(350 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(350 + offset.X, 200 + offset.Y),
+                new Vector2(250 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(250 + offset.X, 200 + offset.Y),
+                new Vector2(250 + offset.X, 100 + offset.Y)
+            ));
 
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(100 + offset.X, 100 + offset.Y),
-            ////    new Vector2(200 + offset.X, 100 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(200 + offset.X, 100 + offset.Y),
-            ////    new Vector2(200 + offset.X, 200 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(200 + offset.X, 200 + offset.Y),
-            ////    new Vector2(100 + offset.X, 200 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(100 + offset.X, 200 + offset.Y),
-            ////    new Vector2(100 + offset.X, 100 + offset.Y)
-            ////));
+            this.shapes.Add(new LineShape(
+                new Vector2(350 + offset.X, 100 + offset.Y),
+                new Vector2(450 + offset.X, 100 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(450 + offset.X, 100 + offset.Y),
+                new Vector2(450 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(450 + offset.X, 200 + offset.Y),
+                new Vector2(350 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(350 + offset.X, 200 + offset.Y),
+                new Vector2(350 + offset.X, 100 + offset.Y)
+            ));
 
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(250 + offset.X, 100 + offset.Y),
-            ////    new Vector2(350 + offset.X, 100 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(350 + offset.X, 100 + offset.Y),
-            ////    new Vector2(350 + offset.X, 200 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(350 + offset.X, 200 + offset.Y),
-            ////    new Vector2(250 + offset.X, 200 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(250 + offset.X, 200 + offset.Y),
-            ////    new Vector2(250 + offset.X, 100 + offset.Y)
-            ////));
-
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(350 + offset.X, 100 + offset.Y),
-            ////    new Vector2(450 + offset.X, 100 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(450 + offset.X, 100 + offset.Y),
-            ////    new Vector2(450 + offset.X, 200 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(450 + offset.X, 200 + offset.Y),
-            ////    new Vector2(350 + offset.X, 200 + offset.Y)
-            ////));
-            ////this.shapes.Add(new LineShape(
-            ////    new Vector2(350 + offset.X, 200 + offset.Y),
-            ////    new Vector2(350 + offset.X, 100 + offset.Y)
-            ////));
 
             //this.shapes.Add(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
             //this.shapes.Add(new RectangleShape("EventGate", new Rectangle(1376, 96, 192, 32)));
@@ -768,20 +760,19 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
 
-
         public static void CollidePolygonAndCircle(int polygonARadius, Vector2[] polygonAVertices, CircleShape circleB)
         {
             // Compute circle position in the frame of the polygon.
-            Vector2 c = circleB.Position;
-            Vector2 cLocal = circleB.Position;
+            var c = circleB.Position;
+            var cLocal = circleB.Position;
 
             // Find the min separating edge.
-            int normalIndex = 0;
-            float separation = -float.MaxValue;
+            var normalIndex = 0;
+            var separation = -float.MaxValue;
             float radius = polygonARadius + circleB.Radius;
-            int vertexCount = polygonAVertices.Length;
+            var vertexCount = polygonAVertices.Length;
             var vertices = polygonAVertices;
-            var normals = polygonAVertices;// polygonA.Normals;
+            var normals = polygonAVertices; // polygonA.Normals;
 
             //for (int i = 0; i < vertexCount; ++i)
             //{
@@ -801,14 +792,14 @@ namespace CollisionFloatTestNewMono.Engine
             //}
 
             // Vertices that subtend the incident face.
-            int vertIndex1 = normalIndex;
-            int vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
-            Vector2 v1 = vertices[vertIndex1];
-            Vector2 v2 = vertices[vertIndex2];
+            var vertIndex1 = normalIndex;
+            var vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
+            var v1 = vertices[vertIndex1];
+            var v2 = vertices[vertIndex2];
 
             // Compute barycentric coordinates
-            float u1 = Vector2.Dot(cLocal - v1, v2 - v1);
-            float u2 = Vector2.Dot(cLocal - v2, v1 - v2);
+            var u1 = Vector2.Dot(cLocal - v1, v2 - v1);
+            var u2 = Vector2.Dot(cLocal - v2, v1 - v2);
 
             if (u1 <= 0.0f)
             {
@@ -842,8 +833,8 @@ namespace CollisionFloatTestNewMono.Engine
             }
             else
             {
-                Vector2 faceCenter = 0.5f * (v1 + v2);
-                float s = Vector2.Dot(cLocal - faceCenter, normals[vertIndex1]);
+                var faceCenter = 0.5f * (v1 + v2);
+                var s = Vector2.Dot(cLocal - faceCenter, normals[vertIndex1]);
                 if (s > radius)
                 {
                     return;
@@ -983,43 +974,10 @@ namespace CollisionFloatTestNewMono.Engine
                                         break;
                                     case LineShape lineShape:
 
-                                        var nearestVector = Vector2.Zero;
-                                        var center = circleShape.Position + circleShape.Velocity;
-                                        var radius = circleShape.Radius;
-                                        var pointOnLine = ProjectPointOnLine(lineShape.Start, lineShape.End, center);
-                                        var localNearestVector = FindNearestExitVector(pointOnLine, center, radius);
-
-                                        var isPointInSegment = IsProjectedPointOnLine(lineShape.Start, lineShape.End, pointOnLine);
-                                        if (isPointInSegment)
-                                        {
-                                            nearestVector.X += localNearestVector.X;
-                                            nearestVector.Y += localNearestVector.Y;
-
-                                            center.X += localNearestVector.X;
-                                            center.Y += localNearestVector.Y;
-                                        }
-                                        else
-                                        {
-                                            // check if line points are intersecting
-                                            var nv1 = FindNearestExitVector(lineShape.Start, center, radius);
-
-                                            nearestVector.X += nv1.X;
-                                            nearestVector.Y += nv1.Y;
-                                            center.X += nv1.X;
-                                            center.Y += nv1.Y;
-
-                                            var nv2 = FindNearestExitVector(lineShape.End, center, radius);
-                                            nearestVector.X += nv2.X;
-                                            nearestVector.Y += nv2.Y;
-                                            center.X += nv2.X;
-                                            center.Y += nv2.Y;
-                                        }
-
+                                        var nearestVector = GetNearestVectorFromCircleAndLine(circleShape.Position + circleShape.Velocity, circleShape.Radius, lineShape.Start, lineShape.End);
                                         if (nearestVector != Vector2.Zero)
                                         {
-                                            lineShape.Color = Color.Red;
                                             circleShape.Velocity += nearestVector;
-                                            hasCollison = true;
                                         }
 
                                         break;
@@ -1118,75 +1076,6 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="count"></param>
-        /// <param name="color"></param>
-        /// <param name="closed"></param>
-        private void DrawPolygon(Vector2[] vertices, int count, Color color, bool closed = true)
-        {
-            if (!this.primitiveBatch.IsReady())
-                throw new InvalidOperationException("BeginCustomDraw must be called before drawing anything.");
-
-            for (int i = 0; i < count - 1; i++)
-            {
-                this.primitiveBatch.AddVertex(vertices[i], color, PrimitiveType.LineList);
-                this.primitiveBatch.AddVertex(vertices[i + 1], color, PrimitiveType.LineList);
-            }
-
-            if (closed)
-            {
-                this.primitiveBatch.AddVertex(vertices[count - 1], color, PrimitiveType.LineList);
-                this.primitiveBatch.AddVertex(vertices[0], color, PrimitiveType.LineList);
-            }
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="count"></param>
-        /// <param name="color"></param>
-        /// <param name="outline"></param>
-        private void DrawSolidPolygon(Vector2[] vertices, int count, Color color, bool outline = true)
-        {
-            if (!this.primitiveBatch.IsReady())
-                throw new InvalidOperationException("BeginCustomDraw must be called before drawing anything.");
-
-            if (count == 2)
-            {
-                this.DrawPolygon(vertices, count, color);
-                return;
-            }
-
-            Color colorFill = color * (outline ? 0.5f : 1.0f);
-
-            for (int i = 1; i < count - 1; i++)
-            {
-                this.primitiveBatch.AddVertex(vertices[0], colorFill, PrimitiveType.TriangleList);
-                this.primitiveBatch.AddVertex(vertices[i], colorFill, PrimitiveType.TriangleList);
-                this.primitiveBatch.AddVertex(vertices[i + 1], colorFill, PrimitiveType.TriangleList);
-            }
-
-            if (outline)
-                this.DrawPolygon(vertices, count, color);
-        }
-
-
-        private void DrawPoint(Vector2 p, float size, Color color)
-        {
-            Vector2[] verts = new Vector2[4];
-            float hs = size / 2.0f;
-            verts[0] = p + new Vector2(-hs, -hs);
-            verts[1] = p + new Vector2(hs, -hs);
-            verts[2] = p + new Vector2(hs, hs);
-            verts[3] = p + new Vector2(-hs, hs);
-
-            this.DrawSolidPolygon(verts, 4, color, true);
-        }
-
-
-        /// <summary>
-        /// </summary>
         /// <param name="gameTime"></param>
         /// <param name="spriteBatch"></param>
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
@@ -1198,48 +1087,58 @@ namespace CollisionFloatTestNewMono.Engine
                 spriteBatch.End();
             }
 
-            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, this.camera.ViewMatrixWithOffset);
+            this.primitiveBatch.Begin(ref this.projection, ref this.view);
 
             foreach (var shape in this.shapes)
             {
                 switch (shape)
                 {
                     case CircleShape circleShape:
-                        spriteBatch.DrawCircle(circleShape.Position, circleShape.Radius, 64, shape.Color);
+
+                        this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, shape.Color);
+
                         break;
                     case LineShape lineShape:
-                        spriteBatch.DrawLine(lineShape.Start, lineShape.End, lineShape.Color);
+
+                        this.primitiveBatch.DrawSegment(lineShape.Start, lineShape.End, lineShape.Color);
+
                         break;
                     case RectangleShape rectangleShape:
-                        spriteBatch.FillRectangle(rectangleShape.Rectangle, rectangleShape.Color * 0.5f);
+
+                        var lineTopStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
+                        var lineTopEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
+
+                        var lineLeftStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
+                        var lineLeftEnd = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
+
+                        var lineBottomStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
+                        var lineBottomEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
+
+                        var lineRightStart = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
+                        var lineRightEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
+
+                        this.primitiveBatch.DrawSegment(lineTopStart, lineTopEnd, rectangleShape.Color);
+                        this.primitiveBatch.DrawSegment(lineLeftStart, lineLeftEnd, rectangleShape.Color);
+                        this.primitiveBatch.DrawSegment(lineBottomStart, lineBottomEnd, rectangleShape.Color);
+                        this.primitiveBatch.DrawSegment(lineRightStart, lineRightEnd, rectangleShape.Color);
+
+                        break;
+                    case PolygonShape polygonShape:
+
+                        this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
+
                         break;
                 }
             }
 
-            var collision = false;
-            this.primitiveBatch.Begin(ref this.projection, ref this.view);
-            this.DrawSolidPolygon(this.vertices, this.vertices.Length, collision ? Color.Red : Color.Fuchsia);
-            this.primitiveBatch.End();
-
-            //spriteBatch.DrawRectangle(new Rectangle(400, 400, 200, 200), this.playerShape.Color);
-
-            //for (var index = 0; index < this.vertices.Length - 1; index++)
-            //{
-            //    var vertex = this.vertices[index];
-            //    var vertexNext = this.vertices[index + 1];
-            //    spriteBatch.DrawLine(vertex, vertexNext, Color.Fuchsia);
-            //}
-
-
             switch (this.playerShape)
             {
                 case CircleShape circleShape:
-                    spriteBatch.DrawCircle(circleShape.Position, circleShape.Radius, 64, this.playerShape.Color);
-                    //spriteBatch.Draw(this.playerTexture, new Vector2((int)circleShape.Position.X, (int)circleShape.Position.Y), null, Color.White, 0f, new Vector2(this.playerTexture.Width / 2f, this.playerTexture.Height / 2f), 2f, SpriteEffects.None, 0);
+                    this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, this.playerShape.Color);
                     break;
             }
 
-            spriteBatch.End();
+            this.primitiveBatch.End();
 
             spriteBatch.Begin();
             spriteBatch.DrawString(this.font, this.playerShape.Position + " : " + this.camera.CameraPosition, new Vector2(20, 20), Color.White);

@@ -49,7 +49,6 @@
     <Compile Include="Engine\PrimitiveBatch.cs" />
     <Compile Include="GameClass.cs" />
     <Compile Include="Engine\LineShape.cs" />
-    <Compile Include="Engine\Primitives2D.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Engine\Shape.cs" />

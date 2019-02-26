@@ -33,6 +33,11 @@ namespace CollisionFloatTestNewMono.Engine
         private int lineVertsCount;
         private int triangleVertsCount;
 
+
+        /// <summary>
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="bufferSize"></param>
         public PrimitiveBatch(GraphicsDevice graphicsDevice, int bufferSize = DefaultBufferSize)
         {
             if (graphicsDevice == null)
@@ -48,21 +53,19 @@ namespace CollisionFloatTestNewMono.Engine
             this.basicEffect.VertexColorEnabled = true;
         }
 
-        #region IDisposable Members
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        #endregion
-
+        /// <summary>
+        /// </summary>
+        /// <param name="projection"></param>
         public void SetProjection(ref Matrix projection)
         {
             this.basicEffect.Projection = projection;
         }
 
+
+        /// <summary>
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing && !this.isDisposed)
@@ -73,6 +76,16 @@ namespace CollisionFloatTestNewMono.Engine
                 this.isDisposed = true;
             }
         }
+
+
+        /// <summary>
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
 
         /// <summary>
         ///     Begin is called to tell the PrimitiveBatch what kind of primitives will be
@@ -95,11 +108,21 @@ namespace CollisionFloatTestNewMono.Engine
             this.hasBegun = true;
         }
 
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
         public bool IsReady()
         {
             return this.hasBegun;
         }
 
+
+        /// <summary>
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <param name="color"></param>
+        /// <param name="primitiveType"></param>
         public void AddVertex(Vector2 vertex, Color color, PrimitiveType primitiveType)
         {
             if (!this.hasBegun)
@@ -129,6 +152,73 @@ namespace CollisionFloatTestNewMono.Engine
             }
         }
 
+
+        /// <summary>
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <param name="count"></param>
+        /// <param name="color"></param>
+        /// <param name="closed"></param>
+        public void DrawPolygon(Vector2[] vertices, int count, Color color, bool closed = true)
+        {
+            if (!this.IsReady())
+                throw new InvalidOperationException("BeginCustomDraw must be called before drawing anything.");
+
+            for (var i = 0; i < count - 1; i++)
+            {
+                this.AddVertex(vertices[i], color, PrimitiveType.LineList);
+                this.AddVertex(vertices[i + 1], color, PrimitiveType.LineList);
+            }
+
+            if (closed)
+            {
+                this.AddVertex(vertices[count - 1], color, PrimitiveType.LineList);
+                this.AddVertex(vertices[0], color, PrimitiveType.LineList);
+            }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="center"></param>
+        /// <param name="radius"></param>
+        /// <param name="color"></param>
+        public void DrawCircle(Vector2 center, float radius, Color color)
+        {
+            if (!this.IsReady())
+                throw new InvalidOperationException("BeginCustomDraw must be called before drawing anything.");
+
+            const double increment = Math.PI * 2.0 / 32;
+            var theta = 0.0;
+
+            for (var i = 0; i < 32; i++)
+            {
+                var v1 = center + radius * new Vector2((float)Math.Cos(theta), (float)Math.Sin(theta));
+                var v2 = center + radius * new Vector2((float)Math.Cos(theta + increment), (float)Math.Sin(theta + increment));
+
+                this.AddVertex(v1, color, PrimitiveType.LineList);
+                this.AddVertex(v2, color, PrimitiveType.LineList);
+
+                theta += increment;
+            }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="end"></param>
+        /// <param name="color"></param>
+        public void DrawSegment(Vector2 start, Vector2 end, Color color)
+        {
+            if (!this.IsReady())
+                throw new InvalidOperationException("BeginCustomDraw must be called before drawing anything.");
+
+            this.AddVertex(start, color, PrimitiveType.LineList);
+            this.AddVertex(end, color, PrimitiveType.LineList);
+        }
+
+
         /// <summary>
         ///     End is called once all the primitives have been drawn using AddVertex.
         ///     it will call Flush to actually submit the draw call to the graphics card, and
@@ -148,6 +238,10 @@ namespace CollisionFloatTestNewMono.Engine
             this.hasBegun = false;
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void FlushTriangles()
         {
             if (!this.hasBegun)
@@ -157,7 +251,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             if (this.triangleVertsCount >= 3)
             {
-                int primitiveCount = this.triangleVertsCount / 3;
+                var primitiveCount = this.triangleVertsCount / 3;
 
                 // submit the draw call to the graphics card
                 this.device.SamplerStates[0] = SamplerState.AnisotropicClamp;
@@ -166,6 +260,10 @@ namespace CollisionFloatTestNewMono.Engine
             }
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
         private void FlushLines()
         {
             if (!this.hasBegun)
@@ -175,7 +273,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             if (this.lineVertsCount >= 2)
             {
-                int primitiveCount = this.lineVertsCount / 2;
+                var primitiveCount = this.lineVertsCount / 2;
 
                 // submit the draw call to the graphics card
                 this.device.SamplerStates[0] = SamplerState.AnisotropicClamp;
