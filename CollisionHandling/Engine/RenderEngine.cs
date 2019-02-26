@@ -8,6 +8,12 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using VelcroPhysics.DebugViews.MonoGame;
+using VelcroPhysics.Dynamics;
+using VelcroPhysics.Factories;
+using VelcroPhysics.Shared;
+using VelcroPhysics.Tools.ConvexHull.GiftWrap;
+using VelcroPhysics.Utilities;
 
 #endregion
 
@@ -117,7 +123,13 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        private Vector2[] vertices;
+        private IList<Vector2> vertices;
+
+
+        private DebugView debugView;
+        private World world;
+        private Body polygonBody;
+        private Body playerBody;
 
 
         /// <summary>
@@ -356,7 +368,88 @@ namespace CollisionFloatTestNewMono.Engine
                     width * GameHelper.TileSize, height * GameHelper.TileSize);
             }
         }
+        
+        /// <summary>
+        /// Returns the convex hull from the given vertices.
+        /// 
+        /// Giftwrap convex hull algorithm.
+        /// O(n * h) time complexity, where n is the number of points and h is the number of points on the convex hull.
+        /// See http://en.wikipedia.org/wiki/Gift_wrapping_algorithm for more details.
+        ///
+        /// Extracted from Box2D
+        ///
+        /// https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Tools/ConvexHull/GiftWrap/GiftWrap.cs
+        /// </summary>
+        /// <param name="vertices">The vertices.</param>
+        public static IList<Vector2> GetConvexHull(IList<Vector2> vertices)
+        {
+            if (vertices.Count <= 3)
+                return vertices;
 
+            // Find the right most point on the hull
+            var i0 = 0;
+            var x0 = vertices[0].X;
+            for (var i = 1; i < vertices.Count; ++i)
+            {
+                var x = vertices[i].X;
+                if (x > x0 || (x == x0 && vertices[i].Y < vertices[i0].Y))
+                {
+                    i0 = i;
+                    x0 = x;
+                }
+            }
+
+            var hull = new int[vertices.Count];
+            var m = 0;
+            var ih = i0;
+
+            for (;;)
+            {
+                hull[m] = ih;
+
+                var ie = 0;
+                for (var j = 1; j < vertices.Count; ++j)
+                {
+                    if (ie == ih)
+                    {
+                        ie = j;
+                        continue;
+                    }
+
+                    var r = vertices[ie] - vertices[hull[m]];
+                    var v = vertices[j] - vertices[hull[m]];
+                    var c = MathUtils.Cross(ref r, ref v);
+                    if (c < 0.0f)
+                    {
+                        ie = j;
+                    }
+
+                    // Collinearity check
+                    if (c == 0.0f && v.LengthSquared() > r.LengthSquared())
+                    {
+                        ie = j;
+                    }
+                }
+
+                ++m;
+                ih = ie;
+
+                if (ie == i0)
+                {
+                    break;
+                }
+            }
+
+            var result = new List<Vector2>(m);
+
+            // Copy vertices.
+            for (var i = 0; i < m; ++i)
+            {
+                result.Add(vertices[hull[i]]);
+            }
+            return result;
+        
+    }
 
         /// <summary>
         /// </summary>
@@ -379,8 +472,9 @@ namespace CollisionFloatTestNewMono.Engine
             this.camera.SetZoomLevel(1);
             this.camera.SetFocusPosition(Vector2.Zero);
 
+            //this.playerShape = new CircleShape("P", new Vector2(100 + 30 + ((100 / 2f) - (60 / 2f)), 40 + 10 + (100 / 2f - 60 / 2f)), 15);
 
-            this.playerShape = new CircleShape("P", new Vector2(100 + 30 + ((100 / 2f) - (60 / 2f)), 40 + 10 + (100 / 2f - 60 / 2f)), 15);
+            this.playerShape = new CircleShape("P", new Vector2(696, 386), 15);
 
             //this.playerShape = new CircleShape("P", new Vector2(500 + (100 / 2f - 60 / 2f), 500 + (100 / 2f - 60 / 2f)), 30);
 
@@ -404,13 +498,14 @@ namespace CollisionFloatTestNewMono.Engine
 
             var polyOffset = new Vector2(700, 400);
             var sightSize = new Vector2(150, 190);
-            this.vertices = new[]
+            var baseVertices = new[]
             {
-                polyOffset - new Vector2(-15, 0),
-                polyOffset - new Vector2(-sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
-                polyOffset - new Vector2(sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
-                polyOffset - new Vector2(15, 0),
+                polyOffset + new Vector2(sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
+                polyOffset + new Vector2(-sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
+                polyOffset + new Vector2(-15, 0),
+                polyOffset + new Vector2(15, 0),
             };
+            this.vertices = GetConvexHull(baseVertices);
             this.shapes.Add(new PolygonShape(this.vertices));
 
             var offset = new Vector2(120, 140);
@@ -466,6 +561,16 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(350 + offset.X, 100 + offset.Y)
             ));
 
+
+            this.world = new World(Vector2.Zero);
+            this.debugView = new DebugView(this.world);
+            this.debugView.LoadContent(graphicsDevice, content);
+            this.playerBody = BodyFactory.CreateCircle(this.world, ConvertUnits.ToSimUnits(this.playerShape.Radius), 0, bodyType: BodyType.Dynamic);
+            this.playerBody.SleepingAllowed = false;
+            this.polygonBody = BodyFactory.CreatePolygon(this.world, new Vertices(this.vertices.Select(ConvertUnits.ToSimUnits)), 0);
+            this.polygonBody.SleepingAllowed = false;
+            
+            this.playerBody.Position = ConvertUnits.ToSimUnits(this.playerShape.Position);
 
             //this.shapes.Add(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
             //this.shapes.Add(new RectangleShape("EventGate", new Rectangle(1376, 96, 192, 32)));
@@ -760,7 +865,30 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
 
-        public static void CollidePolygonAndCircle(int polygonARadius, Vector2[] polygonAVertices, CircleShape circleB)
+        public const float MaxFloat = float.MaxValue;
+        public const float Epsilon = 1.192092896e-07f;
+        public const float Pi = 3.14159265359f;
+
+        /// <summary>
+        /// A small length used as a collision and constraint tolerance. Usually it is
+        /// chosen to be numerically significant, but visually insignificant.
+        /// </summary>
+        public const float LinearSlop = 0.005f;
+
+        /// <summary>
+        /// The radius of the polygon/edge shape skin. This should not be modified. Making
+        /// this smaller means polygons will have an insufficient buffer for continuous collision.
+        /// Making it larger may create artifacts for vertex collision.
+        /// </summary>
+        public const float PolygonRadius = (2.0f * LinearSlop);
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="polygonA"></param>
+        /// <param name="circleB"></param>
+        public static void CollidePolygonAndCircle(PolygonShape polygonA, CircleShape circleB)
         {
             // Compute circle position in the frame of the polygon.
             var c = circleB.Position;
@@ -768,34 +896,46 @@ namespace CollisionFloatTestNewMono.Engine
 
             // Find the min separating edge.
             var normalIndex = 0;
-            var separation = -float.MaxValue;
-            float radius = polygonARadius + circleB.Radius;
-            var vertexCount = polygonAVertices.Length;
-            var vertices = polygonAVertices;
-            var normals = polygonAVertices; // polygonA.Normals;
+            var separation = -MaxFloat;
+            float radius = polygonA.Radius + circleB.Radius;
+            var vertexCount = polygonA.Vertices.Length;
+            var vertices = polygonA.Vertices;
+            var normals = polygonA.Normals;
 
-            //for (int i = 0; i < vertexCount; ++i)
-            //{
-            //    float s = Vector2.Dot(normals[i], cLocal - vertices[i]);
+            for (var i = 0; i < vertexCount; ++i)
+            {
+                var s = Vector2.Dot(normals[i], cLocal - vertices[i]);
 
-            //    if (s > radius)
-            //    {
-            //        // Early out.
-            //        return;
-            //    }
+                if (s > radius)
+                {
+                    // Early out.
+                    return;
+                }
 
-            //    if (s > separation)
-            //    {
-            //        separation = s;
-            //        normalIndex = i;
-            //    }
-            //}
+                if (s > separation)
+                {
+                    separation = s;
+                    normalIndex = i;
+                }
+            }
 
             // Vertices that subtend the incident face.
             var vertIndex1 = normalIndex;
             var vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
             var v1 = vertices[vertIndex1];
             var v2 = vertices[vertIndex2];
+
+            // If the center is inside the polygon ...
+            if (separation < Epsilon)
+            {
+                //manifold.PointCount = 1;
+                //manifold.Type = ManifoldType.FaceA;
+                //manifold.LocalNormal = normals[normalIndex];
+                //manifold.LocalPoint = 0.5f * (v1 + v2);
+                //manifold.Points.Value0.LocalPoint = circleB.Position;
+                //manifold.Points.Value0.Id.Key = 0;
+                return;
+            }
 
             // Compute barycentric coordinates
             var u1 = Vector2.Dot(cLocal - v1, v2 - v1);
@@ -846,6 +986,9 @@ namespace CollisionFloatTestNewMono.Engine
                 //manifold.LocalPoint = faceCenter;
                 //manifold.Points.Value0.LocalPoint = circleB.Position;
                 //manifold.Points.Value0.Id.Key = 0;
+
+                circleB.Velocity += s * normals[vertIndex1];
+                polygonA.Color = Color.Red;
             }
         }
 
@@ -931,7 +1074,7 @@ namespace CollisionFloatTestNewMono.Engine
             // Umliegende Shapes
             var currentWorldPosition = playerCircleShape.Position;
             var currentTilePosition = ConvertPositionToTilePosition(currentWorldPosition);
-            var allShapesAround = new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
+            var allShapesAround = this.shapes;// new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
 
             foreach (var shape in allShapesAround)
                 shape.Color = Color.Yellow;
@@ -1034,6 +1177,11 @@ namespace CollisionFloatTestNewMono.Engine
                                         }
 
                                         break;
+                                    case PolygonShape polygonShape:
+
+                                        CollidePolygonAndCircle(polygonShape, circleShape);
+
+                                        break;
                                 }
 
                                 break;
@@ -1064,6 +1212,9 @@ namespace CollisionFloatTestNewMono.Engine
                 }
             }
 
+            // Body
+            this.playerBody.Position = ConvertUnits.ToSimUnits(playerCircleShape.Position);
+
             // Camera
             this.camera.SetFocusPosition(playerCircleShape.Position);
             this.camera.Update(gameTime);
@@ -1071,6 +1222,8 @@ namespace CollisionFloatTestNewMono.Engine
             // Zwischenspeichern
             this.projection = Matrix.CreateOrthographicOffCenter(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, 0, 1);
             this.view = this.camera.ViewMatrixWithOffset;
+
+            this.world.Step(Math.Min((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f, (1f / 30f)));
         }
 
 
@@ -1086,6 +1239,12 @@ namespace CollisionFloatTestNewMono.Engine
                 spriteBatch.Draw(this.texture, Vector2.Zero, new Rectangle((int)-this.camera.ViewMatrixWithOffset.Translation.X, (int)-this.camera.ViewMatrixWithOffset.Translation.Y, this.camera.Viewport.Width, this.camera.Viewport.Height), Color.White);
                 spriteBatch.End();
             }
+            
+            // L/R/B/T
+            var projectionMatrix = Matrix.CreateOrthographicOffCenter(0f, ConvertUnits.ToSimUnits(this.camera.Viewport.Width), ConvertUnits.ToSimUnits(this.camera.Viewport.Height), 0f, 0f, 1f);
+            var viewMatrix = this.camera.DebugViewMatrix * Matrix.CreateTranslation(ConvertUnits.ToSimUnits(this.camera.ViewOffset.X), ConvertUnits.ToSimUnits(this.camera.ViewOffset.Y), 0);
+
+            this.debugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
 
             this.primitiveBatch.Begin(ref this.projection, ref this.view);
 
@@ -1139,6 +1298,7 @@ namespace CollisionFloatTestNewMono.Engine
             }
 
             this.primitiveBatch.End();
+
 
             spriteBatch.Begin();
             spriteBatch.DrawString(this.font, this.playerShape.Position + " : " + this.camera.CameraPosition, new Vector2(20, 20), Color.White);

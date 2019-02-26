@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using VelcroPhysics.Utilities;
 
 #endregion
 
@@ -73,6 +74,10 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         public Matrix ViewMatrixWithOffset => this.viewMatrixWithOffset;
+
+        /// <summary>
+        /// </summary>
+        public Matrix DebugViewMatrix { get; private set; }
 
 
         /// <summary>
@@ -179,6 +184,12 @@ namespace CollisionFloatTestNewMono.Engine
                               Matrix.CreateTranslation(targetOriginVector) *
                               this.scaleMatrix *
                               Matrix.CreateTranslation(new Vector3(this.Origin, 0f));
+            
+            // Matrix neuberechnen
+            this.DebugViewMatrix = Matrix.CreateTranslation(ConvertUnits.ToSimUnits(-this.positionWithOffset)) *
+                                   Matrix.CreateTranslation(ConvertUnits.ToSimUnits(targetOriginVector)) *
+                                   this.scaleMatrix *
+                                   Matrix.CreateTranslation(ConvertUnits.ToSimUnits(new Vector3(this.Origin, 0f)));
 
             // Invertieren
             Matrix.Invert(ref this.viewMatrix, out this.invertedViewMatrix);

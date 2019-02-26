@@ -1,49 +1,11 @@
 ﻿#region
 
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 
 #endregion
 
 namespace CollisionFloatTestNewMono.Engine
 {
-    public class PolygonShape : Shape
-    {
-        public Vector2[] Vertices { get; }
-        public Point[] PointVertices { get; }
-
-        public PolygonShape(Vector2[] vertices)
-        {
-            this.Vertices = vertices;
-            this.PointVertices = this.GeneratePoints(vertices).ToArray();
-        }
-
-        private IEnumerable<Point> GeneratePoints(Vector2[] vertices)
-        {
-            foreach (var vertex in vertices)
-            {
-                yield return GameHelper.ConvertPositionToTilePosition(vertex);
-            }
-        }
-    }
-
-    public class RectangleShape : Shape
-    {
-        public string Name { get; }
-
-        public Rectangle Rectangle { get; }
-
-        public Rectangle TileRectangle { get; }
-
-        public RectangleShape(string name, Rectangle rectangle)
-        {
-            this.Name = name;
-            this.Rectangle = rectangle;
-            this.TileRectangle = GameHelper.ConvertPositionToTilePosition(rectangle);
-        }
-    }
-
     public class CircleShape : Shape
     {
         public string Name { get; }
