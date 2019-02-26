@@ -399,7 +399,7 @@ namespace CollisionFloatTestNewMono.Engine
             var m = 0;
             var ih = i0;
 
-            for (;;)
+            for (; ; )
             {
                 hull[m] = ih;
 
