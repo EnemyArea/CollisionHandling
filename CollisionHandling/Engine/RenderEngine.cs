@@ -12,7 +12,6 @@ using VelcroPhysics.DebugViews.MonoGame;
 using VelcroPhysics.Dynamics;
 using VelcroPhysics.Factories;
 using VelcroPhysics.Shared;
-using VelcroPhysics.Tools.ConvexHull.GiftWrap;
 using VelcroPhysics.Utilities;
 
 #endregion
@@ -368,17 +367,14 @@ namespace CollisionFloatTestNewMono.Engine
                     width * GameHelper.TileSize, height * GameHelper.TileSize);
             }
         }
-        
+
         /// <summary>
-        /// Returns the convex hull from the given vertices.
-        /// 
-        /// Giftwrap convex hull algorithm.
-        /// O(n * h) time complexity, where n is the number of points and h is the number of points on the convex hull.
-        /// See http://en.wikipedia.org/wiki/Gift_wrapping_algorithm for more details.
-        ///
-        /// Extracted from Box2D
-        ///
-        /// https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Tools/ConvexHull/GiftWrap/GiftWrap.cs
+        ///     Returns the convex hull from the given vertices.
+        ///     Giftwrap convex hull algorithm.
+        ///     O(n * h) time complexity, where n is the number of points and h is the number of points on the convex hull.
+        ///     See http://en.wikipedia.org/wiki/Gift_wrapping_algorithm for more details.
+        ///     Extracted from Box2D
+        ///     https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Tools/ConvexHull/GiftWrap/GiftWrap.cs
         /// </summary>
         /// <param name="vertices">The vertices.</param>
         public static IList<Vector2> GetConvexHull(IList<Vector2> vertices)
@@ -447,9 +443,9 @@ namespace CollisionFloatTestNewMono.Engine
             {
                 result.Add(vertices[hull[i]]);
             }
+
             return result;
-        
-    }
+        }
 
         /// <summary>
         /// </summary>
@@ -569,7 +565,7 @@ namespace CollisionFloatTestNewMono.Engine
             this.playerBody.SleepingAllowed = false;
             this.polygonBody = BodyFactory.CreatePolygon(this.world, new Vertices(this.vertices.Select(ConvertUnits.ToSimUnits)), 0);
             this.polygonBody.SleepingAllowed = false;
-            
+
             this.playerBody.Position = ConvertUnits.ToSimUnits(this.playerShape.Position);
 
             //this.shapes.Add(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
@@ -870,47 +866,44 @@ namespace CollisionFloatTestNewMono.Engine
         public const float Pi = 3.14159265359f;
 
         /// <summary>
-        /// A small length used as a collision and constraint tolerance. Usually it is
-        /// chosen to be numerically significant, but visually insignificant.
+        ///     A small length used as a collision and constraint tolerance. Usually it is
+        ///     chosen to be numerically significant, but visually insignificant.
         /// </summary>
         public const float LinearSlop = 0.005f;
 
         /// <summary>
-        /// The radius of the polygon/edge shape skin. This should not be modified. Making
-        /// this smaller means polygons will have an insufficient buffer for continuous collision.
-        /// Making it larger may create artifacts for vertex collision.
+        ///     The radius of the polygon/edge shape skin. This should not be modified. Making
+        ///     this smaller means polygons will have an insufficient buffer for continuous collision.
+        ///     Making it larger may create artifacts for vertex collision.
         /// </summary>
         public const float PolygonRadius = (2.0f * LinearSlop);
 
 
         /// <summary>
-        /// 
+        /// Compute the collision between a polygon and a circle.
+        /// https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Collision/Narrowphase/CollideCircle.cs
         /// </summary>
-        /// <param name="polygonA"></param>
-        /// <param name="circleB"></param>
-        public static void CollidePolygonAndCircle(PolygonShape polygonA, CircleShape circleB)
+        /// <param name="polygonShape"></param>
+        /// <param name="circleShape"></param>
+        private static void CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
         {
             // Compute circle position in the frame of the polygon.
-            var c = circleB.Position;
-            var cLocal = circleB.Position;
+            var cLocal = circleShape.Position + circleShape.Velocity;
 
             // Find the min separating edge.
             var normalIndex = 0;
             var separation = -MaxFloat;
-            float radius = polygonA.Radius + circleB.Radius;
-            var vertexCount = polygonA.Vertices.Length;
-            var vertices = polygonA.Vertices;
-            var normals = polygonA.Normals;
+            var radius = polygonShape.Radius + circleShape.Radius;
+            var vertexCount = polygonShape.Vertices.Length;
+            var vertices = polygonShape.Vertices;
+            var normals = polygonShape.Normals;
 
             for (var i = 0; i < vertexCount; ++i)
             {
                 var s = Vector2.Dot(normals[i], cLocal - vertices[i]);
 
                 if (s > radius)
-                {
-                    // Early out.
                     return;
-                }
 
                 if (s > separation)
                 {
@@ -928,12 +921,8 @@ namespace CollisionFloatTestNewMono.Engine
             // If the center is inside the polygon ...
             if (separation < Epsilon)
             {
-                //manifold.PointCount = 1;
-                //manifold.Type = ManifoldType.FaceA;
-                //manifold.LocalNormal = normals[normalIndex];
-                //manifold.LocalPoint = 0.5f * (v1 + v2);
-                //manifold.Points.Value0.LocalPoint = circleB.Position;
-                //manifold.Points.Value0.Id.Key = 0;
+                circleShape.Velocity -= separation * normals[normalIndex] - new Vector2(circleShape.Radius) * normals[normalIndex];
+                polygonShape.Color = Color.Red;
                 return;
             }
 
@@ -944,51 +933,34 @@ namespace CollisionFloatTestNewMono.Engine
             if (u1 <= 0.0f)
             {
                 if (Vector2.DistanceSquared(cLocal, v1) > radius * radius)
-                {
                     return;
-                }
 
-                //manifold.PointCount = 1;
-                //manifold.Type = ManifoldType.FaceA;
-                //manifold.LocalNormal = cLocal - v1;
-                //manifold.LocalNormal.Normalize();
-                //manifold.LocalPoint = v1;
-                //manifold.Points.Value0.LocalPoint = circleB.Position;
-                //manifold.Points.Value0.Id.Key = 0;
+                var localNormal = cLocal - v1;
+                localNormal.Normalize();
+
+                circleShape.Velocity -= separation * localNormal - new Vector2(circleShape.Radius) * localNormal;
+                polygonShape.Color = Color.Red;
             }
             else if (u2 <= 0.0f)
             {
                 if (Vector2.DistanceSquared(cLocal, v2) > radius * radius)
-                {
                     return;
-                }
 
-                //manifold.PointCount = 1;
-                //manifold.Type = ManifoldType.FaceA;
-                //manifold.LocalNormal = cLocal - v2;
-                //manifold.LocalNormal.Normalize();
-                //manifold.LocalPoint = v2;
-                //manifold.Points.Value0.LocalPoint = circleB.Position;
-                //manifold.Points.Value0.Id.Key = 0;
+                var localNormal = cLocal - v2;
+                localNormal.Normalize();
+
+                circleShape.Velocity -= separation * localNormal - new Vector2(circleShape.Radius) * localNormal;
+                polygonShape.Color = Color.Red;
             }
             else
             {
                 var faceCenter = 0.5f * (v1 + v2);
                 var s = Vector2.Dot(cLocal - faceCenter, normals[vertIndex1]);
                 if (s > radius)
-                {
                     return;
-                }
 
-                //manifold.PointCount = 1;
-                //manifold.Type = ManifoldType.FaceA;
-                //manifold.LocalNormal = normals[vertIndex1];
-                //manifold.LocalPoint = faceCenter;
-                //manifold.Points.Value0.LocalPoint = circleB.Position;
-                //manifold.Points.Value0.Id.Key = 0;
-
-                circleB.Velocity += s * normals[vertIndex1];
-                polygonA.Color = Color.Red;
+                circleShape.Velocity -= s * normals[vertIndex1] - new Vector2(circleShape.Radius) * normals[vertIndex1];
+                polygonShape.Color = Color.Red;
             }
         }
 
@@ -1074,7 +1046,7 @@ namespace CollisionFloatTestNewMono.Engine
             // Umliegende Shapes
             var currentWorldPosition = playerCircleShape.Position;
             var currentTilePosition = ConvertPositionToTilePosition(currentWorldPosition);
-            var allShapesAround = this.shapes;// new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
+            var allShapesAround = this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
 
             foreach (var shape in allShapesAround)
                 shape.Color = Color.Yellow;
@@ -1239,7 +1211,7 @@ namespace CollisionFloatTestNewMono.Engine
                 spriteBatch.Draw(this.texture, Vector2.Zero, new Rectangle((int)-this.camera.ViewMatrixWithOffset.Translation.X, (int)-this.camera.ViewMatrixWithOffset.Translation.Y, this.camera.Viewport.Width, this.camera.Viewport.Height), Color.White);
                 spriteBatch.End();
             }
-            
+
             // L/R/B/T
             var projectionMatrix = Matrix.CreateOrthographicOffCenter(0f, ConvertUnits.ToSimUnits(this.camera.Viewport.Width), ConvertUnits.ToSimUnits(this.camera.Viewport.Height), 0f, 0f, 1f);
             var viewMatrix = this.camera.DebugViewMatrix * Matrix.CreateTranslation(ConvertUnits.ToSimUnits(this.camera.ViewOffset.X), ConvertUnits.ToSimUnits(this.camera.ViewOffset.Y), 0);
