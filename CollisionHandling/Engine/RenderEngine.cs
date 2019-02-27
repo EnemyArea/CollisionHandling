@@ -399,7 +399,7 @@ namespace CollisionFloatTestNewMono.Engine
             var m = 0;
             var ih = i0;
 
-            for (; ; )
+            while(true)
             {
                 hull[m] = ih;
 
@@ -883,20 +883,20 @@ namespace CollisionFloatTestNewMono.Engine
         /// Compute the collision between a polygon and a circle.
         /// https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Collision/Narrowphase/CollideCircle.cs
         /// </summary>
-        /// <param name="polygonShape"></param>
-        /// <param name="circleShape"></param>
-        private static void CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
+        /// <param name="polygonA"></param>
+        /// <param name="circleB"></param>
+        public static void CollidePolygonAndCircle(PolygonShape polygonA, CircleShape circleB)
         {
             // Compute circle position in the frame of the polygon.
-            var cLocal = circleShape.Position + circleShape.Velocity;
+            var cLocal = circleB.Position + circleB.Velocity;
 
             // Find the min separating edge.
             var normalIndex = 0;
             var separation = -MaxFloat;
-            var radius = polygonShape.Radius + circleShape.Radius;
-            var vertexCount = polygonShape.Vertices.Length;
-            var vertices = polygonShape.Vertices;
-            var normals = polygonShape.Normals;
+            var radius = polygonA.Radius + circleB.Radius;
+            var vertexCount = polygonA.Vertices.Length;
+            var vertices = polygonA.Vertices;
+            var normals = polygonA.Normals;
 
             for (var i = 0; i < vertexCount; ++i)
             {
@@ -921,8 +921,8 @@ namespace CollisionFloatTestNewMono.Engine
             // If the center is inside the polygon ...
             if (separation < Epsilon)
             {
-                circleShape.Velocity -= separation * normals[normalIndex] - new Vector2(circleShape.Radius) * normals[normalIndex];
-                polygonShape.Color = Color.Red;
+                circleB.Velocity -= separation * normals[normalIndex] - new Vector2(circleB.Radius) * normals[normalIndex];
+                polygonA.Color = Color.Red;
                 return;
             }
 
@@ -938,8 +938,8 @@ namespace CollisionFloatTestNewMono.Engine
                 var localNormal = cLocal - v1;
                 localNormal.Normalize();
 
-                circleShape.Velocity -= separation * localNormal - new Vector2(circleShape.Radius) * localNormal;
-                polygonShape.Color = Color.Red;
+                circleB.Velocity -= separation * localNormal - new Vector2(circleB.Radius) * localNormal;
+                polygonA.Color = Color.Red;
             }
             else if (u2 <= 0.0f)
             {
@@ -949,8 +949,8 @@ namespace CollisionFloatTestNewMono.Engine
                 var localNormal = cLocal - v2;
                 localNormal.Normalize();
 
-                circleShape.Velocity -= separation * localNormal - new Vector2(circleShape.Radius) * localNormal;
-                polygonShape.Color = Color.Red;
+                circleB.Velocity -= separation * localNormal - new Vector2(circleB.Radius) * localNormal;
+                polygonA.Color = Color.Red;
             }
             else
             {
@@ -959,8 +959,8 @@ namespace CollisionFloatTestNewMono.Engine
                 if (s > radius)
                     return;
 
-                circleShape.Velocity -= s * normals[vertIndex1] - new Vector2(circleShape.Radius) * normals[vertIndex1];
-                polygonShape.Color = Color.Red;
+                circleB.Velocity -= s * normals[vertIndex1] - new Vector2(circleB.Radius) * normals[vertIndex1];
+                polygonA.Color = Color.Red;
             }
         }
 
