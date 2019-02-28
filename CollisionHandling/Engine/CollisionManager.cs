@@ -11,6 +11,21 @@ using Microsoft.Xna.Framework;
 namespace CollisionFloatTestNewMono.Engine
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public enum ShapeContactType
+    {
+        None,
+
+        // Circle
+        Polygon,
+        CircleAndPolygon,
+        Circle,
+        LineAndPolygon,
+        CircleAndLine
+    }
+
+    /// <summary>
     /// </summary>
     public sealed class CollisionManager
     {
@@ -63,8 +78,8 @@ namespace CollisionFloatTestNewMono.Engine
             var reversedMapData = new int[width, height];
 
             for (var y = 0; y < height; y++)
-            for (var x = 0; x < width; x++)
-                reversedMapData[x, y] = mapCollisionData[y, x];
+                for (var x = 0; x < width; x++)
+                    reversedMapData[x, y] = mapCollisionData[y, x];
 
             return reversedMapData;
         }
@@ -289,86 +304,6 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        ///     Returns the convex hull from the given vertices.
-        ///     Giftwrap convex hull algorithm.
-        ///     O(n * h) time complexity, where n is the number of points and h is the number of points on the convex hull.
-        ///     See http://en.wikipedia.org/wiki/Gift_wrapping_algorithm for more details.
-        ///     Extracted from Box2D
-        ///     https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Tools/ConvexHull/GiftWrap/GiftWrap.cs
-        /// </summary>
-        /// <param name="vertices">The vertices.</param>
-        public IList<Vector2> GetConvexHull(IList<Vector2> vertices)
-        {
-            if (vertices.Count <= 3)
-                return vertices;
-
-            // Find the right most point on the hull
-            var i0 = 0;
-            var x0 = vertices[0].X;
-            for (var i = 1; i < vertices.Count; ++i)
-            {
-                var x = vertices[i].X;
-                if (x > x0 || (x == x0 && vertices[i].Y < vertices[i0].Y))
-                {
-                    i0 = i;
-                    x0 = x;
-                }
-            }
-
-            var hull = new int[vertices.Count];
-            var m = 0;
-            var ih = i0;
-
-            while (true)
-            {
-                hull[m] = ih;
-
-                var ie = 0;
-                for (var j = 1; j < vertices.Count; ++j)
-                {
-                    if (ie == ih)
-                    {
-                        ie = j;
-                        continue;
-                    }
-
-                    var r = vertices[ie] - vertices[hull[m]];
-                    var v = vertices[j] - vertices[hull[m]];
-                    var c = MathUtils.Cross(ref r, ref v);
-                    if (c < 0.0f)
-                    {
-                        ie = j;
-                    }
-
-                    // Collinearity check
-                    if (c == 0.0f && v.LengthSquared() > r.LengthSquared())
-                    {
-                        ie = j;
-                    }
-                }
-
-                ++m;
-                ih = ie;
-
-                if (ie == i0)
-                {
-                    break;
-                }
-            }
-
-            var result = new List<Vector2>(m);
-
-            // Copy vertices.
-            for (var i = 0; i < m; ++i)
-            {
-                result.Add(vertices[hull[i]]);
-            }
-
-            return result;
-        }
-
-
-        /// <summary>
         ///     A + dot(AP,AB) / dot(AB,AB) * AB
         /// </summary>
         /// <param name="linePoint1"></param>
@@ -485,9 +420,9 @@ namespace CollisionFloatTestNewMono.Engine
         ///     Compute the collision between a polygon and a circle.
         ///     https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Collision/Narrowphase/CollideCircle.cs
         /// </summary>
-        /// <param name="polygonShape"></param>
         /// <param name="circleShape"></param>
-        public Vector2 CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
+        /// <param name="polygonShape"></param>
+        public Vector2 CollideCircleAndPolygon(CircleShape circleShape, PolygonShape polygonShape)
         {
             // Find the min separating edge.
             var normalIndex = 0;
@@ -519,9 +454,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             // If the center is inside the polygon ...
             if (separation < Epsilon)
-            {
-                return separation * normals[normalIndex] - new Vector2(circleShape.Radius) * normals[normalIndex];
-            }
+                return new Vector2(circleShape.Radius) * normals[normalIndex] - separation * normals[normalIndex];
 
             // Compute barycentric coordinates
             var u1 = Vector2.Dot(center - v1, v2 - v1);
@@ -535,7 +468,7 @@ namespace CollisionFloatTestNewMono.Engine
                 var localNormal = center - v1;
                 localNormal.Normalize();
 
-                return separation * localNormal - new Vector2(circleShape.Radius) * localNormal;
+                return new Vector2(circleShape.Radius) * localNormal - separation * localNormal;
             }
 
             if (u2 <= 0.0f)
@@ -546,7 +479,7 @@ namespace CollisionFloatTestNewMono.Engine
                 var localNormal = center - v2;
                 localNormal.Normalize();
 
-                return separation * localNormal - new Vector2(circleShape.Radius) * localNormal;
+                return new Vector2(circleShape.Radius) * localNormal - separation * localNormal;
             }
 
             var faceCenter = 0.5f * (v1 + v2);
@@ -554,7 +487,7 @@ namespace CollisionFloatTestNewMono.Engine
             if (sDot > radius)
                 return Vector2.Zero;
 
-            return sDot * normals[vertIndex1] - new Vector2(circleShape.Radius) * normals[vertIndex1];
+            return new Vector2(circleShape.Radius) * normals[vertIndex1] - sDot * normals[vertIndex1];
         }
 
 
@@ -603,36 +536,28 @@ namespace CollisionFloatTestNewMono.Engine
 
                 var nearestVectorTop = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineTopStart, lineTopEnd);
                 if (nearestVectorTop != Vector2.Zero)
-                {
                     newVelocity += nearestVectorTop;
-                }
 
                 var lineLeftStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
                 var lineLeftEnd = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
 
                 var nearestVectorLeft = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineLeftStart, lineLeftEnd);
                 if (nearestVectorLeft != Vector2.Zero)
-                {
                     newVelocity += nearestVectorLeft;
-                }
 
                 var lineBottomStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
                 var lineBottomEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
 
                 var nearestVectorBottom = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineBottomStart, lineBottomEnd);
                 if (nearestVectorBottom != Vector2.Zero)
-                {
                     newVelocity += nearestVectorBottom;
-                }
 
                 var lineRightStart = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
                 var lineRightEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
 
                 var nearestVectorRight = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineRightStart, lineRightEnd);
                 if (nearestVectorRight != Vector2.Zero)
-                {
                     newVelocity += nearestVectorRight;
-                }
             }
 
             return newVelocity;

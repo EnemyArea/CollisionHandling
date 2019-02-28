@@ -29,7 +29,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         private CircleShape playerShape;
-        
+
         /// <summary>
         /// </summary>
         private KeyboardState oldState;
@@ -73,7 +73,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         private PrimitiveBatch primitiveBatch;
-        
+
         /// <summary>
         /// </summary>
         private Matrix projection;
@@ -150,7 +150,7 @@ namespace CollisionFloatTestNewMono.Engine
                 polyOffset + new Vector2(-15, 0),
                 polyOffset + new Vector2(15, 0),
             };
-            this.vertices = this.collisionManager.GetConvexHull(baseVertices);
+            this.vertices = GameHelper.GetConvexHull(baseVertices);
             this.shapes.Add(new PolygonShape(this.vertices));
 
             var offset = new Vector2(120, 140);
@@ -362,7 +362,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             //var lines = this.collisionManager.CreateHullForBody(this.mapWith, this.mapHeight, mapData, true);
             //this.shapes.AddRange(lines);
-            
+
             this.grid = new CollisionGrid<Shape>(this.mapWith, this.mapHeight, this.mapWith * GameHelper.TileSize, this.mapHeight * GameHelper.TileSize);
 
             foreach (var shape in this.shapes)
@@ -509,60 +509,49 @@ namespace CollisionFloatTestNewMono.Engine
                     {
                         if (shape == shapeObs || (playerCircleShape == shapeObs))
                             continue;
+                        
+                        var shapeContactType = ShapeContactType.None;
+                        var newVelocity = Vector2.Zero;
 
-                        switch (shape)
+                        if (shape is CircleShape && shapeObs is CircleShape)
+                            shapeContactType = ShapeContactType.Circle;
+                     
+                        if (shape is CircleShape && shapeObs is LineShape)
+                            shapeContactType = ShapeContactType.CircleAndLine;
+                        
+                        if (shape is CircleShape && shapeObs is PolygonShape)
+                            shapeContactType = ShapeContactType.CircleAndPolygon;
+
+                        switch (shapeContactType)
                         {
-                            case CircleShape circleShape:
+                            case ShapeContactType.Circle:
 
-                                switch (shapeObs)
-                                {
-                                    case CircleShape circleShapeObs:
-                                        {
-                                            var newVelocity = this.collisionManager.CircleAndCircle(circleShape, circleShapeObs);
-                                            if (newVelocity != Vector2.Zero)
-                                            {
-                                                circleShape.Velocity += newVelocity;
-                                                circleShapeObs.Color = Color.Red;
-                                                hasCollison = true;
-                                            }
-                                        }
-                                        break;
-                                    case LineShape lineShape:
-                                        {
-                                            var newVelocity = this.collisionManager.CircleAndLine(circleShape, lineShape);
-                                            if (newVelocity != Vector2.Zero)
-                                            {
-                                                circleShape.Velocity += newVelocity;
-                                                lineShape.Color = Color.Red;
-                                                hasCollison = true;
-                                            }
-                                        }
-                                        break;
-                                    case RectangleShape rectangleShape:
-                                        {
-                                            var newVelocity = this.collisionManager.CircleAndRectangle(circleShape, rectangleShape);
-                                            if (newVelocity != Vector2.Zero)
-                                            {
-                                                circleShape.Velocity += newVelocity;
-                                                rectangleShape.Color = Color.Red;
-                                                hasCollison = true;
-                                            }
-                                        }
-                                        break;
-                                    case PolygonShape polygonShape:
-                                        {
-                                            var newVelocity = this.collisionManager.CollidePolygonAndCircle(polygonShape, circleShape);
-                                            if (newVelocity != Vector2.Zero)
-                                            {
-                                                circleShape.Velocity -= newVelocity;
-                                                polygonShape.Color = Color.Red;
-                                                hasCollison = true;
-                                            }
-                                        }
-                                        break;
-                                }
+                                newVelocity = this.collisionManager.CircleAndCircle((CircleShape)shape, (CircleShape)shapeObs);
 
                                 break;
+                            case ShapeContactType.CircleAndLine:
+
+                                newVelocity = this.collisionManager.CircleAndLine((CircleShape)shape, (LineShape)shapeObs);
+
+                                break;
+                            case ShapeContactType.CircleAndPolygon:
+
+                                newVelocity = this.collisionManager.CollideCircleAndPolygon((CircleShape)shape,(PolygonShape)shapeObs);
+
+                                break;
+                            case ShapeContactType.LineAndPolygon:
+                                
+                                break;
+                            case ShapeContactType.Polygon:
+                                
+                                break;
+                        }
+
+                        if (newVelocity != Vector2.Zero)
+                        {
+                            shape.Velocity += newVelocity;
+                            shapeObs.Color = Color.Red;
+                            hasCollison = true;
                         }
                     }
 
