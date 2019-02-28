@@ -21,7 +21,7 @@ namespace CollisionFloatTestNewMono.Engine
         Polygon,
         CircleAndPolygon,
         Circle,
-        LineAndPolygon,
+        PolygonAndLine,
         CircleAndLine
     }
 

@@ -498,18 +498,20 @@ namespace CollisionFloatTestNewMono.Engine
                     {
                         if (shape == shapeObs || (playerCircleShape == shapeObs))
                             continue;
-                        
+
                         var shapeContactType = ShapeContactType.None;
                         var newVelocity = Vector2.Zero;
 
                         if (shape is CircleShape && shapeObs is CircleShape)
                             shapeContactType = ShapeContactType.Circle;
-                     
-                        if (shape is CircleShape && shapeObs is LineShape)
+                        else if (shape is CircleShape && shapeObs is LineShape)
                             shapeContactType = ShapeContactType.CircleAndLine;
-                        
-                        if (shape is CircleShape && shapeObs is PolygonShape)
+                        else if (shape is CircleShape && shapeObs is PolygonShape)
                             shapeContactType = ShapeContactType.CircleAndPolygon;
+                        else if (shape is PolygonShape && shapeObs is PolygonShape)
+                            shapeContactType = ShapeContactType.Polygon;
+                        else if (shape is PolygonShape && shapeObs is LineShape)
+                            shapeContactType = ShapeContactType.PolygonAndLine;
 
                         switch (shapeContactType)
                         {
@@ -525,14 +527,14 @@ namespace CollisionFloatTestNewMono.Engine
                                 break;
                             case ShapeContactType.CircleAndPolygon:
 
-                                newVelocity = this.collisionManager.CollideCircleAndPolygon((CircleShape)shape,(PolygonShape)shapeObs);
+                                newVelocity = this.collisionManager.CollideCircleAndPolygon((CircleShape)shape, (PolygonShape)shapeObs);
 
                                 break;
-                            case ShapeContactType.LineAndPolygon:
-                                
+                            case ShapeContactType.PolygonAndLine:
+
                                 break;
                             case ShapeContactType.Polygon:
-                                
+
                                 break;
                         }
 
