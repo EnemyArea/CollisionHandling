@@ -402,16 +402,6 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        /// </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        private static Point ConvertPositionToTilePosition(Vector2 position)
-        {
-            return new Point((int)(position.X / GameHelper.TileSize), (int)(position.Y / GameHelper.TileSize));
-        }
-
-
-        /// <summary>
         ///     Update the tile engine.
         /// </summary>
         public void Update(GameTime gameTime)
@@ -420,7 +410,6 @@ namespace CollisionFloatTestNewMono.Engine
 
             // Time
             var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
 
             if (newState.IsKeyDown(Keys.F1) && !this.oldState.IsKeyDown(Keys.F1))
                 this.showTexture = !this.showTexture;
@@ -491,7 +480,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             // Umliegende Shapes
             var currentWorldPosition = playerCircleShape.Position;
-            var currentTilePosition = ConvertPositionToTilePosition(currentWorldPosition);
+            var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
             var allShapesAround = this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
 
             foreach (var shape in allShapesAround)
@@ -627,26 +616,6 @@ namespace CollisionFloatTestNewMono.Engine
                     case LineShape lineShape:
 
                         this.primitiveBatch.DrawSegment(lineShape.Start, lineShape.End, lineShape.Color);
-
-                        break;
-                    case RectangleShape rectangleShape:
-
-                        var lineTopStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
-                        var lineTopEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
-
-                        var lineLeftStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
-                        var lineLeftEnd = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
-
-                        var lineBottomStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
-                        var lineBottomEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
-
-                        var lineRightStart = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
-                        var lineRightEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
-
-                        this.primitiveBatch.DrawSegment(lineTopStart, lineTopEnd, rectangleShape.Color);
-                        this.primitiveBatch.DrawSegment(lineLeftStart, lineLeftEnd, rectangleShape.Color);
-                        this.primitiveBatch.DrawSegment(lineBottomStart, lineBottomEnd, rectangleShape.Color);
-                        this.primitiveBatch.DrawSegment(lineRightStart, lineRightEnd, rectangleShape.Color);
 
                         break;
                     case PolygonShape polygonShape:

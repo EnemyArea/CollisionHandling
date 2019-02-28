@@ -355,50 +355,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             return Vector2.Zero;
         }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="radius"></param>
-        /// <param name="lineStart"></param>
-        /// <param name="lineEnd"></param>
-        /// <returns></returns>
-        private Vector2 CircleAndLine(Vector2 position, float radius, Vector2 lineStart, Vector2 lineEnd)
-        {
-            var nearestVector = Vector2.Zero;
-            var pointOnLine = ProjectPointOnLine(lineStart, lineEnd, position);
-            var localNearestVector = FindNearestExitVector(pointOnLine, position, radius);
-
-            var isPointInSegment = IsProjectedPointOnLine(lineStart, lineEnd, pointOnLine);
-            if (isPointInSegment)
-            {
-                nearestVector.X += localNearestVector.X;
-                nearestVector.Y += localNearestVector.Y;
-
-                position.X += localNearestVector.X;
-                position.Y += localNearestVector.Y;
-            }
-            else
-            {
-                // check if line points are intersecting
-                var nv1 = FindNearestExitVector(lineStart, position, radius);
-
-                nearestVector.X += nv1.X;
-                nearestVector.Y += nv1.Y;
-                position.X += nv1.X;
-                position.Y += nv1.Y;
-
-                var nv2 = FindNearestExitVector(lineEnd, position, radius);
-                nearestVector.X += nv2.X;
-                nearestVector.Y += nv2.Y;
-                position.X += nv2.X;
-                position.Y += nv2.Y;
-            }
-
-            return nearestVector;
-        }
-
+        
 
         /// <summary>
         /// </summary>
@@ -410,9 +367,38 @@ namespace CollisionFloatTestNewMono.Engine
             var center = circleShape.Position + circleShape.Velocity;
             var radius = circleShape.Radius;
             var lineStart = lineShape.Start;
-            var lineEnd = lineShape.End;
+            var lineEnd = lineShape.End;           
+            var nearestVector = Vector2.Zero;
+            var pointOnLine = ProjectPointOnLine(lineStart, lineEnd, center);
+            var localNearestVector = FindNearestExitVector(pointOnLine, center, radius);
 
-            return this.CircleAndLine(center, radius, lineStart, lineEnd);
+            var isPointInSegment = IsProjectedPointOnLine(lineStart, lineEnd, pointOnLine);
+            if (isPointInSegment)
+            {
+                nearestVector.X += localNearestVector.X;
+                nearestVector.Y += localNearestVector.Y;
+
+                center.X += localNearestVector.X;
+                center.Y += localNearestVector.Y;
+            }
+            else
+            {
+                // check if line points are intersecting
+                var nv1 = FindNearestExitVector(lineStart, center, radius);
+
+                nearestVector.X += nv1.X;
+                nearestVector.Y += nv1.Y;
+                center.X += nv1.X;
+                center.Y += nv1.Y;
+
+                var nv2 = FindNearestExitVector(lineEnd, center, radius);
+                nearestVector.X += nv2.X;
+                nearestVector.Y += nv2.Y;
+                center.X += nv2.X;
+                center.Y += nv2.Y;
+            }
+
+            return nearestVector;
         }
 
 
@@ -510,57 +496,6 @@ namespace CollisionFloatTestNewMono.Engine
             }
 
             return Vector2.Zero;
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="circleShape"></param>
-        /// <param name="rectangleShape"></param>
-        /// <returns></returns>
-        public Vector2 CircleAndRectangle(CircleShape circleShape, RectangleShape rectangleShape)
-        {
-            var v = new Vector2(
-                MathHelper.Clamp(circleShape.Position.X + circleShape.Velocity.X, rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Right),
-                MathHelper.Clamp(circleShape.Position.Y + circleShape.Velocity.Y, rectangleShape.Rectangle.Top, rectangleShape.Rectangle.Bottom));
-
-            var newVelocity = Vector2.Zero;
-            var collisionDirection = (circleShape.Position + circleShape.Velocity) - v;
-            var distanceSquared = collisionDirection.LengthSquared();
-
-            var isColliding = distanceSquared > 0 && (distanceSquared < circleShape.Radius * circleShape.Radius);
-            if (isColliding)
-            {
-                var lineTopStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
-                var lineTopEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
-
-                var nearestVectorTop = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineTopStart, lineTopEnd);
-                if (nearestVectorTop != Vector2.Zero)
-                    newVelocity += nearestVectorTop;
-
-                var lineLeftStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
-                var lineLeftEnd = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
-
-                var nearestVectorLeft = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineLeftStart, lineLeftEnd);
-                if (nearestVectorLeft != Vector2.Zero)
-                    newVelocity += nearestVectorLeft;
-
-                var lineBottomStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
-                var lineBottomEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
-
-                var nearestVectorBottom = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineBottomStart, lineBottomEnd);
-                if (nearestVectorBottom != Vector2.Zero)
-                    newVelocity += nearestVectorBottom;
-
-                var lineRightStart = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
-                var lineRightEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
-
-                var nearestVectorRight = this.CircleAndLine(circleShape.Position + circleShape.Velocity + newVelocity, circleShape.Radius, lineRightStart, lineRightEnd);
-                if (nearestVectorRight != Vector2.Zero)
-                    newVelocity += nearestVectorRight;
-            }
-
-            return newVelocity;
         }
     }
 }
