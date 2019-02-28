@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
+using VelcroPhysics.Collision.ContactSystem;
 
 #endregion
 
@@ -13,16 +14,17 @@ namespace CollisionFloatTestNewMono.Engine
     /// <summary>
     /// 
     /// </summary>
+    [Flags]
     public enum ShapeContactType
     {
-        None,
+        NotSupported,
 
-        // Circle
         Polygon,
-        CircleAndPolygon,
         Circle,
-        PolygonAndLine,
-        CircleAndLine
+        Line,
+        LineAndCircle,
+        PolygonAndCircle,
+        LineAndPolygon
     }
 
     /// <summary>

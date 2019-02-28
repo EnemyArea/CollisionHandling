@@ -5,9 +5,9 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CollisionHandling", "CollisionHandling\CollisionHandling.csproj", "{6DE9DD49-9702-4F67-864B-2EBC7FA47879}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VelcroPhysics.MonoGame", "..\..\Users\kcissarek\Downloads\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\VelcroPhysics\VelcroPhysics.MonoGame.csproj", "{A1E006CF-211A-4025-9CA8-838C6E37C615}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VelcroPhysics.MonoGame", "..\VelcroPhysics\VelcroPhysics\VelcroPhysics.MonoGame.csproj", "{A1E006CF-211A-4025-9CA8-838C6E37C615}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame", "..\..\Users\kcissarek\Downloads\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\DebugViews\MonoGame\MonoGame.csproj", "{C3165802-740A-4B3F-91B5-5416D9647C7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MonoGame", "..\VelcroPhysics\DebugViews\MonoGame\MonoGame.csproj", "{C3165802-740A-4B3F-91B5-5416D9647C7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

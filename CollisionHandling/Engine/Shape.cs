@@ -12,8 +12,13 @@ namespace CollisionFloatTestNewMono.Engine
 
         public Vector2 Velocity { get; set; }
 
-        protected Shape()
+        public virtual Vector2 Position { get; set; }
+
+        public ShapeContactType ShapeContactType { get;}
+
+        protected Shape(ShapeContactType shapeContactType)
         {
+            this.ShapeContactType = shapeContactType;
             this.Color = Color.Gray;
         }
     }

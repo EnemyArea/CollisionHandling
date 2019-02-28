@@ -78,11 +78,11 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Users\kcissarek\Downloads\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\DebugViews\MonoGame\MonoGame.csproj">
+    <ProjectReference Include="..\..\VelcroPhysics\DebugViews\MonoGame\MonoGame.csproj">
       <Project>{c3165802-740a-4b3f-91b5-5416d9647c7a}</Project>
       <Name>MonoGame</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Users\kcissarek\Downloads\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\VelcroPhysics-1456abf40e4c30065bf122f409ce60ce3873ff09\VelcroPhysics\VelcroPhysics.MonoGame.csproj">
+    <ProjectReference Include="..\..\VelcroPhysics\VelcroPhysics\VelcroPhysics.MonoGame.csproj">
       <Project>{A1E006CF-211A-4025-9CA8-838C6E37C615}</Project>
       <Name>VelcroPhysics.MonoGame</Name>
     </ProjectReference>

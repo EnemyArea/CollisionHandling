@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -9,9 +10,6 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using VelcroPhysics.DebugViews.MonoGame;
 using VelcroPhysics.Dynamics;
-using VelcroPhysics.Factories;
-using VelcroPhysics.Shared;
-using VelcroPhysics.Utilities;
 
 #endregion
 
@@ -28,7 +26,7 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        private CircleShape playerShape;
+        private Shape playerShape;
 
         /// <summary>
         /// </summary>
@@ -91,6 +89,30 @@ namespace CollisionFloatTestNewMono.Engine
         private CollisionManager collisionManager;
 
 
+        /// <summary>
+        /// </summary>
+        private static readonly ShapeContactType[,] registers =
+        {
+            {
+                ShapeContactType.Circle,
+                ShapeContactType.Line,
+                ShapeContactType.PolygonAndCircle,
+                ShapeContactType.NotSupported
+            },
+            {
+                ShapeContactType.LineAndCircle,
+                ShapeContactType.NotSupported,
+                ShapeContactType.LineAndCircle,
+                ShapeContactType.NotSupported
+            },
+            {
+                ShapeContactType.PolygonAndCircle,
+                ShapeContactType.LineAndPolygon,
+                ShapeContactType.Polygon,
+                ShapeContactType.NotSupported
+            }
+        };
+
         private DebugView debugView;
         private World world;
         private Body polygonBody;
@@ -119,7 +141,18 @@ namespace CollisionFloatTestNewMono.Engine
 
             //this.playerShape = new CircleShape("P", new Vector2(100 + 30 + ((100 / 2f) - (60 / 2f)), 40 + 10 + (100 / 2f - 60 / 2f)), 15);
 
-            this.playerShape = new CircleShape("P", new Vector2(696, 386), 15);
+            //this.playerShape = new CircleShape("P", new Vector2(696, 386), 15);
+
+            var size = new Vector2(20, 30);
+            this.playerShape = new PolygonShape(GameHelper.GetConvexHull(new[]
+            {
+                new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-20, 0),
+                new Vector2(20, 0),
+            }));
+            this.playerShape.Position = new Vector2(500 + (100 / 2f - 60 / 2f), 500 + (100 / 2f - 60 / 2f));
+
 
             //this.playerShape = new CircleShape("P", new Vector2(500 + (100 / 2f - 60 / 2f), 500 + (100 / 2f - 60 / 2f)), 30);
 
@@ -207,15 +240,15 @@ namespace CollisionFloatTestNewMono.Engine
             ));
 
 
-            this.world = new World(Vector2.Zero);
-            this.debugView = new DebugView(this.world);
-            this.debugView.LoadContent(graphicsDevice, content);
-            this.playerBody = BodyFactory.CreateCircle(this.world, ConvertUnits.ToSimUnits(this.playerShape.Radius), 0, bodyType: BodyType.Dynamic);
-            this.playerBody.SleepingAllowed = false;
-            this.polygonBody = BodyFactory.CreatePolygon(this.world, new Vertices(this.vertices.Select(ConvertUnits.ToSimUnits)), 0);
-            this.polygonBody.SleepingAllowed = false;
+            //this.world = new World(Vector2.Zero);
+            //this.debugView = new DebugView(this.world);
+            //this.debugView.LoadContent(graphicsDevice, content);
+            //this.playerBody = BodyFactory.CreateCircle(this.world, ConvertUnits.ToSimUnits(this.playerShape.Radius), 0, bodyType: BodyType.Dynamic);
+            //this.playerBody.SleepingAllowed = false;
+            //this.polygonBody = BodyFactory.CreatePolygon(this.world, new Vertices(this.vertices.Select(ConvertUnits.ToSimUnits)), 0);
+            //this.polygonBody.SleepingAllowed = false;
 
-            this.playerBody.Position = ConvertUnits.ToSimUnits(this.playerShape.Position);
+            //this.playerBody.Position = ConvertUnits.ToSimUnits(this.playerShape.Position);
 
             //this.shapes.Add(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
             //this.shapes.Add(new RectangleShape("EventGate", new Rectangle(1376, 96, 192, 32)));
@@ -465,21 +498,20 @@ namespace CollisionFloatTestNewMono.Engine
             //    }
             //}
 
-            var playerCircleShape = this.playerShape;
-            playerCircleShape.Color = Color.Fuchsia;
-            playerCircleShape.Velocity = Vector2.Zero;
+            this.playerShape.Color = Color.Fuchsia;
+            this.playerShape.Velocity = Vector2.Zero;
 
             if (velocityDirection != Vector2.Zero)
             {
                 velocityDirection.Normalize();
-                playerCircleShape.Velocity += velocityDirection * this.playerSpeed * elapsed;
+                this.playerShape.Velocity += velocityDirection * this.playerSpeed * elapsed;
             }
 
             foreach (var shape in this.shapes)
                 shape.Color = Color.Fuchsia;
 
             // Umliegende Shapes
-            var currentWorldPosition = playerCircleShape.Position;
+            var currentWorldPosition = this.playerShape.Position;
             var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
             var allShapesAround = this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
 
@@ -496,53 +528,47 @@ namespace CollisionFloatTestNewMono.Engine
 
                     foreach (var shapeObs in allShapesAround)
                     {
-                        if (shape == shapeObs || (playerCircleShape == shapeObs))
+                        if (shape == shapeObs || (this.playerShape == shapeObs))
                             continue;
-
-                        var shapeContactType = ShapeContactType.None;
+                        
                         var newVelocity = Vector2.Zero;
+                        
+                        var shapeContactType = registers[(int)shape.ShapeContactType, (int)shapeObs.ShapeContactType];
+                        Debug.WriteLine(shapeContactType);
 
-                        if (shape is CircleShape && shapeObs is CircleShape)
-                            shapeContactType = ShapeContactType.Circle;
-                        else if (shape is CircleShape && shapeObs is LineShape)
-                            shapeContactType = ShapeContactType.CircleAndLine;
-                        else if (shape is CircleShape && shapeObs is PolygonShape)
-                            shapeContactType = ShapeContactType.CircleAndPolygon;
-                        else if (shape is PolygonShape && shapeObs is PolygonShape)
-                            shapeContactType = ShapeContactType.Polygon;
-                        else if (shape is PolygonShape && shapeObs is LineShape)
-                            shapeContactType = ShapeContactType.PolygonAndLine;
-
-                        switch (shapeContactType)
+                        if (shape == this.playerShape && shapeObs is CircleShape && shapeContactType == ShapeContactType.PolygonAndCircle)
                         {
-                            case ShapeContactType.Circle:
+                            //switch (shapeContactType)
+                            //{
+                            //    case ShapeContactType.Circle:
 
-                                newVelocity = this.collisionManager.CircleAndCircle((CircleShape)shape, (CircleShape)shapeObs);
+                            //        newVelocity = this.collisionManager.CircleAndCircle((CircleShape)shape, (CircleShape)shapeObs);
 
-                                break;
-                            case ShapeContactType.CircleAndLine:
+                            //        break;
+                            //    case ShapeContactType.CircleAndLine:
 
-                                newVelocity = this.collisionManager.CircleAndLine((CircleShape)shape, (LineShape)shapeObs);
+                            //        newVelocity = this.collisionManager.CircleAndLine((CircleShape)shape, (LineShape)shapeObs);
 
-                                break;
-                            case ShapeContactType.CircleAndPolygon:
+                            //        break;
+                            //    case ShapeContactType.CircleAndPolygon:
 
-                                newVelocity = this.collisionManager.CollideCircleAndPolygon((CircleShape)shape, (PolygonShape)shapeObs);
+                            //        newVelocity = this.collisionManager.CollideCircleAndPolygon((CircleShape)shape, (PolygonShape)shapeObs);
 
-                                break;
-                            case ShapeContactType.PolygonAndLine:
+                            //        break;
+                            //    case ShapeContactType.PolygonAndLine:
 
-                                break;
-                            case ShapeContactType.Polygon:
+                            //        break;
+                            //    case ShapeContactType.Polygon:
 
-                                break;
-                        }
+                            //        break;
+                            //}
 
-                        if (newVelocity != Vector2.Zero)
-                        {
-                            shape.Velocity += newVelocity;
-                            shapeObs.Color = Color.Red;
-                            hasCollison = true;
+                            if (newVelocity != Vector2.Zero)
+                            {
+                                shape.Velocity += newVelocity;
+                                shapeObs.Color = Color.Red;
+                                hasCollison = true;
+                            }
                         }
                     }
 
@@ -552,36 +578,44 @@ namespace CollisionFloatTestNewMono.Engine
             }
 
             // Bewegen
-            foreach (var shape in this.grid.Items.ToArray())
+            foreach (var shape in allShapesAround)
             {
                 if (shape.Velocity != Vector2.Zero)
                 {
                     switch (shape)
                     {
                         case CircleShape circleShape:
-
-                            var result = circleShape.Velocity;
-                            circleShape.Position += new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y));
-                            this.grid.Move(shape, circleShape.TilePosition);
-                            circleShape.Velocity = Vector2.Zero;
-
+                            {
+                                var result = circleShape.Velocity;
+                                circleShape.Position += new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y));
+                                this.grid.Move(shape, circleShape.TilePosition);
+                                circleShape.Velocity = Vector2.Zero;
+                            }
+                            break;
+                        case PolygonShape polygonShape:
+                            {
+                                var result = polygonShape.Velocity;
+                                polygonShape.Position += new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y));
+                                //this.grid.Move(shape, polygonShape.TilePosition);
+                                polygonShape.Velocity = Vector2.Zero;
+                            }
                             break;
                     }
                 }
             }
 
-            // Body
-            this.playerBody.Position = ConvertUnits.ToSimUnits(playerCircleShape.Position);
+            //// Body
+            //this.playerBody.Position = ConvertUnits.ToSimUnits(playerCircleShape.Position);
 
             // Camera
-            this.camera.SetFocusPosition(playerCircleShape.Position);
+            this.camera.SetFocusPosition(this.playerShape.Position);
             this.camera.Update(gameTime);
 
             // Zwischenspeichern
             this.projection = Matrix.CreateOrthographicOffCenter(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, 0, 1);
             this.view = this.camera.ViewMatrixWithOffset;
 
-            this.world.Step(Math.Min((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f, (1f / 30f)));
+            //this.world.Step(Math.Min((float)gameTime.ElapsedGameTime.TotalMilliseconds * 0.001f, (1f / 30f)));
         }
 
 
@@ -598,11 +632,10 @@ namespace CollisionFloatTestNewMono.Engine
                 spriteBatch.End();
             }
 
-            // L/R/B/T
-            var projectionMatrix = Matrix.CreateOrthographicOffCenter(0f, ConvertUnits.ToSimUnits(this.camera.Viewport.Width), ConvertUnits.ToSimUnits(this.camera.Viewport.Height), 0f, 0f, 1f);
-            var viewMatrix = this.camera.DebugViewMatrix * Matrix.CreateTranslation(ConvertUnits.ToSimUnits(this.camera.ViewOffset.X), ConvertUnits.ToSimUnits(this.camera.ViewOffset.Y), 0);
-
-            this.debugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
+            //// L/R/B/T
+            //var projectionMatrix = Matrix.CreateOrthographicOffCenter(0f, ConvertUnits.ToSimUnits(this.camera.Viewport.Width), ConvertUnits.ToSimUnits(this.camera.Viewport.Height), 0f, 0f, 1f);
+            //var viewMatrix = this.camera.DebugViewMatrix * Matrix.CreateTranslation(ConvertUnits.ToSimUnits(this.camera.ViewOffset.X), ConvertUnits.ToSimUnits(this.camera.ViewOffset.Y), 0);
+            //this.debugView.RenderDebugData(ref projectionMatrix, ref viewMatrix);
 
             this.primitiveBatch.Begin(ref this.projection, ref this.view);
 
@@ -622,7 +655,7 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                     case PolygonShape polygonShape:
 
-                        this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
+                        this.primitiveBatch.DrawPolygon(polygonShape.Position, polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
 
                         break;
                 }
@@ -631,7 +664,10 @@ namespace CollisionFloatTestNewMono.Engine
             switch (this.playerShape)
             {
                 case CircleShape circleShape:
-                    this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, this.playerShape.Color);
+                    this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, circleShape.Color);
+                    break;
+                case PolygonShape polygonShape:
+                    this.primitiveBatch.DrawPolygon(polygonShape.Position, polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
                     break;
             }
 

@@ -14,7 +14,7 @@ namespace CollisionFloatTestNewMono.Engine
 
         private Vector2 position;
 
-        public Vector2 Position
+        public override Vector2 Position
         {
             get { return this.position; }
             set
@@ -25,7 +25,7 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
 
-        public CircleShape(string name, Vector2 position, int radius)
+        public CircleShape(string name, Vector2 position, int radius) : base(ShapeContactType.Circle)
         {
             this.Position = position;
             this.Name = name;
