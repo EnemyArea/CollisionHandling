@@ -44,6 +44,7 @@
     <Compile Include="Engine\CollisionGrid.cs" />
     <Compile Include="Engine\Camera2D.cs" />
     <Compile Include="Engine\CircleShape.cs" />
+    <Compile Include="Engine\CollisionManager.cs" />
     <Compile Include="Engine\GameHelper.cs" />
     <Compile Include="Engine\Mathf.cs" />
     <Compile Include="Engine\MathUtils.cs" />

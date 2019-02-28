@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,45 +24,12 @@ namespace CollisionFloatTestNewMono.Engine
     {
         /// <summary>
         /// </summary>
-        [Flags]
-        private enum BorderlineType
-        {
-            None = 0,
-            Left = 1,
-            Top = 2,
-            Right = 4,
-            Bottom = 8
-        }
-
-
-        /// <summary>
-        /// </summary>
-        private sealed class BorderlineBlock
-        {
-            public BorderlineType BorderlineType;
-            public int X;
-            public int Y;
-            public int Width;
-            public int Height;
-            public bool IsSearchedLeft;
-            public bool IsSearchedTop;
-            public bool IsSearchedRight;
-            public bool IsSearchedBottom;
-        }
-
-
-        /// <summary>
-        /// </summary>
         private float playerSpeed;
 
         /// <summary>
         /// </summary>
         private CircleShape playerShape;
-
-        /// <summary>
-        /// </summary>
-        private Texture2D playerTexture;
-
+        
         /// <summary>
         /// </summary>
         private KeyboardState oldState;
@@ -107,11 +73,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         private PrimitiveBatch primitiveBatch;
-
-        /// <summary>
-        /// </summary>
-        private BasicEffect basicEffect;
-
+        
         /// <summary>
         /// </summary>
         private Matrix projection;
@@ -124,328 +86,16 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         private IList<Vector2> vertices;
 
+        /// <summary>
+        /// </summary>
+        private CollisionManager collisionManager;
+
 
         private DebugView debugView;
         private World world;
         private Body polygonBody;
         private Body playerBody;
 
-
-        /// <summary>
-        /// </summary>
-        /// <param name="mapCollisionData"></param>
-        /// <returns></returns>
-        private static int[,] ReverseMapCollisionData(int[,] mapCollisionData)
-        {
-            var reversedMapData = new int[mapCollisionData.GetLength(1), mapCollisionData.GetLength(0)];
-
-            for (var y = 0; y < mapCollisionData.GetLength(0); y++)
-            {
-                for (var x = 0; x < mapCollisionData.GetLength(1); x++)
-                {
-                    reversedMapData[x, y] = mapCollisionData[y, x];
-                }
-            }
-
-            return reversedMapData;
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="borderlineBlock"></param>
-        /// <param name="borderlineType"></param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static void MarkAsSearched(BorderlineBlock borderlineBlock, BorderlineType borderlineType)
-        {
-            switch (borderlineType)
-            {
-                case BorderlineType.Left:
-                    borderlineBlock.IsSearchedLeft = true;
-                    break;
-                case BorderlineType.Top:
-                    borderlineBlock.IsSearchedTop = true;
-                    break;
-                case BorderlineType.Right:
-                    borderlineBlock.IsSearchedRight = true;
-                    break;
-                case BorderlineType.Bottom:
-                    borderlineBlock.IsSearchedBottom = true;
-                    break;
-            }
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="borderLines"></param>
-        /// <param name="borderlineType"></param>
-        /// <returns></returns>
-        private static IEnumerable<BorderlineBlock> FindLines(int width, int height, BorderlineBlock[,] borderLines, BorderlineType borderlineType)
-        {
-            for (var y = 0; y < height; y++)
-            {
-                for (var x = 0; x < width; x++)
-                {
-                    var borderLine = borderLines[x, y];
-                    if (borderLine == null)
-                        continue;
-
-                    if (borderlineType == BorderlineType.Left && borderLine.IsSearchedLeft ||
-                        borderlineType == BorderlineType.Top && borderLine.IsSearchedTop ||
-                        borderlineType == BorderlineType.Right && borderLine.IsSearchedRight ||
-                        borderlineType == BorderlineType.Bottom && borderLine.IsSearchedBottom)
-                        continue;
-
-                    var newBorderLine = new BorderlineBlock
-                    {
-                        X = x,
-                        Y = y,
-                        BorderlineType = borderlineType
-                    };
-
-                    var nextNodeX = x;
-                    var nextNodeY = y;
-                    while (nextNodeX < width && nextNodeY < height &&
-                           borderLines[nextNodeX, nextNodeY] != null &&
-                           (borderLines[nextNodeX, nextNodeY].BorderlineType & borderlineType) == borderlineType)
-                    {
-                        switch (borderlineType)
-                        {
-                            case BorderlineType.Left:
-                            case BorderlineType.Right:
-
-                                // Markieren
-                                newBorderLine.Height += 1;
-                                MarkAsSearched(borderLines[nextNodeX, nextNodeY], borderlineType);
-                                nextNodeY += 1;
-
-                                break;
-                            case BorderlineType.Top:
-                            case BorderlineType.Bottom:
-
-                                // Markieren
-                                newBorderLine.Width += 1;
-                                MarkAsSearched(borderLines[nextNodeX, nextNodeY], borderlineType);
-                                nextNodeX += 1;
-
-                                break;
-                        }
-                    }
-
-                    // Markieren
-                    MarkAsSearched(newBorderLine, borderlineType);
-
-                    // Nur zurückgeben, wenn es etwas gibt
-                    if (newBorderLine.Width > 0 || newBorderLine.Height > 0)
-                        yield return newBorderLine;
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="p0"></param>
-        /// <param name="p1"></param>
-        /// <param name="p2"></param>
-        /// <param name="p3"></param>
-        /// <returns></returns>
-        private static LineShape CreateLine(int p0, int p1, int p2, int p3)
-        {
-            return new LineShape(new Vector2(p0, p1), new Vector2(p2, p3));
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="width"></param>
-        /// <param name="height"></param>
-        /// <param name="mapCollisionData"></param>
-        /// <param name="useOuterBorder"></param>
-        private static IEnumerable<LineShape> CreateHullForBody(int width, int height, int[,] mapCollisionData, bool useOuterBorder)
-        {
-            // Neuen Puffer buaen
-            var mapDataReversed = ReverseMapCollisionData(mapCollisionData);
-
-            // Die Border bestimmen
-            var borderLines = new BorderlineBlock[width, height];
-            for (var y = 0; y < height; y++)
-            {
-                for (var x = 0; x < width; x++)
-                {
-                    if (mapDataReversed[x, y] != 1)
-                        continue;
-
-                    var borderlineBlock = new BorderlineBlock();
-
-                    if (x + 1 >= width || (x + 1 < width && mapDataReversed[x + 1, y] == 0))
-                        borderlineBlock.BorderlineType |= BorderlineType.Right;
-
-                    if (x - 1 < 0 || (x - 1 >= 0 && mapDataReversed[x - 1, y] == 0))
-                        borderlineBlock.BorderlineType |= BorderlineType.Left;
-
-                    if (y + 1 >= height || (y + 1 < height && mapDataReversed[x, y + 1] == 0))
-                        borderlineBlock.BorderlineType |= BorderlineType.Bottom;
-
-                    if (y - 1 < 0 || (y - 1 >= 0 && mapDataReversed[x, y - 1] == 0))
-                        borderlineBlock.BorderlineType |= BorderlineType.Top;
-
-                    borderLines[x, y] = borderlineBlock;
-                }
-            }
-
-            // Borders
-            var leftBorders = FindLines(width, height, borderLines, BorderlineType.Left).ToArray();
-            var topBorders = FindLines(width, height, borderLines, BorderlineType.Top).ToArray();
-            var rightBorders = FindLines(width, height, borderLines, BorderlineType.Right).ToArray();
-            var bottomBorders = FindLines(width, height, borderLines, BorderlineType.Bottom).ToArray();
-
-            // Border bauen
-            foreach (var borderlineBlock in leftBorders)
-            {
-                yield return CreateLine(
-                    borderlineBlock.X * GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize,
-                    borderlineBlock.X * GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize + borderlineBlock.Height * GameHelper.TileSize);
-            }
-
-            // Border bauen
-            foreach (var borderlineBlock in topBorders)
-            {
-                yield return CreateLine(
-                    borderlineBlock.X * GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize,
-                    borderlineBlock.X * GameHelper.TileSize + borderlineBlock.Width * GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize);
-            }
-
-            // Border bauen
-            foreach (var borderlineBlock in rightBorders)
-            {
-                yield return CreateLine(
-                    borderlineBlock.X * GameHelper.TileSize + borderlineBlock.Width * GameHelper.TileSize + GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize,
-                    borderlineBlock.X * GameHelper.TileSize + borderlineBlock.Width * GameHelper.TileSize + GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize + borderlineBlock.Height * GameHelper.TileSize);
-            }
-
-            // Border bauen
-            foreach (var borderlineBlock in bottomBorders)
-            {
-                yield return CreateLine(
-                    borderlineBlock.X * GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize + borderlineBlock.Height * GameHelper.TileSize + GameHelper.TileSize,
-                    borderlineBlock.X * GameHelper.TileSize + borderlineBlock.Width * GameHelper.TileSize,
-                    borderlineBlock.Y * GameHelper.TileSize + borderlineBlock.Height * GameHelper.TileSize + GameHelper.TileSize);
-            }
-
-            // Äußeren Rand miteinbeziehen
-            if (useOuterBorder)
-            {
-                // Linke Wand
-                yield return CreateLine(
-                    0, 0,
-                    0, height * GameHelper.TileSize);
-
-                // Obere Wand
-                yield return CreateLine(
-                    0, 0,
-                    width * GameHelper.TileSize, 0);
-
-                // Rechte Wand
-                yield return CreateLine(
-                    width * GameHelper.TileSize, 0,
-                    width * GameHelper.TileSize, height * GameHelper.TileSize);
-
-                // Untere Wand
-                yield return CreateLine(
-                    0, height * GameHelper.TileSize,
-                    width * GameHelper.TileSize, height * GameHelper.TileSize);
-            }
-        }
-
-        /// <summary>
-        ///     Returns the convex hull from the given vertices.
-        ///     Giftwrap convex hull algorithm.
-        ///     O(n * h) time complexity, where n is the number of points and h is the number of points on the convex hull.
-        ///     See http://en.wikipedia.org/wiki/Gift_wrapping_algorithm for more details.
-        ///     Extracted from Box2D
-        ///     https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Tools/ConvexHull/GiftWrap/GiftWrap.cs
-        /// </summary>
-        /// <param name="vertices">The vertices.</param>
-        public static IList<Vector2> GetConvexHull(IList<Vector2> vertices)
-        {
-            if (vertices.Count <= 3)
-                return vertices;
-
-            // Find the right most point on the hull
-            var i0 = 0;
-            var x0 = vertices[0].X;
-            for (var i = 1; i < vertices.Count; ++i)
-            {
-                var x = vertices[i].X;
-                if (x > x0 || (x == x0 && vertices[i].Y < vertices[i0].Y))
-                {
-                    i0 = i;
-                    x0 = x;
-                }
-            }
-
-            var hull = new int[vertices.Count];
-            var m = 0;
-            var ih = i0;
-
-            while(true)
-            {
-                hull[m] = ih;
-
-                var ie = 0;
-                for (var j = 1; j < vertices.Count; ++j)
-                {
-                    if (ie == ih)
-                    {
-                        ie = j;
-                        continue;
-                    }
-
-                    var r = vertices[ie] - vertices[hull[m]];
-                    var v = vertices[j] - vertices[hull[m]];
-                    var c = MathUtils.Cross(ref r, ref v);
-                    if (c < 0.0f)
-                    {
-                        ie = j;
-                    }
-
-                    // Collinearity check
-                    if (c == 0.0f && v.LengthSquared() > r.LengthSquared())
-                    {
-                        ie = j;
-                    }
-                }
-
-                ++m;
-                ih = ie;
-
-                if (ie == i0)
-                {
-                    break;
-                }
-            }
-
-            var result = new List<Vector2>(m);
-
-            // Copy vertices.
-            for (var i = 0; i < m; ++i)
-            {
-                result.Add(vertices[hull[i]]);
-            }
-
-            return result;
-        }
 
         /// <summary>
         /// </summary>
@@ -456,11 +106,10 @@ namespace CollisionFloatTestNewMono.Engine
             this.graphicsDevice = graphicsDevice;
 
             this.playerSpeed = 300;
-            this.playerTexture = content.Load<Texture2D>("playersprite");
             this.font = content.Load<SpriteFont>("Fonts/interfaceFontSmall");
             this.texture = content.Load<Texture2D>("floor");
-            this.basicEffect = new BasicEffect(graphicsDevice);
             this.primitiveBatch = new PrimitiveBatch(graphicsDevice, 1000);
+            this.collisionManager = new CollisionManager();
 
             this.camera = new Camera2D();
             this.camera.UpdateViewport(graphicsDevice.Viewport);
@@ -501,7 +150,7 @@ namespace CollisionFloatTestNewMono.Engine
                 polyOffset + new Vector2(-15, 0),
                 polyOffset + new Vector2(15, 0),
             };
-            this.vertices = GetConvexHull(baseVertices);
+            this.vertices = this.collisionManager.GetConvexHull(baseVertices);
             this.shapes.Add(new PolygonShape(this.vertices));
 
             var offset = new Vector2(120, 140);
@@ -711,9 +360,9 @@ namespace CollisionFloatTestNewMono.Engine
             //    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
             //};
 
-            //var lines = CreateHullForBody(this.mapWith, this.mapHeight, mapData, true);
+            //var lines = this.collisionManager.CreateHullForBody(this.mapWith, this.mapHeight, mapData, true);
             //this.shapes.AddRange(lines);
-
+            
             this.grid = new CollisionGrid<Shape>(this.mapWith, this.mapHeight, this.mapWith * GameHelper.TileSize, this.mapHeight * GameHelper.TileSize);
 
             foreach (var shape in this.shapes)
@@ -753,215 +402,12 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        ///     A + dot(AP,AB) / dot(AB,AB) * AB
-        /// </summary>
-        /// <param name="linePoint1"></param>
-        /// <param name="linePoint2"></param>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        private static Vector2 ProjectPointOnLine(Vector2 linePoint1, Vector2 linePoint2, Vector2 point)
-        {
-            //var A = linePoint1;
-            //var B = linePoint2;
-            var ap = new Vector2(point.X - linePoint1.X, point.Y - linePoint1.Y);
-            var ab = new Vector2(linePoint2.X - linePoint1.X, linePoint2.Y - linePoint1.Y);
-
-            var coef = Vector2.Dot(ap, ab) / Vector2.Dot(ab, ab);
-            return new Vector2(linePoint1.X + coef * ab.X, linePoint1.Y + coef * ab.Y);
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="linePoint1"></param>
-        /// <param name="linePoint2"></param>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        private static bool IsProjectedPointOnLine(Vector2 linePoint1, Vector2 linePoint2, Vector2 point)
-        {
-            return linePoint1.X < point.X && point.X < linePoint2.X ||
-                   linePoint1.X > point.X && point.X > linePoint2.X ||
-                   linePoint1.Y < point.Y && point.Y < linePoint2.Y ||
-                   linePoint1.Y > point.Y && point.Y > linePoint2.Y;
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="projectedPoint"></param>
-        /// <param name="circleCenter"></param>
-        /// <param name="radius"></param>
-        /// <returns></returns>
-        private static Vector2 FindNearestExitVector(Vector2 projectedPoint, Vector2 circleCenter, float radius)
-        {
-            var l1 = circleCenter.X - projectedPoint.X;
-            var l2 = circleCenter.Y - projectedPoint.Y;
-            var pointToCircleDist = (float)Math.Sqrt(l1 * l1 + l2 * l2);
-
-            if (pointToCircleDist < radius)
-            {
-                var minDistance = radius - pointToCircleDist;
-                return new Vector2(l1 / pointToCircleDist * minDistance, l2 / pointToCircleDist * minDistance);
-            }
-
-            return Vector2.Zero;
-        }
-
-
-        /// <summary>
         /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
         private static Point ConvertPositionToTilePosition(Vector2 position)
         {
             return new Point((int)(position.X / GameHelper.TileSize), (int)(position.Y / GameHelper.TileSize));
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="position"></param>
-        /// <param name="radius"></param>
-        /// <param name="lineStart"></param>
-        /// <param name="lineEnd"></param>
-        /// <returns></returns>
-        private static Vector2 GetNearestVectorFromCircleAndLine(Vector2 position, float radius, Vector2 lineStart, Vector2 lineEnd)
-        {
-            var nearestVector = Vector2.Zero;
-            var pointOnLine = ProjectPointOnLine(lineStart, lineEnd, position);
-            var localNearestVector = FindNearestExitVector(pointOnLine, position, radius);
-
-            var isPointInSegment = IsProjectedPointOnLine(lineStart, lineEnd, pointOnLine);
-            if (isPointInSegment)
-            {
-                nearestVector.X += localNearestVector.X;
-                nearestVector.Y += localNearestVector.Y;
-
-                position.X += localNearestVector.X;
-                position.Y += localNearestVector.Y;
-            }
-            else
-            {
-                // check if line points are intersecting
-                var nv1 = FindNearestExitVector(lineStart, position, radius);
-
-                nearestVector.X += nv1.X;
-                nearestVector.Y += nv1.Y;
-                position.X += nv1.X;
-                position.Y += nv1.Y;
-
-                var nv2 = FindNearestExitVector(lineEnd, position, radius);
-                nearestVector.X += nv2.X;
-                nearestVector.Y += nv2.Y;
-                position.X += nv2.X;
-                position.Y += nv2.Y;
-            }
-
-            return nearestVector;
-        }
-
-
-        public const float MaxFloat = float.MaxValue;
-        public const float Epsilon = 1.192092896e-07f;
-        public const float Pi = 3.14159265359f;
-
-        /// <summary>
-        ///     A small length used as a collision and constraint tolerance. Usually it is
-        ///     chosen to be numerically significant, but visually insignificant.
-        /// </summary>
-        public const float LinearSlop = 0.005f;
-
-        /// <summary>
-        ///     The radius of the polygon/edge shape skin. This should not be modified. Making
-        ///     this smaller means polygons will have an insufficient buffer for continuous collision.
-        ///     Making it larger may create artifacts for vertex collision.
-        /// </summary>
-        public const float PolygonRadius = (2.0f * LinearSlop);
-
-
-        /// <summary>
-        /// Compute the collision between a polygon and a circle.
-        /// https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Collision/Narrowphase/CollideCircle.cs
-        /// </summary>
-        /// <param name="polygonA"></param>
-        /// <param name="circleB"></param>
-        public static void CollidePolygonAndCircle(PolygonShape polygonA, CircleShape circleB)
-        {
-            // Compute circle position in the frame of the polygon.
-            var cLocal = circleB.Position + circleB.Velocity;
-
-            // Find the min separating edge.
-            var normalIndex = 0;
-            var separation = -MaxFloat;
-            var radius = polygonA.Radius + circleB.Radius;
-            var vertexCount = polygonA.Vertices.Length;
-            var vertices = polygonA.Vertices;
-            var normals = polygonA.Normals;
-
-            for (var i = 0; i < vertexCount; ++i)
-            {
-                var s = Vector2.Dot(normals[i], cLocal - vertices[i]);
-
-                if (s > radius)
-                    return;
-
-                if (s > separation)
-                {
-                    separation = s;
-                    normalIndex = i;
-                }
-            }
-
-            // Vertices that subtend the incident face.
-            var vertIndex1 = normalIndex;
-            var vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
-            var v1 = vertices[vertIndex1];
-            var v2 = vertices[vertIndex2];
-
-            // If the center is inside the polygon ...
-            if (separation < Epsilon)
-            {
-                circleB.Velocity -= separation * normals[normalIndex] - new Vector2(circleB.Radius) * normals[normalIndex];
-                polygonA.Color = Color.Red;
-                return;
-            }
-
-            // Compute barycentric coordinates
-            var u1 = Vector2.Dot(cLocal - v1, v2 - v1);
-            var u2 = Vector2.Dot(cLocal - v2, v1 - v2);
-
-            if (u1 <= 0.0f)
-            {
-                if (Vector2.DistanceSquared(cLocal, v1) > radius * radius)
-                    return;
-
-                var localNormal = cLocal - v1;
-                localNormal.Normalize();
-
-                circleB.Velocity -= separation * localNormal - new Vector2(circleB.Radius) * localNormal;
-                polygonA.Color = Color.Red;
-            }
-            else if (u2 <= 0.0f)
-            {
-                if (Vector2.DistanceSquared(cLocal, v2) > radius * radius)
-                    return;
-
-                var localNormal = cLocal - v2;
-                localNormal.Normalize();
-
-                circleB.Velocity -= separation * localNormal - new Vector2(circleB.Radius) * localNormal;
-                polygonA.Color = Color.Red;
-            }
-            else
-            {
-                var faceCenter = 0.5f * (v1 + v2);
-                var s = Vector2.Dot(cLocal - faceCenter, normals[vertIndex1]);
-                if (s > radius)
-                    return;
-
-                circleB.Velocity -= s * normals[vertIndex1] - new Vector2(circleB.Radius) * normals[vertIndex1];
-                polygonA.Color = Color.Red;
-            }
         }
 
 
@@ -1071,88 +517,48 @@ namespace CollisionFloatTestNewMono.Engine
                                 switch (shapeObs)
                                 {
                                     case CircleShape circleShapeObs:
-
-                                        var direction = (circleShape.Position + circleShape.Velocity) - (circleShapeObs.Position + circleShapeObs.Velocity);
-                                        var distance = (float)Math.Round(direction.Length());
-                                        var sumOfRadii = circleShape.Radius + circleShapeObs.Radius;
-
-                                        if (!(sumOfRadii - distance <= 0))
                                         {
-                                            hasCollison = true;
-
-                                            var depth = sumOfRadii - distance;
-                                            direction.Normalize();
-                                            circleShape.Velocity += direction * depth;
-                                            circleShapeObs.Color = Color.Red;
+                                            var newVelocity = this.collisionManager.CircleAndCircle(circleShape, circleShapeObs);
+                                            if (newVelocity != Vector2.Zero)
+                                            {
+                                                circleShape.Velocity += newVelocity;
+                                                circleShapeObs.Color = Color.Red;
+                                                hasCollison = true;
+                                            }
                                         }
-
                                         break;
                                     case LineShape lineShape:
-
-                                        var nearestVector = GetNearestVectorFromCircleAndLine(circleShape.Position + circleShape.Velocity, circleShape.Radius, lineShape.Start, lineShape.End);
-                                        if (nearestVector != Vector2.Zero)
                                         {
-                                            circleShape.Velocity += nearestVector;
+                                            var newVelocity = this.collisionManager.CircleAndLine(circleShape, lineShape);
+                                            if (newVelocity != Vector2.Zero)
+                                            {
+                                                circleShape.Velocity += newVelocity;
+                                                lineShape.Color = Color.Red;
+                                                hasCollison = true;
+                                            }
                                         }
-
                                         break;
                                     case RectangleShape rectangleShape:
-
-                                        var v = new Vector2(
-                                            MathHelper.Clamp(circleShape.Position.X + circleShape.Velocity.X, rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Right),
-                                            MathHelper.Clamp(circleShape.Position.Y + circleShape.Velocity.Y, rectangleShape.Rectangle.Top, rectangleShape.Rectangle.Bottom));
-
-                                        var collisionDirection = (circleShape.Position + circleShape.Velocity) - v;
-                                        var distanceSquared = collisionDirection.LengthSquared();
-
-                                        var isColliding = distanceSquared > 0 && (distanceSquared < circleShape.Radius * circleShape.Radius);
-                                        if (isColliding)
                                         {
-                                            var lineTopStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
-                                            var lineTopEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
-
-                                            var nearestVectorTop = GetNearestVectorFromCircleAndLine(circleShape.Position + circleShape.Velocity, circleShape.Radius, lineTopStart, lineTopEnd);
-                                            if (nearestVectorTop != Vector2.Zero)
+                                            var newVelocity = this.collisionManager.CircleAndRectangle(circleShape, rectangleShape);
+                                            if (newVelocity != Vector2.Zero)
                                             {
-                                                circleShape.Velocity += nearestVectorTop;
+                                                circleShape.Velocity += newVelocity;
+                                                rectangleShape.Color = Color.Red;
+                                                hasCollison = true;
                                             }
-
-                                            var lineLeftStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Top);
-                                            var lineLeftEnd = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
-
-                                            var nearestVectorLeft = GetNearestVectorFromCircleAndLine(circleShape.Position + circleShape.Velocity, circleShape.Radius, lineLeftStart, lineLeftEnd);
-                                            if (nearestVectorLeft != Vector2.Zero)
-                                            {
-                                                circleShape.Velocity += nearestVectorLeft;
-                                            }
-
-                                            var lineBottomStart = new Vector2(rectangleShape.Rectangle.Left, rectangleShape.Rectangle.Bottom);
-                                            var lineBottomEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
-
-                                            var nearestVectorBottom = GetNearestVectorFromCircleAndLine(circleShape.Position + circleShape.Velocity, circleShape.Radius, lineBottomStart, lineBottomEnd);
-                                            if (nearestVectorBottom != Vector2.Zero)
-                                            {
-                                                circleShape.Velocity += nearestVectorBottom;
-                                            }
-
-                                            var lineRightStart = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Top);
-                                            var lineRightEnd = new Vector2(rectangleShape.Rectangle.Right, rectangleShape.Rectangle.Bottom);
-
-                                            var nearestVectorRight = GetNearestVectorFromCircleAndLine(circleShape.Position + circleShape.Velocity, circleShape.Radius, lineRightStart, lineRightEnd);
-                                            if (nearestVectorRight != Vector2.Zero)
-                                            {
-                                                circleShape.Velocity += nearestVectorRight;
-                                            }
-
-                                            rectangleShape.Color = Color.Red;
-                                            hasCollison = true;
                                         }
-
                                         break;
                                     case PolygonShape polygonShape:
-
-                                        CollidePolygonAndCircle(polygonShape, circleShape);
-
+                                        {
+                                            var newVelocity = this.collisionManager.CollidePolygonAndCircle(polygonShape, circleShape);
+                                            if (newVelocity != Vector2.Zero)
+                                            {
+                                                circleShape.Velocity -= newVelocity;
+                                                polygonShape.Color = Color.Red;
+                                                hasCollison = true;
+                                            }
+                                        }
                                         break;
                                 }
 
