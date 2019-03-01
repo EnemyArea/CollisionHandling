@@ -14,25 +14,16 @@ namespace CollisionFloatTestNewMono.Engine
     {
         /// <summary>
         /// </summary>
-        private readonly Vector2[] baseVertices;
-
-
-        /// <summary>
-        /// </summary>
-        public Vector2[] Normals { get; private set; }
+        public Vector2[] Normals { get; }
 
         /// <summary>
         /// </summary>
-        public Vector2[] Vertices { get; private set; }
+        public Vector2[] Vertices { get; }
 
         /// <summary>
         /// </summary>
         public Point[] PointVertices { get; private set; }
-
-        /// <summary>
-        /// </summary>
-        public float Radius { get; private set; }
-
+        
 
         /// <summary>
         /// </summary>
@@ -42,8 +33,8 @@ namespace CollisionFloatTestNewMono.Engine
         public PolygonShape(string name, Vector2 position, IEnumerable<Vector2> vertices)
             : base(ShapeType.Polygon, name, position, 0)
         {
-            this.baseVertices = vertices.ToArray();
-            this.UpdateVertices();
+            this.Vertices = vertices.ToArray();
+            this.Normals = VectorHelper.CreateNormals(this.Vertices);
         }
 
 
@@ -55,48 +46,8 @@ namespace CollisionFloatTestNewMono.Engine
             foreach (var vertex in this.Vertices)
                 yield return GameHelper.ConvertPositionToTilePosition(vertex);
         }
-
-
-        /// <summary>
-        /// </summary>
-        private void UpdateVertices()
-        {
-            this.Vertices = MathUtils.Mul(ref this.transform, this.baseVertices.ToArray());
-            this.Normals = VectorHelper.CreateNormals(this.Vertices);
-            this.PointVertices = this.GeneratePoints().ToArray();
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="rotation"></param>
-        public override void SetRotation(float rotation)
-        {
-            base.SetRotation(rotation);
-            this.UpdateVertices();
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="position"></param>
-        public override void SetPosition(Vector2 position)
-        {
-            base.SetPosition(position);
-            this.UpdateVertices();
-        }
-
-
-        /// <summary>
-        /// </summary>
-        /// <param name="velocity"></param>
-        public override void ApplyVelocity(Vector2 velocity)
-        {
-            base.ApplyVelocity(velocity);
-            this.UpdateVertices();
-        }
-
-
+        
+        
         /// <summary>
         /// </summary>
         /// <returns></returns>

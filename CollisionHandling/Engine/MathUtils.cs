@@ -54,6 +54,12 @@ namespace CollisionFloatTestNewMono.Engine
             return length - Abs(time - length);
         }
 
+
+        /// <summary>
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="vertices"></param>
+        /// <returns></returns>
         public static Vector2[] Mul(ref Transform transform, Vector2[] vertices)
         {
             var verticesNew = new Vector2[vertices.Length];
@@ -64,15 +70,37 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
 
+        /// <summary>
+        /// </summary>
+        /// <param name="T"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public static Vector2 Mul(ref Transform T, Vector2 v)
         {
             return Mul(ref T, ref v);
         }
 
+
+        /// <summary>
+        /// </summary>
+        /// <param name="T"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 Mul(Transform T, Vector2 v)
+        {
+            return Mul(ref T, ref v);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="T"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
         public static Vector2 Mul(ref Transform T, ref Vector2 v)
         {
-            float x = (T.Rotation.Cosine * v.X - T.Rotation.Sine * v.Y) + T.Position.X;
-            float y = (T.Rotation.Sine * v.X + T.Rotation.Cosine * v.Y) + T.Position.Y;
+            var x = (T.Rotation.Cosine * v.X - T.Rotation.Sine * v.Y) + T.Position.X;
+            var y = (T.Rotation.Sine * v.X + T.Rotation.Cosine * v.Y) + T.Position.Y;
 
             return new Vector2(x, y);
         }
@@ -97,6 +125,33 @@ namespace CollisionFloatTestNewMono.Engine
         public static Vector2 MulT(ref Rotation rot, Vector2 axis)
         {
             return MulT(rot, axis);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="T"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 MulT(ref Transform T, Vector2 v)
+        {
+            return MulT(ref T, ref v);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="T"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 MulT(ref Transform T, ref Vector2 v)
+        {
+            var px = v.X - T.Position.X;
+            var py = v.Y - T.Position.Y;
+            var x = (T.Rotation.Cosine * px + T.Rotation.Sine * py);
+            var y = (-T.Rotation.Sine * px + T.Rotation.Cosine * py);
+
+            return new Vector2(x, y);
         }
 
 
@@ -144,15 +199,15 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        /// v2 = A.q' * (B.q * v1 + B.p - A.p)
-        ///    = A.q' * B.q * v1 + A.q' * (B.p - A.p)
+        ///     v2 = A.q' * (B.q * v1 + B.p - A.p)
+        ///     = A.q' * B.q * v1 + A.q' * (B.p - A.p)
         /// </summary>
         /// <param name="A"></param>
         /// <param name="B"></param>
         /// <returns></returns>
         public static Transform MulT(Transform A, Transform B)
         {
-            Transform C = new Transform();
+            var C = new Transform();
             C.Rotation = MulT(A.Rotation, B.Rotation);
             C.Position = MulT(A.Rotation, B.Position - A.Position);
             return C;
@@ -227,9 +282,9 @@ namespace CollisionFloatTestNewMono.Engine
         /// <returns></returns>
         public static float InvSqrt(float x)
         {
-            FloatConverter convert = new FloatConverter();
+            var convert = new FloatConverter();
             convert.x = x;
-            float xhalf = 0.5f * x;
+            var xhalf = 0.5f * x;
             convert.i = 0x5f3759df - (convert.i >> 1);
             x = convert.x;
             x = x * (1.5f - xhalf * x * x);
@@ -263,9 +318,9 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         public static double VectorAngle(ref Vector2 p1, ref Vector2 p2)
         {
-            double theta1 = Math.Atan2(p1.Y, p1.X);
-            double theta2 = Math.Atan2(p2.Y, p2.X);
-            double dtheta = theta2 - theta1;
+            var theta1 = Math.Atan2(p1.Y, p1.X);
+            var theta2 = Math.Atan2(p2.Y, p2.X);
+            var dtheta = theta2 - theta1;
             while (dtheta > Math.PI)
                 dtheta -= (2 * Math.PI);
             while (dtheta < -Math.PI)
