@@ -12,30 +12,6 @@ namespace CollisionFloatTestNewMono.Engine
 {
     /// <summary>
     /// </summary>
-    public enum ShapeContactType : byte
-    {
-        NotSupported,
-        Polygon,
-        PolygonAndCircle,
-        Circle,
-        PolygonAndLine,
-        LineAndCircle
-    }
-
-
-    /// <summary>
-    /// </summary>
-    public enum ShapeType
-    {
-        Unknown = -1,
-        Circle = 0,
-        Line = 1,
-        Polygon = 2,
-    }
-
-
-    /// <summary>
-    /// </summary>
     public sealed class CollisionManager
     {
         /// <summary>
@@ -417,15 +393,14 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="polygonShape"></param>
         /// <param name="circleShape"></param>
-        /// <param name="transform"></param>
-        public Vector2 CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape, Transform transform)
+        public Vector2 CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
         {
             // Find the min separating edge.
             var normalIndex = 0;
             var separation = -MaxFloat;
             var radius = circleShape.Radius;
             var vertexCount = polygonShape.Vertices.Length;
-            var vertices = MathUtils.Mul(ref transform, polygonShape.Vertices);
+            var vertices = polygonShape.Vertices;
             var normals = VectorHelper.CreateNormals(vertices);
             var center = circleShape.Position + circleShape.Velocity;
 

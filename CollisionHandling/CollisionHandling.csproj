@@ -46,11 +46,14 @@
     <Compile Include="Engine\CircleShape.cs" />
     <Compile Include="Engine\CollisionManager.cs" />
     <Compile Include="Engine\GameHelper.cs" />
-    <Compile Include="Engine\Mathf.cs" />
     <Compile Include="Engine\MathUtils.cs" />
     <Compile Include="Engine\PolygonShape.cs" />
     <Compile Include="Engine\PrimitiveBatch.cs" />
     <Compile Include="Engine\RectangleShape.cs" />
+    <Compile Include="Engine\Rotation.cs" />
+    <Compile Include="Engine\ShapeContactType.cs" />
+    <Compile Include="Engine\ShapeType.cs" />
+    <Compile Include="Engine\Transform.cs" />
     <Compile Include="Engine\VectorHelper.cs" />
     <Compile Include="GameClass.cs" />
     <Compile Include="Engine\LineShape.cs" />

@@ -14,7 +14,7 @@ namespace CollisionFloatTestNewMono.Engine
         public Rectangle TileRectangle { get; }
 
         public RectangleShape(string name, Rectangle rectangle)
-            : base(name, new Vector2(rectangle.X,rectangle.Y), GameHelper.GetConvexHull(GameHelper.CreateVerticesFromRectangle(rectangle).ToArray()))
+            : base(name, new Vector2(rectangle.X + rectangle.Width / 2f, rectangle.Y + rectangle.Height / 2f), VectorHelper.CreateRectangle(rectangle.Width / 2f, rectangle.Height / 2f))
         {
             this.Rectangle = rectangle;
             this.TileRectangle = GameHelper.ConvertPositionToTilePosition(rectangle);

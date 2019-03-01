@@ -165,10 +165,10 @@ namespace CollisionFloatTestNewMono.Engine
             //this.shapes.Add(new CircleShape("C2", new Vector2(250 + 50, 100 + 50), 50));
 
 
-            //this.shapes.Add(new RectangleShape("TestArea", new Rectangle(100, 100, 50, 50)));
-            //this.shapes.Add(new RectangleShape("TestArea2", new Rectangle(150, 100, 50, 50)));
-            //this.shapes.Add(new RectangleShape("TestArea3", new Rectangle(100, 150, 50, 50)));
-            //this.shapes.Add(new RectangleShape("TestArea4", new Rectangle(150, 150, 50, 50)));
+            this.shapes.Add(new RectangleShape("TestArea", new Rectangle(100, 100, 50, 50)));
+            this.shapes.Add(new RectangleShape("TestArea2", new Rectangle(150, 100, 50, 50)));
+            this.shapes.Add(new RectangleShape("TestArea3", new Rectangle(100, 150, 50, 50)));
+            this.shapes.Add(new RectangleShape("TestArea4", new Rectangle(150, 150, 50, 50)));
 
             this.shapes.Add(new CircleShape("C1", new Vector2(300, 500), 50));
             this.shapes.Add(new CircleShape("C2", new Vector2(500, 500), 50));
@@ -447,7 +447,7 @@ namespace CollisionFloatTestNewMono.Engine
                 this.showTexture = !this.showTexture;
 
             if (newState.IsKeyDown(Keys.F4) && !this.oldState.IsKeyDown(Keys.F4))
-                this.playerShape.Position = Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(this.camera.ViewMatrixWithOffset));
+                this.playerShape.SetPosition(Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(this.camera.ViewMatrixWithOffset)));
 
             var velocityDirection = Vector2.Zero;
             if (newState.IsKeyDown(Keys.LeftShift) || newState.IsKeyDown(Keys.RightShift))
@@ -480,8 +480,8 @@ namespace CollisionFloatTestNewMono.Engine
             this.oldState = newState;
 
             // Bewegen....
-            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime);
-            this.rotation = 25;// (int)MathHelper.Lerp(0, 360, Mathf.PingPong(time, 1));
+            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
+            this.rotation = (int)MathHelper.Lerp(0, 360, time);
 
             //var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(2).ToArray();
             //foreach (var circleShape in shapesToMove)
@@ -498,12 +498,12 @@ namespace CollisionFloatTestNewMono.Engine
             //}
 
             this.playerShape.Color = Color.Fuchsia;
-            this.playerShape.Velocity = Vector2.Zero;
+            this.playerShape.ResetVelocity();
 
             if (velocityDirection != Vector2.Zero)
             {
                 velocityDirection.Normalize();
-                this.playerShape.Velocity += velocityDirection * this.playerSpeed * elapsed;
+                this.playerShape.ApplyVelocity(velocityDirection * this.playerSpeed * elapsed);
             }
 
             foreach (var shape in this.shapes)
@@ -554,9 +554,10 @@ namespace CollisionFloatTestNewMono.Engine
                                 newVelocity += this.collisionManager.CircleAndCircle((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
                                 break;
                             case ShapeContactType.PolygonAndCircle:
-                                
-                                var transform = new Transform(sortedShapeA.Position + sortedShapeA.Velocity, new Rot(MathHelper.ToRadians(this.rotation)));
-                                newVelocity += this.collisionManager.CollidePolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB, transform);
+
+                                var polygonShape = (PolygonShape)sortedShapeA;
+                                polygonShape.SetRotation(MathHelper.ToRadians(this.rotation));
+                                newVelocity += this.collisionManager.CollidePolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
 
                                 break;
                             case ShapeContactType.LineAndCircle:
@@ -570,7 +571,7 @@ namespace CollisionFloatTestNewMono.Engine
 
                         if (newVelocity != Vector2.Zero)
                         {
-                            shapeA.Velocity += newVelocity;
+                            shapeA.ApplyVelocity(newVelocity);
                             shapeB.Color = Color.Red;
                             hasCollison = true;
                         }
@@ -591,17 +592,17 @@ namespace CollisionFloatTestNewMono.Engine
                         case CircleShape circleShape:
                             {
                                 var result = circleShape.Velocity;
-                                circleShape.Position += new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y));
+                                circleShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
                                 this.grid.Move(shape, circleShape.TilePosition);
-                                circleShape.Velocity = Vector2.Zero;
+                                circleShape.ResetVelocity();
                             }
                             break;
                         case PolygonShape polygonShape:
                             {
                                 var result = polygonShape.Velocity;
-                                polygonShape.Position += new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y));
+                                polygonShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
                                 //this.grid.Move(shape, polygonShape.TilePosition);
-                                polygonShape.Velocity = Vector2.Zero;
+                                polygonShape.ResetVelocity();
                             }
                             break;
                     }
@@ -659,14 +660,7 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                     case PolygonShape polygonShape:
 
-                        var polyOffset = polygonShape.Position;
-                        var transform = new Transform(polyOffset, new Rot(MathHelper.ToRadians(this.rotation)));
-
-                        var newVertices = new Vector2[polygonShape.Vertices.Length];
-                        for (var i = 0; i < polygonShape.Vertices.Length; i++)
-                            newVertices[i] = MathUtils.Mul(ref transform, polygonShape.Vertices[i]);
-
-                        this.primitiveBatch.DrawPolygon(newVertices, polygonShape.Vertices.Length, polygonShape.Color);
+                        this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
 
                         break;
                 }

@@ -148,7 +148,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="rectangle"></param>
         /// <returns></returns>
-        public static IEnumerable<Vector2> CreateVerticesFromRectangle(Rectangle rectangle)
+        public static IEnumerable<Vector2> CreatePreShiftVerticesFromRectangle(Rectangle rectangle)
         {
             yield return new Vector2(rectangle.Left, rectangle.Top);
             yield return new Vector2(rectangle.Right, rectangle.Top);
@@ -158,6 +158,23 @@ namespace CollisionFloatTestNewMono.Engine
             yield return new Vector2(rectangle.Right, rectangle.Bottom);
             yield return new Vector2(rectangle.Right, rectangle.Top);
             yield return new Vector2(rectangle.Right, rectangle.Bottom);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public static IEnumerable<Vector2> CreateVerticesFromRectangle(Rectangle rectangle)
+        {
+            yield return new Vector2(0, 0);
+            yield return new Vector2(rectangle.Width, 0);
+            yield return new Vector2(0, 0);
+            yield return new Vector2(0, rectangle.Height);
+            yield return new Vector2(0, rectangle.Height);
+            yield return new Vector2(rectangle.Width, rectangle.Height);
+            yield return new Vector2(rectangle.Width, 0);
+            yield return new Vector2(rectangle.Width, rectangle.Height);
         }
     }
 }

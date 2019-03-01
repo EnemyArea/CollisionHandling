@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using VelcroPhysics.Shared;
 
 #endregion
 
@@ -12,6 +13,48 @@ namespace CollisionFloatTestNewMono.Engine
     /// </summary>
     public static class VectorHelper
     {
+        /// <summary>
+        ///     Build vertices to represent an axis-aligned box.
+        /// </summary>
+        /// <param name="hx">the half-width.</param>
+        /// <param name="hy">the half-height.</param>
+        public static Vertices CreateRectangle(float hx, float hy)
+        {
+            var vertices = new Vertices(4);
+            vertices.Add(new Vector2(-hx, -hy));
+            vertices.Add(new Vector2(hx, -hy));
+            vertices.Add(new Vector2(hx, hy));
+            vertices.Add(new Vector2(-hx, hy));
+
+            return vertices;
+        }
+
+
+        /// <summary>
+        ///     Build vertices to represent an oriented box.
+        /// </summary>
+        /// <param name="hx">the half-width.</param>
+        /// <param name="hy">the half-height.</param>
+        /// <param name="center">the center of the box in local coordinates.</param>
+        /// <param name="angle">the rotation of the box in local coordinates.</param>
+        public static Vertices CreateRectangle(float hx, float hy, Vector2 center, float angle)
+        {
+            var vertices = CreateRectangle(hx, hy);
+
+            var xf = new Transform();
+            xf.p = center;
+            xf.q.Set(angle);
+
+            // Transform vertices
+            for (var i = 0; i < 4; ++i)
+            {
+                vertices[i] = MathUtils.Mul(ref xf, vertices[i]);
+            }
+
+            return vertices;
+        }
+
+
         /// <summary>
         /// </summary>
         /// <param name="vertices"></param>
