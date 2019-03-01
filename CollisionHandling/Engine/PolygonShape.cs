@@ -29,6 +29,10 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         public Point[] PointVertices { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        public float Radius { get; private set; }
+
 
         /// <summary>
         /// </summary>

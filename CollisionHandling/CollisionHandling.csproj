@@ -41,10 +41,13 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Engine\ClipVertex.cs" />
     <Compile Include="Engine\CollisionGrid.cs" />
     <Compile Include="Engine\Camera2D.cs" />
     <Compile Include="Engine\CircleShape.cs" />
     <Compile Include="Engine\CollisionManager.cs" />
+    <Compile Include="Engine\ContactFeatureType.cs" />
+    <Compile Include="Engine\FixedArray2.cs" />
     <Compile Include="Engine\GameHelper.cs" />
     <Compile Include="Engine\MathUtils.cs" />
     <Compile Include="Engine\PolygonShape.cs" />

@@ -144,16 +144,18 @@ namespace CollisionFloatTestNewMono.Engine
 
             //this.playerShape = new CircleShape("P", new Vector2(100 + 30 + ((100 / 2f) - (60 / 2f)), 40 + 10 + (100 / 2f - 60 / 2f)), 15);
 
-            this.playerShape = new CircleShape("P", new Vector2(696, 386), 15);
+            //this.playerShape = new CircleShape("P", new Vector2(696, 386), 15);
 
-            //var size = new Vector2(20, 30);
-            //this.playerShape = new PolygonShape("P", GameHelper.GetConvexHull(new[]
-            //{
-            //    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
-            //    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
-            //    new Vector2(-20, 0),
-            //    new Vector2(20, 0),
-            //}));
+            var size = new Vector2(20, 30);
+            this.playerShape = new PolygonShape("P", new Vector2(700, 380),
+                GameHelper.GetConvexHull(new[]
+                {
+                    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
+                    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
+                    new Vector2(-20, 0),
+                    new Vector2(20, 0),
+                }));
+
             //this.playerShape.Position = new Vector2(500 + (100 / 2f - 60 / 2f), 600 + (100 / 2f - 60 / 2f));
 
 
@@ -169,10 +171,10 @@ namespace CollisionFloatTestNewMono.Engine
             //this.shapes.Add(new CircleShape("C2", new Vector2(250 + 50, 100 + 50), 50));
 
 
-            this.shapes.Add(new RectangleShape("TestArea", new Rectangle(100, 100, 50, 50)));
-            this.shapes.Add(new RectangleShape("TestArea2", new Rectangle(150, 100, 50, 50)));
-            this.shapes.Add(new RectangleShape("TestArea3", new Rectangle(100, 150, 50, 50)));
-            this.shapes.Add(new RectangleShape("TestArea4", new Rectangle(150, 150, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea", new Rectangle(100, 100, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea2", new Rectangle(150, 100, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea3", new Rectangle(100, 150, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea4", new Rectangle(150, 150, 50, 50)));
 
             this.shapes.Add(new CircleShape("C1", new Vector2(300, 500), 50));
             this.shapes.Add(new CircleShape("C2", new Vector2(500, 500), 50));
@@ -542,21 +544,28 @@ namespace CollisionFloatTestNewMono.Engine
                         switch (shapeContactType)
                         {
                             case ShapeContactType.Circle:
-                                newVelocity += this.collisionManager.CircleAndCircle((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
+
+                                newVelocity += this.collisionManager.CollidesCircleAndCircle((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
+
                                 break;
                             case ShapeContactType.PolygonAndCircle:
 
                                 var polygonShape = (PolygonShape)sortedShapeA;
-                                polygonShape.SetRotation(MathHelper.ToRadians(this.rotation));
-                                newVelocity += this.collisionManager.CollidePolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                //polygonShape.SetRotation(MathHelper.ToRadians(this.rotation));
+                                newVelocity += this.collisionManager.CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
                                 
                                 //this.polygonBody.Rotation = MathHelper.ToRadians(this.rotation);
 
                                 break;
                             case ShapeContactType.LineAndCircle:
+
                                 newVelocity += this.collisionManager.CircleAndLine((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
+
                                 break;
                             case ShapeContactType.Polygon:
+
+                                newVelocity += this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
+
                                 break;
                             case ShapeContactType.PolygonAndLine:
                                 break;

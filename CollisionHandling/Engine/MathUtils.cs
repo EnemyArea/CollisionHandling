@@ -1,7 +1,6 @@
 ﻿#region
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
 
@@ -77,6 +76,88 @@ namespace CollisionFloatTestNewMono.Engine
 
             return new Vector2(x, y);
         }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="rot"></param>
+        /// <param name="axis"></param>
+        /// <returns></returns>
+        public static Vector2 Mul(ref Rotation rot, Vector2 axis)
+        {
+            return Mul(rot, axis);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="rot"></param>
+        /// <param name="axis"></param>
+        /// <returns></returns>
+        public static Vector2 MulT(ref Rotation rot, Vector2 axis)
+        {
+            return MulT(rot, axis);
+        }
+
+
+        /// <summary>
+        ///     Rotate a vector
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 Mul(Rotation q, Vector2 v)
+        {
+            return new Vector2(q.Cosine * v.X - q.Sine * v.Y, q.Sine * v.X + q.Cosine * v.Y);
+        }
+
+
+        /// <summary>
+        ///     Inverse rotate a vector
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public static Vector2 MulT(Rotation q, Vector2 v)
+        {
+            return new Vector2(q.Cosine * v.X + q.Sine * v.Y, -q.Sine * v.X + q.Cosine * v.Y);
+        }
+
+
+        /// <summary>
+        ///     Transpose multiply two rotations: qT * r
+        /// </summary>
+        /// <param name="q"></param>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public static Rotation MulT(Rotation q, Rotation r)
+        {
+            // [ qc qs] * [rc -rs] = [qc*rc+qs*rs -qc*rs+qs*rc]
+            // [-qs qc]   [rs  rc]   [-qs*rc+qc*rs qs*rs+qc*rc]
+            // s = qc * rs - qs * rc
+            // c = qc * rc + qs * rs
+            Rotation qr;
+            qr.Sine = q.Cosine * r.Sine - q.Sine * r.Cosine;
+            qr.Cosine = q.Cosine * r.Cosine + q.Sine * r.Sine;
+            return qr;
+        }
+
+
+        /// <summary>
+        /// v2 = A.q' * (B.q * v1 + B.p - A.p)
+        ///    = A.q' * B.q * v1 + A.q' * (B.p - A.p)
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
+        /// <returns></returns>
+        public static Transform MulT(Transform A, Transform B)
+        {
+            Transform C = new Transform();
+            C.Rotation = MulT(A.Rotation, B.Rotation);
+            C.Position = MulT(A.Rotation, B.Position - A.Position);
+            return C;
+        }
+
 
         public static float Cross(ref Vector2 a, ref Vector2 b)
         {

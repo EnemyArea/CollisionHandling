@@ -22,6 +22,16 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         private const float Epsilon = 1.192092896e-07f;
 
+        /// <summary>
+        /// </summary>
+        private const float LinearSlop = 0.005f;
+        
+        /// <summary>
+        /// The maximum number of contact points between two convex shapes.
+        /// DO NOT CHANGE THIS VALUE!
+        /// </summary>
+        private const int MaxManifoldPoints = 2;
+
 
         /// <summary>
         /// </summary>
@@ -63,8 +73,8 @@ namespace CollisionFloatTestNewMono.Engine
             var reversedMapData = new int[width, height];
 
             for (var y = 0; y < height; y++)
-                for (var x = 0; x < width; x++)
-                    reversedMapData[x, y] = mapCollisionData[y, x];
+            for (var x = 0; x < width; x++)
+                reversedMapData[x, y] = mapCollisionData[y, x];
 
             return reversedMapData;
         }
@@ -393,7 +403,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="polygonShape"></param>
         /// <param name="circleShape"></param>
-        public Vector2 CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
+        public Vector2 CollidesPolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
         {
             // Find the min separating edge.
             var normalIndex = 0;
@@ -467,7 +477,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="circleShape"></param>
         /// <param name="circleShapeObs"></param>
         /// <returns></returns>
-        public Vector2 CircleAndCircle(CircleShape circleShape, CircleShape circleShapeObs)
+        public Vector2 CollidesCircleAndCircle(CircleShape circleShape, CircleShape circleShapeObs)
         {
             var direction = (circleShape.Position + circleShape.Velocity) - (circleShapeObs.Position + circleShapeObs.Velocity);
             var distance = (float)Math.Round(direction.Length());
@@ -481,6 +491,281 @@ namespace CollisionFloatTestNewMono.Engine
             }
 
             return Vector2.Zero;
+        }
+
+
+        /// <summary>
+        ///     Clipping for contact manifolds.
+        /// </summary>
+        /// <param name="vOut">The v out.</param>
+        /// <param name="vIn">The v in.</param>
+        /// <param name="normal">The normal.</param>
+        /// <param name="offset">The offset.</param>
+        /// <param name="vertexIndexA">The vertex index A.</param>
+        /// <returns></returns>
+        private static int ClipSegmentToLine(out FixedArray2<ClipVertex> vOut, ref FixedArray2<ClipVertex> vIn, Vector2 normal, float offset, int vertexIndexA)
+        {
+            vOut = new FixedArray2<ClipVertex>();
+
+            // Start with no output points
+            int numOut = 0;
+
+            // Calculate the distance of end points to the line
+            float distance0 = Vector2.Dot(normal, vIn.Value0.V) - offset;
+            float distance1 = Vector2.Dot(normal, vIn.Value1.V) - offset;
+
+            // If the points are behind the plane
+            if (distance0 <= 0.0f) vOut[numOut++] = vIn.Value0;
+            if (distance1 <= 0.0f) vOut[numOut++] = vIn.Value1;
+
+            // If the points are on different sides of the plane
+            if (distance0 * distance1 < 0.0f)
+            {
+                // Find intersection point of edge and plane
+                float interp = distance0 / (distance0 - distance1);
+
+                ClipVertex cv = vOut[numOut];
+                cv.V = vIn.Value0.V + interp * (vIn.Value1.V - vIn.Value0.V);
+
+                // VertexA is hitting edgeB.
+                cv.ID.ContactFeature.IndexA = (byte)vertexIndexA;
+                cv.ID.ContactFeature.IndexB = vIn.Value0.ID.ContactFeature.IndexB;
+                //cv.ID.ContactFeature.TypeA = ContactFeatureType.Vertex;
+                //cv.ID.ContactFeature.TypeB = ContactFeatureType.Face;
+                vOut[numOut] = cv;
+
+                ++numOut;
+            }
+
+            return numOut;
+        }
+
+
+        /// <summary>
+        ///     Compute the collision manifold between two polygons.
+        /// </summary>
+        public Vector2 CollidePolygons(PolygonShape polyA, PolygonShape polyB)
+        {
+            // Find edge normal of max separation on A - return if separating axis is found
+            // Find edge normal of max separation on B - return if separation axis is found
+            // Choose reference edge as min(minA, minB)
+            // Find incident edge
+            // Clip
+
+            float totalRadius = polyA.Radius + polyB.Radius;
+
+            var xfA = polyA.Transform;
+            var xfB = polyB.Transform;
+
+            int edgeA;
+            float separationA = FindMaxSeparation(out edgeA, polyA, ref xfA, polyB, ref xfB);
+            if (separationA > totalRadius)
+                return Vector2.Zero;
+
+            int edgeB;
+            float separationB = FindMaxSeparation(out edgeB, polyB, ref xfB, polyA, ref xfA);
+            if (separationB > totalRadius)
+                return Vector2.Zero;
+
+            PolygonShape poly1; // reference polygon
+            PolygonShape poly2; // incident polygon
+            Transform xf1, xf2;
+            int edge1; // reference edge
+            bool flip;
+            const float k_tol = 0.1f * LinearSlop;
+
+            if (separationB > separationA + k_tol)
+            {
+                poly1 = polyB;
+                poly2 = polyA;
+                xf1 = xfB;
+                xf2 = xfA;
+                edge1 = edgeB;
+                //manifold.Type = ManifoldType.FaceB;
+                flip = true;
+            }
+            else
+            {
+                poly1 = polyA;
+                poly2 = polyB;
+                xf1 = xfA;
+                xf2 = xfB;
+                edge1 = edgeA;
+                //manifold.Type = ManifoldType.FaceA;
+                flip = false;
+            }
+
+            FixedArray2<ClipVertex> incidentEdge;
+            FindIncidentEdge(out incidentEdge, poly1, ref xf1, edge1, poly2, ref xf2);
+
+            int count1 = poly1.Vertices.Length;
+            Vector2[] vertices1 = poly1.Vertices;
+
+            int iv1 = edge1;
+            int iv2 = edge1 + 1 < count1 ? edge1 + 1 : 0;
+
+            Vector2 v11 = vertices1[iv1];
+            Vector2 v12 = vertices1[iv2];
+
+            Vector2 localTangent = v12 - v11;
+            localTangent.Normalize();
+
+            Vector2 localNormal = MathUtils.Cross(localTangent, 1.0f);
+            Vector2 planePoint = 0.5f * (v11 + v12);
+
+            Vector2 tangent = MathUtils.Mul(ref xf1.Rotation, localTangent);
+            Vector2 normal = MathUtils.Cross(tangent, 1.0f);
+
+            v11 = MathUtils.Mul(ref xf1, v11);
+            v12 = MathUtils.Mul(ref xf1, v12);
+
+            // Face offset.
+            float frontOffset = Vector2.Dot(normal, v11);
+
+            // Side offsets, extended by polytope skin thickness.
+            float sideOffset1 = -Vector2.Dot(tangent, v11) + totalRadius;
+            float sideOffset2 = Vector2.Dot(tangent, v12) + totalRadius;
+
+            // Clip incident edge against extruded edge1 side edges.
+            FixedArray2<ClipVertex> clipPoints1;
+            FixedArray2<ClipVertex> clipPoints2;
+
+            // Clip to box side 1
+            int np = ClipSegmentToLine(out clipPoints1, ref incidentEdge, -tangent, sideOffset1, iv1);
+
+            if (np < 2)
+                return Vector2.Zero;
+
+            // Clip to negative box side 1
+            np = ClipSegmentToLine(out clipPoints2, ref clipPoints1, tangent, sideOffset2, iv2);
+
+            if (np < 2)
+                return Vector2.Zero;
+
+            //// Now clipPoints2 contains the clipped points.
+            //int pointCount = 0;
+            //for (int i = 0; i < MaxManifoldPoints; ++i)
+            //{
+            //    float separation = Vector2.Dot(normal, clipPoints2[i].V) - frontOffset;
+
+            //    if (separation <= totalRadius)
+            //    {
+            //        ManifoldPoint cp = manifold.Points[pointCount];
+            //        cp.LocalPoint = MathUtils.MulT(ref xf2, clipPoints2[i].V);
+            //        cp.Id = clipPoints2[i].ID;
+
+            //        if (flip)
+            //        {
+            //            // Swap features
+            //            ContactFeature cf = cp.Id.ContactFeature;
+            //            cp.Id.ContactFeature.IndexA = cf.IndexB;
+            //            cp.Id.ContactFeature.IndexB = cf.IndexA;
+            //            cp.Id.ContactFeature.TypeA = cf.TypeB;
+            //            cp.Id.ContactFeature.TypeB = cf.TypeA;
+            //        }
+
+            //        manifold.Points[pointCount] = cp;
+
+            //        ++pointCount;
+            //    }
+            //}
+
+            //manifold.PointCount = pointCount;
+            return Vector2.Zero;
+        }
+
+
+        /// <summary>
+        ///     Find the max separation between poly1 and poly2 using edge normals from poly1.
+        /// </summary>
+        private static float FindMaxSeparation(out int edgeIndex, PolygonShape poly1, ref Transform xf1, PolygonShape poly2, ref Transform xf2)
+        {
+            int count1 = poly1.Vertices.Length;
+            int count2 = poly2.Vertices.Length;
+            Vector2[] n1s = poly1.Normals;
+            Vector2[] v1s = poly1.Vertices;
+            Vector2[] v2s = poly2.Vertices;
+            Transform xf = MathUtils.MulT(xf2, xf1);
+
+            int bestIndex = 0;
+            float maxSeparation = -MaxFloat;
+            for (int i = 0; i < count1; ++i)
+            {
+                // Get poly1 normal in frame2.
+                Vector2 n = MathUtils.Mul(ref xf.Rotation, n1s[i]);
+                Vector2 v1 = MathUtils.Mul(ref xf, v1s[i]);
+
+                // Find deepest point for normal i.
+                float si = MaxFloat;
+                for (int j = 0; j < count2; ++j)
+                {
+                    float sij = Vector2.Dot(n, v2s[j] - v1);
+                    if (sij < si)
+                    {
+                        si = sij;
+                    }
+                }
+
+                if (si > maxSeparation)
+                {
+                    maxSeparation = si;
+                    bestIndex = i;
+                }
+            }
+
+            edgeIndex = bestIndex;
+            return maxSeparation;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="poly1"></param>
+        /// <param name="xf1"></param>
+        /// <param name="edge1"></param>
+        /// <param name="poly2"></param>
+        /// <param name="xf2"></param>
+        private static void FindIncidentEdge(out FixedArray2<ClipVertex> c, PolygonShape poly1, ref Transform xf1, int edge1, PolygonShape poly2, ref Transform xf2)
+        {
+            Vector2[] normals1 = poly1.Normals;
+
+            int count2 = poly2.Vertices.Length;
+            Vector2[] vertices2 = poly2.Vertices;
+            Vector2[] normals2 = poly2.Normals;
+
+            // Get the normal of the reference edge in poly2's frame.
+            Vector2 normal1 = MathUtils.MulT(ref xf2.Rotation, MathUtils.Mul(ref xf1.Rotation, normals1[edge1]));
+
+            // Find the incident edge on poly2.
+            int index = 0;
+            float minDot = MaxFloat;
+            for (int i = 0; i < count2; ++i)
+            {
+                float dot = Vector2.Dot(normal1, normals2[i]);
+                if (dot < minDot)
+                {
+                    minDot = dot;
+                    index = i;
+                }
+            }
+
+            // Build the clip vertices for the incident edge.
+            int i1 = index;
+            int i2 = i1 + 1 < count2 ? i1 + 1 : 0;
+
+            c = new FixedArray2<ClipVertex>();
+            c.Value0.V = MathUtils.Mul(ref xf2, vertices2[i1]);
+            c.Value0.ID.ContactFeature.IndexA = (byte)edge1;
+            c.Value0.ID.ContactFeature.IndexB = (byte)i1;
+            //c.Value0.ID.ContactFeature.TypeA = ContactFeatureType.Face;
+            //c.Value0.ID.ContactFeature.TypeB = ContactFeatureType.Vertex;
+
+            c.Value1.V = MathUtils.Mul(ref xf2, vertices2[i2]);
+            c.Value1.ID.ContactFeature.IndexA = (byte)edge1;
+            c.Value1.ID.ContactFeature.IndexB = (byte)i2;
+            //c.Value1.ID.ContactFeature.TypeA = ContactFeatureType.Face;
+            //c.Value1.ID.ContactFeature.TypeB = ContactFeatureType.Vertex;
         }
     }
 }
