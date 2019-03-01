@@ -87,8 +87,8 @@ namespace CollisionFloatTestNewMono.Engine
             var reversedMapData = new int[width, height];
 
             for (var y = 0; y < height; y++)
-            for (var x = 0; x < width; x++)
-                reversedMapData[x, y] = mapCollisionData[y, x];
+                for (var x = 0; x < width; x++)
+                    reversedMapData[x, y] = mapCollisionData[y, x];
 
             return reversedMapData;
         }
@@ -417,12 +417,12 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="polygonShape"></param>
         /// <param name="circleShape"></param>
-        public Vector2 CollideCircleAndPolygon(PolygonShape polygonShape, CircleShape circleShape)
+        public Vector2 CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
         {
             // Find the min separating edge.
             var normalIndex = 0;
             var separation = -MaxFloat;
-            var radius = polygonShape.Radius + circleShape.Radius;
+            var radius = circleShape.Radius;
             var vertexCount = polygonShape.Vertices.Length;
             var vertices = polygonShape.Vertices;
             var normals = polygonShape.Normals;
@@ -430,7 +430,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             for (var i = 0; i < vertexCount; ++i)
             {
-                var s = Vector2.Dot(normals[i], center - vertices[i]);
+                var s = Vector2.Dot(normals[i], center - (polygonShape.Position + polygonShape.Velocity + vertices[i]));
                 if (s > radius)
                     return Vector2.Zero;
 
@@ -444,8 +444,8 @@ namespace CollisionFloatTestNewMono.Engine
             // Vertices that subtend the incident face.
             var vertIndex1 = normalIndex;
             var vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
-            var v1 = vertices[vertIndex1];
-            var v2 = vertices[vertIndex2];
+            var v1 = polygonShape.Position + polygonShape.Velocity + vertices[vertIndex1];
+            var v2 = polygonShape.Position + polygonShape.Velocity + vertices[vertIndex2];
 
             // If the center is inside the polygon ...
             if (separation < Epsilon)

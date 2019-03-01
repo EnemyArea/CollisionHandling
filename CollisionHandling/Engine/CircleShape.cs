@@ -8,7 +8,6 @@ namespace CollisionFloatTestNewMono.Engine
 {
     public class CircleShape : Shape
     {
-        public string Name { get; }
         public int Radius { get; }
         public Point TilePosition { get; set; }
 
@@ -25,10 +24,10 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
 
-        public CircleShape(string name, Vector2 position, int radius) : base(ShapeType.Circle)
+        public CircleShape(string name, Vector2 position, int radius)
+            : base(ShapeType.Circle, name)
         {
             this.Position = position;
-            this.Name = name;
             this.Radius = radius;
             this.TilePosition = GameHelper.ConvertPositionToTilePosition(position);
         }

@@ -13,9 +13,9 @@ namespace CollisionFloatTestNewMono.Engine
         public IList<Vector2> Normals { get; }
         public Vector2[] Vertices { get; }
         public Point[] PointVertices { get; }
-        public int Radius { get; }
 
-        public PolygonShape(IEnumerable<Vector2> vertices) : base(ShapeType.Polygon)
+        public PolygonShape(string name, IEnumerable<Vector2> vertices)
+            : base(ShapeType.Polygon, name)
         {
             this.Vertices = vertices.ToArray();
             this.Normals = new List<Vector2>();
@@ -39,6 +39,12 @@ namespace CollisionFloatTestNewMono.Engine
             {
                 yield return GameHelper.ConvertPositionToTilePosition(vertex);
             }
+        }
+
+
+        public override string ToString()
+        {
+            return $"{this.Name} / {this.Position}/ {this.Vertices} / {this.Normals} / {this.PointVertices}";
         }
     }
 }
