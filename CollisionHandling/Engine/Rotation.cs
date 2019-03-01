@@ -15,12 +15,12 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// Sine
         /// </summary>
-        public float s;
+        public float Sine;
 
         /// <summary>
         /// Cosine
         /// </summary>
-        public float c;
+        public float Cosine;
 
 
         /// <summary>
@@ -30,11 +30,11 @@ namespace CollisionFloatTestNewMono.Engine
         public Rotation(float angle)
         {
             // TODO_ERIN optimize
-            this.s = (float)Math.Sin(angle);
-            this.c = (float)Math.Cos(angle);
+            this.Sine = (float)Math.Sin(angle);
+            this.Cosine = (float)Math.Cos(angle);
         }
 
-        
+
         /// <summary>
         ///     Set using an angle in radians.
         /// </summary>
@@ -44,14 +44,14 @@ namespace CollisionFloatTestNewMono.Engine
             //Velcro: Optimization
             if (angle == 0)
             {
-                this.s = 0;
-                this.c = 1;
+                this.Sine = 0;
+                this.Cosine = 1;
             }
             else
             {
                 // TODO_ERIN optimize
-                this.s = (float)Math.Sin(angle);
-                this.c = (float)Math.Cos(angle);
+                this.Sine = (float)Math.Sin(angle);
+                this.Cosine = (float)Math.Cos(angle);
             }
         }
 
@@ -61,8 +61,8 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         public void SetIdentity()
         {
-            this.s = 0.0f;
-            this.c = 1.0f;
+            this.Sine = 0.0f;
+            this.Cosine = 1.0f;
         }
 
 
@@ -71,7 +71,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         public float GetAngle()
         {
-            return (float)Math.Atan2(this.s, this.c);
+            return (float)Math.Atan2(this.Sine, this.Cosine);
         }
 
 
@@ -80,7 +80,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         public Vector2 GetXAxis()
         {
-            return new Vector2(this.c, this.s);
+            return new Vector2(this.Cosine, this.Sine);
         }
 
 
@@ -89,7 +89,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         public Vector2 GetYAxis()
         {
-            return new Vector2(-this.s, this.c);
+            return new Vector2(-this.Sine, this.Cosine);
         }
     }
 }

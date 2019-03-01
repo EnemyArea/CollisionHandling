@@ -72,8 +72,8 @@ namespace CollisionFloatTestNewMono.Engine
 
         public static Vector2 Mul(ref Transform T, ref Vector2 v)
         {
-            float x = (T.q.c * v.X - T.q.s * v.Y) + T.p.X;
-            float y = (T.q.s * v.X + T.q.c * v.Y) + T.p.Y;
+            float x = (T.Rotation.Cosine * v.X - T.Rotation.Sine * v.Y) + T.Position.X;
+            float y = (T.Rotation.Sine * v.X + T.Rotation.Cosine * v.Y) + T.Position.Y;
 
             return new Vector2(x, y);
         }

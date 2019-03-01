@@ -42,8 +42,8 @@ namespace CollisionFloatTestNewMono.Engine
             var vertices = CreateRectangle(hx, hy);
 
             var xf = new Transform();
-            xf.p = center;
-            xf.q.Set(angle);
+            xf.Position = center;
+            xf.Rotation.Set(angle);
 
             // Transform vertices
             for (var i = 0; i < 4; ++i)

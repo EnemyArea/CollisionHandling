@@ -12,8 +12,13 @@ namespace CollisionFloatTestNewMono.Engine
     /// </summary>
     public struct Transform
     {
-        public Vector2 p;
-        public Rotation q;
+        /// <summary>
+        /// </summary>
+        public Vector2 Position;
+
+        /// <summary>
+        /// </summary>
+        public Rotation Rotation;
 
 
         /// <summary>
@@ -23,8 +28,8 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="rotation">The r.</param>
         public Transform(Vector2 position, Rotation rotation)
         {
-            this.p = position;
-            this.q = rotation;
+            this.Position = position;
+            this.Rotation = rotation;
         }
 
 
@@ -33,8 +38,8 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         public void SetIdentity()
         {
-            this.p = Vector2.Zero;
-            this.q.SetIdentity();
+            this.Position = Vector2.Zero;
+            this.Rotation.SetIdentity();
         }
 
 
@@ -45,8 +50,8 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="angle">The angle.</param>
         public void Set(Vector2 position, float angle)
         {
-            this.p = position;
-            this.q.Set(angle);
+            this.Position = position;
+            this.Rotation.Set(angle);
         }
     }
 }

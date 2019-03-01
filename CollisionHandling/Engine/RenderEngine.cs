@@ -2,12 +2,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using VelcroPhysics.DebugViews.MonoGame;
 using VelcroPhysics.Dynamics;
+using VelcroPhysics.Factories;
+using VelcroPhysics.Shared;
+using VelcroPhysics.Utilities;
 
 #endregion
 
@@ -242,10 +246,11 @@ namespace CollisionFloatTestNewMono.Engine
             //this.world = new World(Vector2.Zero);
             //this.debugView = new DebugView(this.world);
             //this.debugView.LoadContent(graphicsDevice, content);
-            //this.playerBody = BodyFactory.CreateCircle(this.world, ConvertUnits.ToSimUnits(this.playerShape.Radius), 0, bodyType: BodyType.Dynamic);
-            //this.playerBody.SleepingAllowed = false;
+            ////this.playerBody = BodyFactory.CreateCircle(this.world, ConvertUnits.ToSimUnits(this.playerShape.Radius), 0, bodyType: BodyType.Dynamic);
+            ////this.playerBody.SleepingAllowed = false;
             //this.polygonBody = BodyFactory.CreatePolygon(this.world, new Vertices(this.vertices.Select(ConvertUnits.ToSimUnits)), 0);
             //this.polygonBody.SleepingAllowed = false;
+            //this.polygonBody.Position = ConvertUnits.ToSimUnits(new Vector2(700, 400));
 
             //this.playerBody.Position = ConvertUnits.ToSimUnits(this.playerShape.Position);
 
@@ -482,21 +487,7 @@ namespace CollisionFloatTestNewMono.Engine
             // Bewegen....
             var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
             this.rotation = (int)MathHelper.Lerp(0, 360, time);
-
-            //var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(2).ToArray();
-            //foreach (var circleShape in shapesToMove)
-            //{
-            //    var firstCircleShape = circleShape;
-            //    firstCircleShape.Velocity = Vector2.Zero;
-
-            //    var firstCircleShapeVelocity = new Vector2(0, shake);
-            //    if (firstCircleShapeVelocity != Vector2.Zero)
-            //    {
-            //        firstCircleShapeVelocity.Normalize();
-            //        firstCircleShape.Velocity += firstCircleShapeVelocity;
-            //    }
-            //}
-
+            
             this.playerShape.Color = Color.Fuchsia;
             this.playerShape.ResetVelocity();
 
@@ -558,6 +549,8 @@ namespace CollisionFloatTestNewMono.Engine
                                 var polygonShape = (PolygonShape)sortedShapeA;
                                 polygonShape.SetRotation(MathHelper.ToRadians(this.rotation));
                                 newVelocity += this.collisionManager.CollidePolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                
+                                //this.polygonBody.Rotation = MathHelper.ToRadians(this.rotation);
 
                                 break;
                             case ShapeContactType.LineAndCircle:
