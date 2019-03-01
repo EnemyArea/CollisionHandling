@@ -83,7 +83,7 @@
       <Name>MonoGame</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\VelcroPhysics\VelcroPhysics\VelcroPhysics.MonoGame.csproj">
-      <Project>{A1E006CF-211A-4025-9CA8-838C6E37C615}</Project>
+      <Project>{a1e006cf-211a-4025-9ca8-838c6e37c615}</Project>
       <Name>VelcroPhysics.MonoGame</Name>
     </ProjectReference>
   </ItemGroup>

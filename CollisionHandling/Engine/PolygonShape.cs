@@ -15,7 +15,7 @@ namespace CollisionFloatTestNewMono.Engine
         public Point[] PointVertices { get; }
         public int Radius { get; }
 
-        public PolygonShape(IEnumerable<Vector2> vertices) : base(ShapeContactType.Polygon)
+        public PolygonShape(IEnumerable<Vector2> vertices) : base(ShapeType.Polygon)
         {
             this.Vertices = vertices.ToArray();
             this.Normals = new List<Vector2>();

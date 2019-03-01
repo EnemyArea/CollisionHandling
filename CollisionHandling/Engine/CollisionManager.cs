@@ -5,27 +5,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
-using VelcroPhysics.Collision.ContactSystem;
 
 #endregion
 
 namespace CollisionFloatTestNewMono.Engine
 {
     /// <summary>
-    /// 
     /// </summary>
-    [Flags]
-    public enum ShapeContactType
+    public enum ShapeContactType : byte
     {
         NotSupported,
-
         Polygon,
-        Circle,
-        Line,
-        LineAndCircle,
         PolygonAndCircle,
-        LineAndPolygon
+        Circle,
+        PolygonAndLine,
+        LineAndCircle
     }
+
+
+    /// <summary>
+    /// </summary>
+    public enum ShapeType
+    {
+        Unknown = -1,
+        Circle = 0,
+        Line = 1,
+        Polygon = 2,
+    }
+
 
     /// <summary>
     /// </summary>
@@ -80,8 +87,8 @@ namespace CollisionFloatTestNewMono.Engine
             var reversedMapData = new int[width, height];
 
             for (var y = 0; y < height; y++)
-                for (var x = 0; x < width; x++)
-                    reversedMapData[x, y] = mapCollisionData[y, x];
+            for (var x = 0; x < width; x++)
+                reversedMapData[x, y] = mapCollisionData[y, x];
 
             return reversedMapData;
         }
@@ -357,19 +364,19 @@ namespace CollisionFloatTestNewMono.Engine
 
             return Vector2.Zero;
         }
-        
+
 
         /// <summary>
         /// </summary>
-        /// <param name="circleShape"></param>
         /// <param name="lineShape"></param>
+        /// <param name="circleShape"></param>
         /// <returns></returns>
-        public Vector2 CircleAndLine(CircleShape circleShape, LineShape lineShape)
+        public Vector2 CircleAndLine(LineShape lineShape, CircleShape circleShape)
         {
             var center = circleShape.Position + circleShape.Velocity;
             var radius = circleShape.Radius;
             var lineStart = lineShape.Start;
-            var lineEnd = lineShape.End;           
+            var lineEnd = lineShape.End;
             var nearestVector = Vector2.Zero;
             var pointOnLine = ProjectPointOnLine(lineStart, lineEnd, center);
             var localNearestVector = FindNearestExitVector(pointOnLine, center, radius);
@@ -408,9 +415,9 @@ namespace CollisionFloatTestNewMono.Engine
         ///     Compute the collision between a polygon and a circle.
         ///     https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Collision/Narrowphase/CollideCircle.cs
         /// </summary>
-        /// <param name="circleShape"></param>
         /// <param name="polygonShape"></param>
-        public Vector2 CollideCircleAndPolygon(CircleShape circleShape, PolygonShape polygonShape)
+        /// <param name="circleShape"></param>
+        public Vector2 CollideCircleAndPolygon(PolygonShape polygonShape, CircleShape circleShape)
         {
             // Find the min separating edge.
             var normalIndex = 0;

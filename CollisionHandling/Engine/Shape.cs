@@ -14,11 +14,11 @@ namespace CollisionFloatTestNewMono.Engine
 
         public virtual Vector2 Position { get; set; }
 
-        public ShapeContactType ShapeContactType { get;}
+        public ShapeType ShapeType { get;}
 
-        protected Shape(ShapeContactType shapeContactType)
+        protected Shape(ShapeType shapeType)
         {
-            this.ShapeContactType = shapeContactType;
+            this.ShapeType = shapeType;
             this.Color = Color.Gray;
         }
     }

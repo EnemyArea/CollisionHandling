@@ -13,7 +13,7 @@ namespace CollisionFloatTestNewMono.Engine
         public Point StartTilePosition { get; }
         public Point EndTilePosition { get; }
 
-        public LineShape(Vector2 start, Vector2 end) : base(ShapeContactType.Line)
+        public LineShape(Vector2 start, Vector2 end) : base(ShapeType.Line)
         {
             this.Start = start;
             this.End = end;

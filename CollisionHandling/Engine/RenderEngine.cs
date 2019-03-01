@@ -88,30 +88,30 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         private CollisionManager collisionManager;
 
-
         /// <summary>
+        /// Circle = 0,
+        /// Line = 1,
+        /// Polygon = 2,
         /// </summary>
         private static readonly ShapeContactType[,] registers =
         {
             {
-                ShapeContactType.Circle,
-                ShapeContactType.Line,
-                ShapeContactType.PolygonAndCircle,
-                ShapeContactType.NotSupported
+                ShapeContactType.Circle,            // 0,0 = Circle->Circle
+                ShapeContactType.LineAndCircle,     // 0,1 = Circle->Line
+                ShapeContactType.PolygonAndCircle,  // 0,2 = Circle->Polygon
             },
             {
-                ShapeContactType.LineAndCircle,
-                ShapeContactType.NotSupported,
-                ShapeContactType.LineAndCircle,
-                ShapeContactType.NotSupported
+                ShapeContactType.LineAndCircle,     // 1,0 = Line->Circle
+                ShapeContactType.NotSupported,      // 1,1 = Line->Line
+                ShapeContactType.PolygonAndLine     // 1,2 = Line->Polygon
             },
             {
-                ShapeContactType.PolygonAndCircle,
-                ShapeContactType.LineAndPolygon,
-                ShapeContactType.Polygon,
-                ShapeContactType.NotSupported
+                ShapeContactType.PolygonAndCircle,  // 2,0 = Polygon->Circle
+                ShapeContactType.PolygonAndLine,    // 2,1 = Polygon->Line
+                ShapeContactType.Polygon            // 2,2 = Polygon->Polygon
             }
         };
+
 
         private DebugView debugView;
         private World world;
@@ -151,7 +151,7 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(-20, 0),
                 new Vector2(20, 0),
             }));
-            this.playerShape.Position = new Vector2(500 + (100 / 2f - 60 / 2f), 500 + (100 / 2f - 60 / 2f));
+            this.playerShape.Position = new Vector2(500 + (100 / 2f - 60 / 2f), 600 + (100 / 2f - 60 / 2f));
 
 
             //this.playerShape = new CircleShape("P", new Vector2(500 + (100 / 2f - 60 / 2f), 500 + (100 / 2f - 60 / 2f)), 30);
@@ -518,7 +518,7 @@ namespace CollisionFloatTestNewMono.Engine
             foreach (var shape in allShapesAround)
                 shape.Color = Color.Yellow;
 
-            foreach (var shape in allShapesAround)
+            foreach (var shapeA in allShapesAround)
             {
                 var iterations = 0;
                 bool hasCollison;
@@ -526,49 +526,51 @@ namespace CollisionFloatTestNewMono.Engine
                 {
                     hasCollison = false;
 
-                    foreach (var shapeObs in allShapesAround)
+                    foreach (var shapeB in allShapesAround)
                     {
-                        if (shape == shapeObs || (this.playerShape == shapeObs))
+                        if (shapeA == shapeB || (this.playerShape == shapeB))
                             continue;
-                        
-                        var newVelocity = Vector2.Zero;
-                        
-                        var shapeContactType = registers[(int)shape.ShapeContactType, (int)shapeObs.ShapeContactType];
-                        Debug.WriteLine(shapeContactType);
 
-                        if (shape == this.playerShape && shapeObs is CircleShape && shapeContactType == ShapeContactType.PolygonAndCircle)
+                        var type1 = shapeA.ShapeType;
+                        var type2 = shapeB.ShapeType;
+                        Shape sortedShapeA;
+                        Shape sortedShapeB;
+
+                        if ((type1 >= type2 || (type1 == ShapeType.Line && type2 == ShapeType.Polygon)) && !(type2 == ShapeType.Line && type1 == ShapeType.Polygon))
                         {
-                            //switch (shapeContactType)
-                            //{
-                            //    case ShapeContactType.Circle:
+                            sortedShapeA = shapeA;
+                            sortedShapeB = shapeB;
+                        }
+                        else
+                        {
+                            sortedShapeA = shapeB;
+                            sortedShapeB = shapeA;
+                        }
+                       
+                        var newVelocity = Vector2.Zero;
+                        var shapeContactType = registers[(int)shapeA.ShapeType, (int)shapeB.ShapeType];
+                        switch (shapeContactType)
+                        {
+                            case ShapeContactType.Circle:
+                                newVelocity = this.collisionManager.CircleAndCircle((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                break;
+                            case ShapeContactType.PolygonAndCircle:
+                                newVelocity = this.collisionManager.CollideCircleAndPolygon((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                break;
+                            case ShapeContactType.LineAndCircle:
+                                newVelocity = this.collisionManager.CircleAndLine((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                break;
+                            case ShapeContactType.Polygon:
+                                break;
+                            case ShapeContactType.PolygonAndLine:
+                                break;
+                        }
 
-                            //        newVelocity = this.collisionManager.CircleAndCircle((CircleShape)shape, (CircleShape)shapeObs);
-
-                            //        break;
-                            //    case ShapeContactType.CircleAndLine:
-
-                            //        newVelocity = this.collisionManager.CircleAndLine((CircleShape)shape, (LineShape)shapeObs);
-
-                            //        break;
-                            //    case ShapeContactType.CircleAndPolygon:
-
-                            //        newVelocity = this.collisionManager.CollideCircleAndPolygon((CircleShape)shape, (PolygonShape)shapeObs);
-
-                            //        break;
-                            //    case ShapeContactType.PolygonAndLine:
-
-                            //        break;
-                            //    case ShapeContactType.Polygon:
-
-                            //        break;
-                            //}
-
-                            if (newVelocity != Vector2.Zero)
-                            {
-                                shape.Velocity += newVelocity;
-                                shapeObs.Color = Color.Red;
-                                hasCollison = true;
-                            }
+                        if (newVelocity != Vector2.Zero)
+                        {
+                            shapeA.Velocity += newVelocity;
+                            shapeB.Color = Color.Red;
+                            hasCollison = true;
                         }
                     }
 

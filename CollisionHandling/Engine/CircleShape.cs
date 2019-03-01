@@ -25,7 +25,7 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
 
-        public CircleShape(string name, Vector2 position, int radius) : base(ShapeContactType.Circle)
+        public CircleShape(string name, Vector2 position, int radius) : base(ShapeType.Circle)
         {
             this.Position = position;
             this.Name = name;
