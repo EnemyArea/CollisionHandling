@@ -1,5 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace CollisionFloatTestNewMono.Engine
 {
@@ -7,6 +12,27 @@ namespace CollisionFloatTestNewMono.Engine
     /// </summary>
     public static class VectorHelper
     {
+        /// <summary>
+        /// </summary>
+        /// <param name="vertices"></param>
+        /// <returns></returns>
+        public static Vector2[] CreateNormals(IList<Vector2> vertices)
+        {
+            // Compute normals. Ensure the edges have non-zero length.
+            var normals = new Vector2[vertices.Count];
+            for (var i = 0; i < vertices.Count; ++i)
+            {
+                var i1 = i;
+                var i2 = i + 1 < vertices.Count ? i + 1 : 0;
+                var edge = vertices[i2] - vertices[i1];
+                var temp = MathUtils.Cross(edge, 1.0f);
+                temp.Normalize();
+                normals[i] = temp;
+            }
+
+            return normals;
+        }
+
         /// <summary>
         /// </summary>
         /// <param name="vector"></param>

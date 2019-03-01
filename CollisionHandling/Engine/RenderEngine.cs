@@ -2,8 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -89,26 +87,26 @@ namespace CollisionFloatTestNewMono.Engine
         private CollisionManager collisionManager;
 
         /// <summary>
-        /// Circle = 0,
-        /// Line = 1,
-        /// Polygon = 2,
+        ///     Circle = 0,
+        ///     Line = 1,
+        ///     Polygon = 2,
         /// </summary>
         private static readonly ShapeContactType[,] registers =
         {
             {
-                ShapeContactType.Circle,            // 0,0 = Circle->Circle
-                ShapeContactType.LineAndCircle,     // 0,1 = Circle->Line
-                ShapeContactType.PolygonAndCircle,  // 0,2 = Circle->Polygon
+                ShapeContactType.Circle, // 0,0 = Circle->Circle
+                ShapeContactType.LineAndCircle, // 0,1 = Circle->Line
+                ShapeContactType.PolygonAndCircle, // 0,2 = Circle->Polygon
             },
             {
-                ShapeContactType.LineAndCircle,     // 1,0 = Line->Circle
-                ShapeContactType.NotSupported,      // 1,1 = Line->Line
-                ShapeContactType.PolygonAndLine     // 1,2 = Line->Polygon
+                ShapeContactType.LineAndCircle, // 1,0 = Line->Circle
+                ShapeContactType.NotSupported, // 1,1 = Line->Line
+                ShapeContactType.PolygonAndLine // 1,2 = Line->Polygon
             },
             {
-                ShapeContactType.PolygonAndCircle,  // 2,0 = Polygon->Circle
-                ShapeContactType.PolygonAndLine,    // 2,1 = Polygon->Line
-                ShapeContactType.Polygon            // 2,2 = Polygon->Polygon
+                ShapeContactType.PolygonAndCircle, // 2,0 = Polygon->Circle
+                ShapeContactType.PolygonAndLine, // 2,1 = Polygon->Line
+                ShapeContactType.Polygon // 2,2 = Polygon->Polygon
             }
         };
 
@@ -117,6 +115,7 @@ namespace CollisionFloatTestNewMono.Engine
         private World world;
         private Body polygonBody;
         private Body playerBody;
+        private int rotation;
 
 
         /// <summary>
@@ -166,25 +165,25 @@ namespace CollisionFloatTestNewMono.Engine
             //this.shapes.Add(new CircleShape("C2", new Vector2(250 + 50, 100 + 50), 50));
 
 
-            this.shapes.Add(new RectangleShape("TestArea", new Rectangle(100, 100, 50, 50)));
-            this.shapes.Add(new RectangleShape("TestArea2", new Rectangle(150, 100, 50, 50)));
-            this.shapes.Add(new RectangleShape("TestArea3", new Rectangle(100, 150, 50, 50)));
-            this.shapes.Add(new RectangleShape("TestArea4", new Rectangle(150, 150, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea", new Rectangle(100, 100, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea2", new Rectangle(150, 100, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea3", new Rectangle(100, 150, 50, 50)));
+            //this.shapes.Add(new RectangleShape("TestArea4", new Rectangle(150, 150, 50, 50)));
 
             this.shapes.Add(new CircleShape("C1", new Vector2(300, 500), 50));
             this.shapes.Add(new CircleShape("C2", new Vector2(500, 500), 50));
 
-            var polyOffset = new Vector2(700, 400);
+
             var sightSize = new Vector2(150, 190);
             var baseVertices = new[]
             {
-                polyOffset + new Vector2(sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
-                polyOffset + new Vector2(-sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
-                polyOffset + new Vector2(-15, 0),
-                polyOffset + new Vector2(15, 0),
+                new Vector2(sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-sightSize.X, sightSize.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-15, 0),
+                new Vector2(15, 0),
             };
             this.vertices = GameHelper.GetConvexHull(baseVertices);
-            this.shapes.Add(new PolygonShape("Polygon1", this.vertices));
+            this.shapes.Add(new PolygonShape("Polygon1", new Vector2(700, 400), this.vertices));
 
             var offset = new Vector2(120, 140);
 
@@ -480,9 +479,9 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.oldState = newState;
 
-            //// Bewegen....
-            //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime);
-            //var shake = MathHelper.Lerp(0, 150, Mathf.PingPong(time, 1));
+            // Bewegen....
+            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime);
+            this.rotation = 25;// (int)MathHelper.Lerp(0, 360, Mathf.PingPong(time, 1));
 
             //var shapesToMove = this.shapes.OfType<CircleShape>().Where(x => x != this.playerShape).Take(2).ToArray();
             //foreach (var circleShape in shapesToMove)
@@ -546,7 +545,7 @@ namespace CollisionFloatTestNewMono.Engine
                             sortedShapeA = shapeB;
                             sortedShapeB = shapeA;
                         }
-                       
+
                         var newVelocity = Vector2.Zero;
                         var shapeContactType = registers[(int)shapeA.ShapeType, (int)shapeB.ShapeType];
                         switch (shapeContactType)
@@ -555,7 +554,10 @@ namespace CollisionFloatTestNewMono.Engine
                                 newVelocity += this.collisionManager.CircleAndCircle((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
                                 break;
                             case ShapeContactType.PolygonAndCircle:
-                                newVelocity += this.collisionManager.CollidePolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                
+                                var transform = new Transform(sortedShapeA.Position + sortedShapeA.Velocity, new Rot(MathHelper.ToRadians(this.rotation)));
+                                newVelocity += this.collisionManager.CollidePolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB, transform);
+
                                 break;
                             case ShapeContactType.LineAndCircle:
                                 newVelocity += this.collisionManager.CircleAndLine((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
@@ -657,7 +659,14 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                     case PolygonShape polygonShape:
 
-                        this.primitiveBatch.DrawPolygon(polygonShape.Position, polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
+                        var polyOffset = polygonShape.Position;
+                        var transform = new Transform(polyOffset, new Rot(MathHelper.ToRadians(this.rotation)));
+
+                        var newVertices = new Vector2[polygonShape.Vertices.Length];
+                        for (var i = 0; i < polygonShape.Vertices.Length; i++)
+                            newVertices[i] = MathUtils.Mul(ref transform, polygonShape.Vertices[i]);
+
+                        this.primitiveBatch.DrawPolygon(newVertices, polygonShape.Vertices.Length, polygonShape.Color);
 
                         break;
                 }
@@ -669,7 +678,7 @@ namespace CollisionFloatTestNewMono.Engine
                     this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, circleShape.Color);
                     break;
                 case PolygonShape polygonShape:
-                    this.primitiveBatch.DrawPolygon(polygonShape.Position, polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
+                    this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Vertices.Length, polygonShape.Color);
                     break;
             }
 
@@ -677,7 +686,7 @@ namespace CollisionFloatTestNewMono.Engine
 
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(this.font, this.playerShape.Position + " : " + this.camera.CameraPosition, new Vector2(20, 20), Color.White);
+            spriteBatch.DrawString(this.font, $"{this.playerShape.Position}  / {this.camera.CameraPosition} / {this.rotation}", new Vector2(20, 20), Color.White);
             spriteBatch.End();
         }
     }

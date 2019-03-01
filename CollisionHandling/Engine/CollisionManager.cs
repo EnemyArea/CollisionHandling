@@ -417,20 +417,21 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="polygonShape"></param>
         /// <param name="circleShape"></param>
-        public Vector2 CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
+        /// <param name="transform"></param>
+        public Vector2 CollidePolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape, Transform transform)
         {
             // Find the min separating edge.
             var normalIndex = 0;
             var separation = -MaxFloat;
             var radius = circleShape.Radius;
             var vertexCount = polygonShape.Vertices.Length;
-            var vertices = polygonShape.Vertices;
-            var normals = polygonShape.Normals;
+            var vertices = MathUtils.Mul(ref transform, polygonShape.Vertices);
+            var normals = VectorHelper.CreateNormals(vertices);
             var center = circleShape.Position + circleShape.Velocity;
 
             for (var i = 0; i < vertexCount; ++i)
             {
-                var s = Vector2.Dot(normals[i], center - (polygonShape.Position + polygonShape.Velocity + vertices[i]));
+                var s = Vector2.Dot(normals[i], center - vertices[i]);
                 if (s > radius)
                     return Vector2.Zero;
 
@@ -444,8 +445,8 @@ namespace CollisionFloatTestNewMono.Engine
             // Vertices that subtend the incident face.
             var vertIndex1 = normalIndex;
             var vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
-            var v1 = polygonShape.Position + polygonShape.Velocity + vertices[vertIndex1];
-            var v2 = polygonShape.Position + polygonShape.Velocity + vertices[vertIndex2];
+            var v1 = vertices[vertIndex1];
+            var v2 = vertices[vertIndex2];
 
             // If the center is inside the polygon ...
             if (separation < Epsilon)

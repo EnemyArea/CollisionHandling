@@ -1,11 +1,39 @@
-﻿using System;
+﻿#region
+
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace CollisionFloatTestNewMono.Engine
 {
     public static class MathUtils
     {
+        public static Vector2[] Mul(ref Transform transform, Vector2[] vertices)
+        {
+            var verticesNew = new Vector2[vertices.Length];
+            for (var i = 0; i < vertices.Length; i++)
+                verticesNew[i] = Mul(ref transform, vertices[i]);
+
+            return verticesNew;
+        }
+
+
+        public static Vector2 Mul(ref Transform T, Vector2 v)
+        {
+            return Mul(ref T, ref v);
+        }
+
+        public static Vector2 Mul(ref Transform T, ref Vector2 v)
+        {
+            float x = (T.q.c * v.X - T.q.s * v.Y) + T.p.X;
+            float y = (T.q.s * v.X + T.q.c * v.Y) + T.p.Y;
+
+            return new Vector2(x, y);
+        }
+
         public static float Cross(ref Vector2 a, ref Vector2 b)
         {
             return a.X * b.Y - a.Y * b.X;
@@ -36,7 +64,7 @@ namespace CollisionFloatTestNewMono.Engine
         {
             return new Vector2(Math.Abs(v.X), Math.Abs(v.Y));
         }
-        
+
         /// Get the skew vector such that dot(skew_vec, other) == cross(vec, other)
         public static Vector2 Skew(Vector2 input)
         {
@@ -44,12 +72,12 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
         /// <summary>
-        /// This function is used to ensure that a floating point number is
-        /// not a NaN or infinity.
+        ///     This function is used to ensure that a floating point number is
+        ///     not a NaN or infinity.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <returns>
-        /// <c>true</c> if the specified x is valid; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified x is valid; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsValid(float x)
         {
@@ -68,7 +96,7 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
         /// <summary>
-        /// This is a approximate yet fast inverse square-root.
+        ///     This is a approximate yet fast inverse square-root.
         /// </summary>
         /// <param name="x">The x.</param>
         /// <returns></returns>
@@ -104,9 +132,9 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
         /// <summary>
-        /// Return the angle between two vectors on a plane
-        /// The angle is from vector 1 to vector 2, positive anticlockwise
-        /// The result is between -pi -> pi
+        ///     Return the angle between two vectors on a plane
+        ///     The angle is from vector 1 to vector 2, positive anticlockwise
+        ///     The result is between -pi -> pi
         /// </summary>
         public static double VectorAngle(ref Vector2 p1, ref Vector2 p2)
         {
@@ -133,11 +161,11 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
         /// <summary>
-        /// Returns a positive number if c is to the left of the line going from a to b.
+        ///     Returns a positive number if c is to the left of the line going from a to b.
         /// </summary>
         /// <returns>
-        /// Positive number if point is left, negative if point is right,
-        /// and 0 if points are collinear.
+        ///     Positive number if point is left, negative if point is right,
+        ///     and 0 if points are collinear.
         /// </returns>
         public static float Area(Vector2 a, Vector2 b, Vector2 c)
         {
@@ -145,11 +173,11 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
         /// <summary>
-        /// Returns a positive number if c is to the left of the line going from a to b.
+        ///     Returns a positive number if c is to the left of the line going from a to b.
         /// </summary>
         /// <returns>
-        /// Positive number if point is left, negative if point is right,
-        /// and 0 if points are collinear.
+        ///     Positive number if point is left, negative if point is right,
+        ///     and 0 if points are collinear.
         /// </returns>
         public static float Area(ref Vector2 a, ref Vector2 b, ref Vector2 c)
         {
@@ -157,7 +185,7 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
         /// <summary>
-        /// Determines if three vertices are collinear (ie. on a straight line)
+        ///     Determines if three vertices are collinear (ie. on a straight line)
         /// </summary>
         /// <param name="a">First vertex</param>
         /// <param name="b">Second vertex</param>
@@ -173,11 +201,11 @@ namespace CollisionFloatTestNewMono.Engine
         {
             b = new Vector2(-s * a.Y, s * a.X);
         }
-        
+
 
         /// <summary>
-        /// Checks if a floating point Value is equal to another,
-        /// within a certain tolerance.
+        ///     Checks if a floating point Value is equal to another,
+        ///     within a certain tolerance.
         /// </summary>
         /// <param name="value1">The first floating point Value.</param>
         /// <param name="value2">The second floating point Value.</param>
@@ -189,21 +217,21 @@ namespace CollisionFloatTestNewMono.Engine
         }
 
         /// <summary>
-        /// Checks if a floating point Value is within a specified
-        /// range of values (inclusive).
+        ///     Checks if a floating point Value is within a specified
+        ///     range of values (inclusive).
         /// </summary>
         /// <param name="value">The Value to check.</param>
         /// <param name="min">The minimum Value.</param>
         /// <param name="max">The maximum Value.</param>
         /// <returns>
-        /// True if the Value is within the range specified,
-        /// false otherwise.
+        ///     True if the Value is within the range specified,
+        ///     false otherwise.
         /// </returns>
         public static bool FloatInRange(float value, float min, float max)
         {
             return (value >= min && value <= max);
         }
-        
+
 
         #region Nested type: FloatConverter
 
