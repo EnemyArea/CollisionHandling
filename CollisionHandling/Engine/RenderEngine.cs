@@ -152,33 +152,41 @@ namespace CollisionFloatTestNewMono.Engine
 
             //this.playerShape = new CircleShape("P", new Vector2(696, 386), 15);
 
-            var size = new Vector2(20, 30);
+            var size = new Vector2(50, 50);
             var playerVertices = GameHelper.GetConvexHull(new[]
             {
-                new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-20, 0),
-                new Vector2(20, 0)
+                new Vector2(0, 0),
+                new Vector2(size.X, 0),
+                new Vector2(size.X, size.Y),
+                new Vector2(0, size.Y)
             });
             //this.playerShape = new PolygonShape("P", new Vector2(700, 380), playerVertices);
             //this.playerShape = new PolygonShape("P", new Vector2(642, 465), playerVertices);
 
-            this.playerShape = new PolygonShape("P", new Vector2(642, 465), playerVertices);
+            this.playerShape = new PolygonShape("P", new Vector2(10, 10), playerVertices);
             this.shapes.Add(this.playerShape);
 
             var sizePolygon = new Vector2(150, 250);
-            var polygonVertices = new[]
+
+            var polygonVertices = GameHelper.GetConvexHull(new[]
             {
-                //new Vector2(sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
-                //new Vector2(-sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
-                //new Vector2(-15, 0),
-                //new Vector2(15, 0)
-                new Vector2(0, 0),
-                new Vector2(sizePolygon.X, 0),
-                new Vector2(sizePolygon.X, sizePolygon.Y),
-                new Vector2(0, sizePolygon.Y)
-            };
+                new Vector2(sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-15, 0),
+                new Vector2(15, 0)
+            });
             this.shapes.Add(new PolygonShape("Polygon1", new Vector2(200, 200), polygonVertices));
+
+            //var polygonVertices = GameHelper.GetConvexHull(new[]
+            //{
+            //    new Vector2(0, 0),
+            //    new Vector2(sizePolygon.X, 0),
+            //    new Vector2(sizePolygon.X, sizePolygon.Y),
+            //    new Vector2(0, sizePolygon.Y)
+            //});
+            //this.shapes.Add(new PolygonShape("Polygon1", new Vector2(200, 200), polygonVertices));
+
+
 
             //var verticies = ShapeUtils.CreateRectangle(150, 150);
 
@@ -581,13 +589,9 @@ namespace CollisionFloatTestNewMono.Engine
 
                                 break;
                             case ShapeContactType.PolygonAndCircle:
-
-                                var polygonShape = (PolygonShape)sortedShapeA;
-                                //polygonShape.SetRotation(MathHelper.ToRadians(this.rotation));
+                                
                                 newVelocity += this.collisionManager.CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
-
-                                //this.polygonBody.Rotation = MathHelper.ToRadians(this.rotation);
-
+                                
                                 break;
                             case ShapeContactType.LineAndCircle:
 
@@ -600,7 +604,6 @@ namespace CollisionFloatTestNewMono.Engine
                                 var testPoly2 = new Polygon2(((PolygonShape)sortedShapeB).Vertices);
 
                                 var rot = MathHelper.ToRadians(this.rotation);
-                                //sortedShapeA.SetRotation(rot);
                                 sortedShapeB.SetRotation(rot);
 
                                 var intercectsMtv = Polygon2.IntersectMTV(testPoly1, testPoly2,
@@ -610,13 +613,8 @@ namespace CollisionFloatTestNewMono.Engine
                                     new Rotation2(sortedShapeB.Rotation));
                                 if (intercectsMtv != null)
                                 {
-                                    //Debug.WriteLine($"{intercectsMtv} / {intercectsMtv.Item1 * intercectsMtv.Item2}");
                                     newVelocity += intercectsMtv.Item1 * intercectsMtv.Item2;
-                                    //shapeB.Color = Color.Red;
                                 }
-
-                                //newVelocity += 
-                                //this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
 
                                 break;
                             case ShapeContactType.PolygonAndLine:
@@ -698,7 +696,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.primitiveBatch.Begin(ref this.projection, ref this.view);
 
-            foreach (var shape in this.shapes.Where(x => x != this.playerShape))
+            foreach (var shape in this.shapes)
             {
                 switch (shape)
                 {
@@ -714,30 +712,16 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                     case PolygonShape polygonShape:
 
+                        var angle = new Rotation2(polygonShape.Transform.Rotation.GetAngle());
                         var testPoly2 = new Polygon2(polygonShape.Vertices);
+                        var origin = testPoly2.Center;
+                        var position = polygonShape.Transform.Position;
+
                         var vertexCount = polygonShape.Vertices.Length;
                         var tempVertices = new Vector2[vertexCount];
                         for (var i = 0; i < vertexCount; ++i)
-                        {
-                            var origin = new Vector2(testPoly2.AABB.Width, testPoly2.AABB.Height) / 2f;
-                            var center = polygonShape.Transform.Position + 
-                                    Vector2.Transform(polygonShape.Vertices[i] - origin, Matrix.CreateRotationZ(polygonShape.Transform.Rotation.GetAngle())) + origin;
-
-                            tempVertices[i] = center;
-                        }
-
-                        // new Vector2(150, 150)
-                        // 90 grad new Vector2(150, 0)
-                        // 180 grad new Vector2(150, 150)
-
-                        // new Vector2(150, 190)
-                        // 90 grad new Vector2(96, 96)
-                        // 180 grad new Vector2(0, 190)
-
-                        // new Vector2(150, 190);
-                        // 90 grad new Vector2(82, 81);
-                        // 180 grad new Vector2(0, 162);
-
+                            tempVertices[i] = position + Math2.Math2.Rotate(polygonShape.Vertices[i], origin, angle);
+                        
                         this.primitiveBatch.DrawPolygon(tempVertices, vertexCount, polygonShape.Color);
 
                         break;
@@ -759,22 +743,23 @@ namespace CollisionFloatTestNewMono.Engine
             //this.primitiveBatch.DrawPolygon(MathUtils.Mul(new Transform(test2Pos + new Vector2(0, 160), new Rotation(rotation)), this.test2.Vertices), this.test2.Vertices.Length, intercects ? Color.Violet : Color.Cyan);
 
 
-            switch (this.playerShape)
-            {
-                case CircleShape circleShape:
-                    this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, circleShape.Color);
-                    break;
-                case PolygonShape polygonShape:
+            //switch (this.playerShape)
+            //{
+            //    case CircleShape circleShape:
+            //        this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, circleShape.Color);
+            //        break;
+            //    case PolygonShape polygonShape:
 
-                    var vertexCount = polygonShape.Vertices.Length;
-                    var tempVertices = new Vector2[vertexCount];
-                    for (var i = 0; i < vertexCount; ++i)
-                        tempVertices[i] = MathUtils.Mul(polygonShape.Transform, polygonShape.Vertices[i]);
+            //        var vertexCount = polygonShape.Vertices.Length;
+            //        var tempVertices = new Vector2[vertexCount];
+            //        for (var i = 0; i < vertexCount; ++i)
+            //            tempVertices[i] = MathUtils.Mul(polygonShape.Transform, polygonShape.Vertices[i]);
 
-                    this.primitiveBatch.DrawPolygon(tempVertices, tempVertices.Length, polygonShape.Color);
-                    break;
-            }
+            //        this.primitiveBatch.DrawPolygon(tempVertices, tempVertices.Length, polygonShape.Color);
+            //        break;
+            //}
 
+            
             this.primitiveBatch.End();
 
 
