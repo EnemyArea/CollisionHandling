@@ -2,7 +2,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -118,6 +120,9 @@ namespace CollisionFloatTestNewMono.Engine
         private Body playerBody;
         private int rotation;
 
+        private Polygon2 test1;
+        private Polygon2 test2;
+
 
         /// <summary>
         /// </summary>
@@ -152,7 +157,9 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(20, 0),
             });
             //this.playerShape = new PolygonShape("P", new Vector2(700, 380), playerVertices);
-            this.playerShape = new PolygonShape("P", new Vector2(642, 465), playerVertices);
+            //this.playerShape = new PolygonShape("P", new Vector2(642, 465), playerVertices);
+
+            this.playerShape = new PolygonShape("P", new Vector2(0, 0), playerVertices);
             this.shapes.Add(this.playerShape);
 
             var sizePolygon = new Vector2(150, 190);
@@ -164,6 +171,10 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(15, 0),
             });
             this.shapes.Add(new PolygonShape("Polygon1", new Vector2(700, 400), polygonVertices));
+
+
+            this.test1 = ShapeUtils.CreateRectangle(50, 50);
+            this.test2 = ShapeUtils.CreateRectangle(50, 50);
 
 
             this.world = new World(Vector2.Zero);
@@ -568,8 +579,18 @@ namespace CollisionFloatTestNewMono.Engine
                                 break;
                             case ShapeContactType.Polygon:
 
-                                newVelocity += 
-                                    this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
+                                var testPoly1 = new Polygon2(((PolygonShape)sortedShapeA).Vertices);
+                                var testPoly2 = new Polygon2(((PolygonShape)sortedShapeB).Vertices);
+
+                                var intercectsMtv = Polygon2.IntersectMTV(testPoly1, testPoly2, sortedShapeA.Position + sortedShapeA.Velocity, sortedShapeB.Position + sortedShapeB.Velocity, new Rotation2(0), new Rotation2(0));
+                                if (intercectsMtv != null)
+                                {
+                                    //Debug.WriteLine($"{intercectsMtv} / {intercectsMtv.Item1 * intercectsMtv.Item2}");
+                                    newVelocity += intercectsMtv.Item1 * intercectsMtv.Item2;
+                                }
+
+                                //newVelocity += 
+                                //this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
 
                                 break;
                             case ShapeContactType.PolygonAndLine:
@@ -677,6 +698,16 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                 }
             }
+
+            var test1Pos = new Vector2(100, 100);
+            var test2Pos = this.playerShape.Position;// new Vector2(100, 100);
+            var intercects = Polygon2.Intersects(this.test1, this.test2, test1Pos, test2Pos, new Rotation2(45), new Rotation2(45), true);
+            //var intercectsMtv = Polygon2.IntersectMTV(this.test1, this.test2, test1Pos, test2Pos, new Rotation2(45), new Rotation2(45));
+            //Debug.WriteLine(intercectsMtv);
+
+            //this.primitiveBatch.DrawPolygon(MathUtils.Mul(new Transform(test1Pos, new Rotation(45)), this.test1.Vertices), this.test1.Vertices.Length, intercects ? Color.Red : Color.Cyan);
+            //this.primitiveBatch.DrawPolygon(MathUtils.Mul(new Transform(test2Pos, new Rotation(45)), this.test2.Vertices), this.test2.Vertices.Length, intercects ? Color.Red : Color.Cyan);
+
 
             switch (this.playerShape)
             {

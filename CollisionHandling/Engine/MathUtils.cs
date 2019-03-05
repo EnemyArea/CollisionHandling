@@ -60,6 +60,21 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="transform"></param>
         /// <param name="vertices"></param>
         /// <returns></returns>
+        public static Vector2[] Mul(Transform transform, Vector2[] vertices)
+        {
+            var verticesNew = new Vector2[vertices.Length];
+            for (var i = 0; i < vertices.Length; i++)
+                verticesNew[i] = Mul(ref transform, vertices[i]);
+
+            return verticesNew;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="transform"></param>
+        /// <param name="vertices"></param>
+        /// <returns></returns>
         public static Vector2[] Mul(ref Transform transform, Vector2[] vertices)
         {
             var verticesNew = new Vector2[vertices.Length];
