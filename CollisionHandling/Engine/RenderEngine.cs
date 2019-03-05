@@ -568,9 +568,8 @@ namespace CollisionFloatTestNewMono.Engine
                                 break;
                             case ShapeContactType.Polygon:
 
-                                var vectors = this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
-                                for (var i = 0; i < vectors.Length; i++)
-                                    newVelocity += vectors[i];
+                                newVelocity += 
+                                    this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
 
                                 break;
                             case ShapeContactType.PolygonAndLine:
