@@ -4,7 +4,6 @@ using CollisionFloatTestNewMono.Engine;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using VelcroPhysics.Dynamics;
 
 #endregion
 
@@ -40,7 +39,6 @@ namespace CollisionFloatTestNewMono
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             this.spriteBatch = new SpriteBatch(this.GraphicsDevice);
-
 
             this.renderEngine = new RenderEngine();
             this.renderEngine.LoadMap(this.GraphicsDevice, this.Content);

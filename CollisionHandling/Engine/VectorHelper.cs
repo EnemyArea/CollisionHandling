@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
-using VelcroPhysics.Shared;
 
 #endregion
 
@@ -18,13 +17,13 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="hx">the half-width.</param>
         /// <param name="hy">the half-height.</param>
-        public static Vertices CreateRectangle(float hx, float hy)
+        public static Vector2[] CreateRectangle(float hx, float hy)
         {
-            var vertices = new Vertices(4);
-            vertices.Add(new Vector2(-hx, -hy));
-            vertices.Add(new Vector2(hx, -hy));
-            vertices.Add(new Vector2(hx, hy));
-            vertices.Add(new Vector2(-hx, hy));
+            var vertices = new Vector2[4];
+            vertices[0] = new Vector2(-hx, -hy);
+            vertices[1] = new Vector2(hx, -hy);
+            vertices[2] = new Vector2(hx, hy);
+            vertices[3] = new Vector2(-hx, hy);
 
             return vertices;
         }
@@ -37,7 +36,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="hy">the half-height.</param>
         /// <param name="center">the center of the box in local coordinates.</param>
         /// <param name="angle">the rotation of the box in local coordinates.</param>
-        public static Vertices CreateRectangle(float hx, float hy, Vector2 center, float angle)
+        public static Vector2[] CreateRectangle(float hx, float hy, Vector2 center, float angle)
         {
             var vertices = CreateRectangle(hx, hy);
 
@@ -75,6 +74,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             return normals;
         }
+
 
         /// <summary>
         /// </summary>

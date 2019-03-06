@@ -34,7 +34,8 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="name"></param>
         /// <param name="position"></param>
         /// <param name="vertices"></param>
-        public PolygonShape(string name, Vector2 position, IEnumerable<Vector2> vertices)
+        /// <param name="degrees"></param>
+        public PolygonShape(string name, Vector2 position, IEnumerable<Vector2> vertices, float degrees = 0)
             : base(ShapeType.Polygon, name, position, 0)
         {
             this.Vertices = vertices.ToArray();
@@ -45,6 +46,8 @@ namespace CollisionFloatTestNewMono.Engine
                 this.Center += this.Vertices[i];
 
             this.Center *= 1.0f / this.Vertices.Length;
+
+            this.SetRotation(MathHelper.ToRadians(degrees));
         }
 
 
