@@ -158,7 +158,6 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 this.Clockwise = cwCounter > ccwCounter;
         }
 
-
         /// <summary>
         /// Determines if the specified polygon at the specified position and rotation contains the specified point
         /// </summary>
@@ -291,6 +290,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="pos">The polygons origin</param>
+        /// <param name="rot">the rotation of the polygon</param>
         /// <param name="axis">The axis to project onto</param>
         /// <returns>poly at pos projected along axis</returns>
         public static AxisAlignedLine2 ProjectAlongAxis(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 axis)
@@ -438,7 +438,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
         /// <summary>
         /// Returns a polygon that is created by rotated the original polygon
-        /// about its center by the specified amount. Returns the original polygon
+        /// about its center by the specified amount. Returns the original polygon if
         /// rot.Theta == 0.
         /// </summary>
         /// <returns>The rotated polygon.</returns>

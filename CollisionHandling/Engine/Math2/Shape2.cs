@@ -1,23 +1,18 @@
-﻿#region
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
-
-#endregion
 
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
     /// <summary>
-    ///     Parent class for shapes - contains functions for comparing different shapes.
+    /// Parent class for shapes - contains functions for comparing different shapes.
     /// </summary>
     public class Shape2
     {
-        public Color Color { get; set; } = Color.Yellow;
-
         /// <summary>
-        ///     Determines if polygon at position 1 intersects the rectangle at position 2. Polygon may
-        ///     be rotated, but the rectangle cannot (use a polygon if you want to rotate it).
+        /// Determines if polygon at position 1 intersects the rectangle at position 2. Polygon may
+        /// be rotated, but the rectangle cannot (use a polygon if you want to rotate it).
         /// </summary>
         /// <param name="poly">Polygon</param>
         /// <param name="rect">Rectangle</param>
@@ -50,8 +45,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the vector, if any, to move poly at pos1 rotated rot1 to prevent intersection of rect
-        ///     at pos2.
+        /// Determines the vector, if any, to move poly at pos1 rotated rot1 to prevent intersection of rect
+        /// at pos2.
         /// </summary>
         /// <param name="poly">Polygon</param>
         /// <param name="rect">Rectangle</param>
@@ -115,8 +110,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the vector to move pos1 to get rect not to intersect poly at pos2 rotated
-        ///     by rot2 radians.
+        /// Determines the vector to move pos1 to get rect not to intersect poly at pos2 rotated
+        /// by rot2 radians.
         /// </summary>
         /// <param name="rect">The rectangle</param>
         /// <param name="poly">The polygon</param>
@@ -131,7 +126,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the rectangle at pos1 intersects the polygon at pos2.
+        /// Determines if the rectangle at pos1 intersects the polygon at pos2.
         /// </summary>
         /// <param name="rect">The rectangle</param>
         /// <param name="poly">The polygon</param>
@@ -147,8 +142,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
 
         /// <summary>
-        ///     Determines if the specified polygon and rectangle where poly is at pos1 and rect is at pos2 intersect
-        ///     along the specified axis.
+        /// Determines if the specified polygon and rectangle where poly is at pos1 and rect is at pos2 intersect
+        /// along the specified axis.
         /// </summary>
         /// <param name="poly">polygon</param>
         /// <param name="rect">Rectangle</param>
@@ -167,8 +162,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the specified rectangle and polygon where rect is at pos1 and poly is at pos2 intersect
-        ///     along the specified axis.
+        /// Determines if the specified rectangle and polygon where rect is at pos1 and poly is at pos2 intersect 
+        /// along the specified axis.
         /// </summary>
         /// <param name="rect">Rectangle</param>
         /// <param name="poly">Polygon</param>
@@ -184,7 +179,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the mtv along axis to move poly at pos1 to prevent intersection with rect at pos2.
+        /// Determines the mtv along axis to move poly at pos1 to prevent intersection with rect at pos2.
         /// </summary>
         /// <param name="poly">polygon</param>
         /// <param name="rect">Rectangle</param>
@@ -202,7 +197,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the mtv along axis to move rect at pos1 to prevent intersection with poly at pos2
+        /// Determines the mtv along axis to move rect at pos1 to prevent intersection with poly at pos2
         /// </summary>
         /// <param name="rect">Rectangle</param>
         /// <param name="poly">polygon</param>
@@ -220,8 +215,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the specified polygon at the specified position and rotation
-        ///     intersects the specified circle at it's respective position.
+        /// Determines if the specified polygon at the specified position and rotation
+        /// intersects the specified circle at it's respective position.
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="circle">The circle</param>
@@ -234,25 +229,15 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             // look at pictures of https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection if you don't
             // believe this is true
-
-            var isLineHit = false;
-            foreach (var line in poly.Lines)
-            {
-                isLineHit = CircleIntersectsLine(circle, line, pos2, pos1, rot1, poly.Center, strict);
-                if (isLineHit)
-                {
-                    break;
-                }
-            }
-
-            return isLineHit; // || Polygon2.Contains(poly, pos1, rot1, new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius), strict);
+            return poly.Lines.Any((l) => CircleIntersectsLine(circle, l, pos2, pos1, rot1, poly.Center, strict)) || Polygon2.Contains(poly, pos1, rot1, new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius), strict);
         }
 
         /// <summary>
-        ///     Determines the minimum translation that must be applied the specified polygon (at the given position
-        ///     and rotation) to prevent intersection with the circle (at its given rotation). If the two are not overlapping,
-        ///     returns null.
-        ///     Returns a tuple of the axis to move the polygon in (unit vector) and the distance to move the polygon.
+        /// Determines the minimum translation that must be applied the specified polygon (at the given position
+        /// and rotation) to prevent intersection with the circle (at its given rotation). If the two are not overlapping,
+        /// returns null.
+        /// 
+        /// Returns a tuple of the axis to move the polygon in (unit vector) and the distance to move the polygon.
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="circle">The circle</param>
@@ -307,14 +292,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                         shortestOverlap = mtv.Value;
                     }
                 }
-
                 return true;
             };
 
             var circleCenter = new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius);
             int last = poly.Vertices.Length - 1;
             var lastVec = Math2.Rotate(poly.Vertices[last], poly.Center, rot1) + pos1;
-            for (var curr = 0; curr < poly.Vertices.Length; curr++)
+            for(int curr = 0; curr < poly.Vertices.Length; curr++)
             {
                 var currVec = Math2.Rotate(poly.Vertices[curr], poly.Center, rot1) + pos1;
 
@@ -323,25 +307,19 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     return null;
 
                 // Test along line normal
-                var n = Math2.Perpendicular(currVec - lastVec);
-                var n2 = Vector2.Normalize(n);
-
-                if (!checkAxis(n2))
+                if (!checkAxis(Vector2.Normalize(Math2.Perpendicular(currVec - lastVec))))
                     return null;
 
                 last = curr;
                 lastVec = currVec;
             }
 
-
-            // TODO: -bestAxis wenn wir den circle steuern und bestAxis wenn wir das polygon nehmen :(
             return Tuple.Create(bestAxis, shortestOverlap);
         }
 
-
         /// <summary>
-        ///     Determines if the specified circle, at the given position, intersects the specified polygon,
-        ///     at the given position and rotation.
+        /// Determines if the specified circle, at the given position, intersects the specified polygon,
+        /// at the given position and rotation.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="poly">The polygon</param>
@@ -355,12 +333,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             return Intersects(poly, circle, pos2, pos1, rot2, strict);
         }
 
-
         /// <summary>
-        ///     Determines the minimum translation vector that must be applied to the circle at the given position to
-        ///     prevent overlap with the polygon at the given position and rotation. If the circle and the polygon do
-        ///     not overlap, returns null. Otherwise, returns a tuple of the unit axis to move the circle in, and the
-        ///     distance to move the circle.
+        /// Determines the minimum translation vector that must be applied to the circle at the given position to
+        /// prevent overlap with the polygon at the given position and rotation. If the circle and the polygon do
+        /// not overlap, returns null. Otherwise, returns a tuple of the unit axis to move the circle in, and the
+        /// distance to move the circle.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="poly">The polygon</param>
@@ -373,13 +350,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var res = IntersectMtv(poly, circle, pos2, pos1, rot2);
             if (res != null)
                 return Tuple.Create(-res.Item1, res.Item2);
-
             return null;
         }
 
-
         /// <summary>
-        ///     Determines if the specified circle an rectangle intersect at their given positions.
+        /// Determines if the specified circle an rectangle intersect at their given positions.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="rect">The rectangle</param>
@@ -391,14 +366,14 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             var circleCenter = new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius);
             return CircleIntersectsHorizontalLine(circle, new Line2(rect.Min + pos2, rect.UpperRight + pos2), circleCenter, strict)
-                   || CircleIntersectsHorizontalLine(circle, new Line2(rect.LowerLeft + pos2, rect.Max + pos2), circleCenter, strict)
-                   || CircleIntersectsVerticalLine(circle, new Line2(rect.Min + pos2, rect.LowerLeft + pos2), circleCenter, strict)
-                   || CircleIntersectsVerticalLine(circle, new Line2(rect.UpperRight + pos2, rect.Max + pos2), circleCenter, strict)
-                   || Rect2.Contains(rect, pos2, new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius), strict);
+                || CircleIntersectsHorizontalLine(circle, new Line2(rect.LowerLeft + pos2, rect.Max + pos2), circleCenter, strict)
+                || CircleIntersectsVerticalLine(circle, new Line2(rect.Min + pos2, rect.LowerLeft + pos2), circleCenter, strict)
+                || CircleIntersectsVerticalLine(circle, new Line2(rect.UpperRight + pos2, rect.Max + pos2), circleCenter, strict)
+                || Rect2.Contains(rect, pos2, new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius), strict);
         }
 
         /// <summary>
-        ///     Determines if the specified rectangle and circle intersect at their given positions.
+        /// Determines if the specified rectangle and circle intersect at their given positions.
         /// </summary>
         /// <param name="rect">The rectangle</param>
         /// <param name="circle">The circle</param>
@@ -412,8 +387,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the minimum translation vector to be applied to the circle to
-        ///     prevent overlap with the rectangle, when they are at their given positions.
+        /// Determines the minimum translation vector to be applied to the circle to 
+        /// prevent overlap with the rectangle, when they are at their given positions.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="rect">The rectangle</param>
@@ -447,7 +422,6 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                         shortestOverlap = mtv.Value;
                     }
                 }
-
                 return true;
             };
 
@@ -457,7 +431,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             for (int curr = 0; curr < 4; curr++)
             {
                 Vector2 currVec = Vector2.Zero;
-                switch (curr)
+                switch(curr)
                 {
                     case 0:
                         currVec = rect.Min + pos2;
@@ -470,7 +444,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                         break;
                     case 3:
                         currVec = rect.UpperRight + pos2;
-                        break;
+                        break; 
                 }
 
                 // Test along circle center -> vector
@@ -489,8 +463,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the minimum translation vector to be applied to the rectangle to
-        ///     prevent overlap with the circle, when they are at their given positions.
+        /// Determines the minimum translation vector to be applied to the rectangle to
+        /// prevent overlap with the circle, when they are at their given positions.
         /// </summary>
         /// <param name="rect">The rectangle</param>
         /// <param name="circle">The circle</param>
@@ -506,7 +480,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Projects the polygon from the given points with origin pos along the specified axis.
+        /// Projects the polygon from the given points with origin pos along the specified axis.
         /// </summary>
         /// <param name="axis">Axis to project onto</param>
         /// <param name="pos">Origin of polygon</param>
@@ -539,8 +513,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the circle whose bounding boxs top left is at the first postion intersects the line
-        ///     at the second position who is rotated the specified amount about the specified point.
+        /// Determines if the circle whose bounding boxs top left is at the first postion intersects the line
+        /// at the second position who is rotated the specified amount about the specified point.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="line">The line</param>
@@ -550,7 +524,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="about2">What the line is rotated about</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle at pos1 intersects the line at pos2 rotated rot2 about about2</returns>
-        private static bool CircleIntersectsLine(Circle2 circle, Line2 line, Vector2 pos1, Vector2 pos2, Rotation2 rot2, Vector2 about2, bool strict)
+        protected static bool CircleIntersectsLine(Circle2 circle, Line2 line, Vector2 pos1, Vector2 pos2, Rotation2 rot2, Vector2 about2, bool strict)
         {
             // Make more math friendly
             var actualLine = new Line2(Math2.Rotate(line.Start, about2, rot2) + pos2, Math2.Rotate(line.End, about2, rot2) + pos2);
@@ -590,12 +564,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var closestDistance = Math.Abs(centerOfCircleProjectedOntoNormalOfLine - lineProjectedOntoItsNormal);
 
             // Step 1a
-            if (strict)
+            if(strict)
             {
                 if (closestDistance >= circle.Radius)
                     return false;
-            }
-            else
+            }else
             {
                 if (closestDistance > circle.Radius)
                     return false;
@@ -654,17 +627,17 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             // If you had trouble following, see the horizontal and vertical cases which are the same process but the projections
             // are simpler
         }
-
+        
         /// <summary>
-        ///     Determines if the circle at the specified position intersects the line,
-        ///     which is at its true position and rotation, when the line is assumed to be horizontal.
+        /// Determines if the circle at the specified position intersects the line, 
+        /// which is at its true position and rotation, when the line is assumed to be horizontal.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="line">The line</param>
         /// <param name="circleCenter">The center of the circle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle with center circleCenter intersects the horizontal line</returns>
-        private static bool CircleIntersectsHorizontalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
+        protected static bool CircleIntersectsHorizontalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
         {
             // This is exactly the same process as CircleIntersectsLine, except the projetions are easier
             var lineY = line.Start.Y;
@@ -674,12 +647,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var closestDistance = Math.Abs(vecCircleCenterToLine1D);
 
             // Step 1a
-            if (strict)
+            if(strict)
             {
                 if (closestDistance >= circle.Radius)
                     return false;
-            }
-            else
+            }else
             {
                 if (closestDistance > circle.Radius)
                     return false;
@@ -704,20 +676,20 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (strict)
                 return distClosestEdgeToCircleSq < circle.Radius * circle.Radius;
-
-            return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
+            else
+                return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
         }
 
         /// <summary>
-        ///     Determines if the circle at the specified position intersects the line, which
-        ///     is at its true position and rotation, when the line is assumed to be vertical
+        /// Determines if the circle at the specified position intersects the line, which
+        /// is at its true position and rotation, when the line is assumed to be vertical
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="line">The line</param>
         /// <param name="circleCenter">The center of the circle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle with center circleCenter intersects the line</returns>
-        private static bool CircleIntersectsVerticalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
+        protected static bool CircleIntersectsVerticalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
         {
             // Same process as horizontal, but axis flipped
             var lineX = line.Start.X;
@@ -759,11 +731,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             else
                 return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
         }
-
         #region NoRotation
-
         /// <summary>
-        ///     Determines if the specified polygon at pos1 with no rotation and rectangle at pos2 intersect
+        /// Determines if the specified polygon at pos1 with no rotation and rectangle at pos2 intersect
         /// </summary>
         /// <param name="poly">Polygon to check</param>
         /// <param name="rect">Rectangle to check</param>
@@ -777,8 +747,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the specified rectangle at pos1 intersects the specified polygon at pos2 with
-        ///     no rotation.
+        /// Determines if the specified rectangle at pos1 intersects the specified polygon at pos2 with
+        /// no rotation.
         /// </summary>
         /// <param name="rect">The rectangle</param>
         /// <param name="poly">The polygon</param>
@@ -792,7 +762,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the specified polygon at pos1 with no rotation intersects the specified
+        /// Determines if the specified polygon at pos1 with no rotation intersects the specified
+        /// 
         /// </summary>
         /// <param name="poly"></param>
         /// <param name="rect"></param>
@@ -805,8 +776,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the minimum translation vector to be applied to the rect to prevent
-        ///     intersection with the specified polygon, when they are at the given positions.
+        /// Determines the minimum translation vector to be applied to the rect to prevent
+        /// intersection with the specified polygon, when they are at the given positions.
         /// </summary>
         /// <param name="rect">The rect</param>
         /// <param name="poly">The polygon</param>
@@ -819,7 +790,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the polygon and circle intersect when at the given positions.
+        /// Determines if the polygon and circle intersect when at the given positions.
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="circle">The circle</param>
@@ -833,7 +804,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines if the circle and polygon intersect when at the given positions.
+        /// Determines if the circle and polygon intersect when at the given positions.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="poly">The polygon</param>
@@ -847,8 +818,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        ///     Determines the minimum translation vector the be applied to the polygon to prevent
-        ///     intersection with the specified circle, when they are at the given positions.
+        /// Determines the minimum translation vector the be applied to the polygon to prevent
+        /// intersection with the specified circle, when they are at the given positions.
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="circle">The circle</param>
@@ -860,10 +831,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             return IntersectMtv(poly, circle, pos1, pos2, Rotation2.Zero);
         }
 
-
         /// <summary>
-        ///     Determines the minimum translation vector to be applied to the circle to prevent
-        ///     intersection with the specified polyogn, when they are at the given positions.
+        /// Determines the minimum translation vector to be applied to the circle to prevent
+        /// intersection with the specified polyogn, when they are at the given positions.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="poly">The polygon</param>
@@ -874,7 +844,6 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             return IntersectMtv(circle, poly, pos1, pos2, Rotation2.Zero);
         }
-
         #endregion
     }
 }

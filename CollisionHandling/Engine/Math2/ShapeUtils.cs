@@ -43,9 +43,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var points = new List<Vector2>();
 
             for (var i = 0; i < texture.Width; i++)
-            for (var j = 0; j < texture.Height; j++)
-                if (uints[j * texture.Width + i] != 0)
-                    points.Add(new Vector2(i, j));
+                for (var j = 0; j < texture.Height; j++)
+                    if (uints[j * texture.Width + i] != 0)
+                        points.Add(new Vector2(i, j));
 
             if (points.Count <= 2)
                 throw new Exception("Can not create a convex hull from a line.");
@@ -56,7 +56,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             );
 
             points.Sort(
-                (a, b) => 
+                (a, b) =>
                 a.X == b.X ?
                      a.Y.CompareTo(b.Y)
                 : (a.X > b.X ? 1 : -1)
@@ -106,7 +106,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             if (rectangleCache.ContainsKey(key))
                 return rectangleCache[key];
 
-            return rectangleCache[key] = new Polygon2(new [] {
+            return rectangleCache[key] = new Polygon2(new[] {
                  new Vector2(x, y),
                  new Vector2(x + width, y),
                  new Vector2(x + width, y + height),
@@ -138,8 +138,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             {
                 verts.Add(
                     center + radius * new Vector2(
-                        (float) Math.Cos(theta),
-                        (float) Math.Sin(theta)
+                        (float)Math.Cos(theta),
+                        (float)Math.Sin(theta)
                     )
                 );
                 theta += increment;

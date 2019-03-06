@@ -450,8 +450,8 @@ namespace CollisionFloatTestNewMono.Engine
             var testCircle2 = new Circle2(circleB.Radius);
 
             var intercectsMtv = Circle2.IntersectMtv(testCircle1, testCircle2,
-                circleA.Position + circleA.Velocity,
-                circleB.Position + circleB.Velocity);
+                circleA.Position - new Vector2(circleA.Radius) + circleA.Velocity,
+                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity);
 
             if (intercectsMtv != null)
                 return intercectsMtv.Item1 * intercectsMtv.Item2;

@@ -3,6 +3,10 @@ using Microsoft.Xna.Framework;
 
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
+    /// <summary>
+    /// Contains utility functions for doing math in two-dimensions that
+    /// don't fit elsewhere. Also contains any necessary constants.
+    /// </summary>
     public class Math2
     {
         /// <summary>
