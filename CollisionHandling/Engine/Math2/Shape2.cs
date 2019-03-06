@@ -236,11 +236,6 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var isLineHit = false;
             foreach (var line in poly.Lines)
             {
-                if (line.Start == new Vector2(0, 0) && line.End == new Vector2(150, 0))
-                {
-
-                }
-
                 isLineHit = CircleIntersectsLine(circle, line, pos2, pos1, rot1, poly.Center, strict);
                 if (isLineHit)
                 {
@@ -287,6 +282,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             // The worst case performance is related to 2x the number of vertices of the polygon, the same speed
             // as for 2 polygons of equal number of vertices.
 
+
+
+
             HashSet<Vector2> checkedAxis = new HashSet<Vector2>();
 
             Vector2 bestAxis = Vector2.Zero;
@@ -311,19 +309,20 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                         shortestOverlap = mtv.Value;
                     }
                 }
+
                 return true;
             };
 
             var circleCenter = new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius);
             int last = poly.Vertices.Length - 1;
             var lastVec = Math2.Rotate(poly.Vertices[last], poly.Center, rot1) + pos1;
-            for (int curr = 0; curr < poly.Vertices.Length; curr++)
+            for (var curr = 0; curr < poly.Vertices.Length; curr++)
             {
                 var currVec = Math2.Rotate(poly.Vertices[curr], poly.Center, rot1) + pos1;
 
-                // Test along circle center -> vector
-                if (!checkAxis(Vector2.Normalize(currVec - circleCenter)))
-                    return null;
+                //// Test along circle center -> vector
+                //if (!checkAxis(Vector2.Normalize(currVec - circleCenter)))
+                //    return null;
 
                 // Test along line normal
                 if (!checkAxis(Vector2.Normalize(Math2.Perpendicular(currVec - lastVec))))
@@ -657,7 +656,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="circleCenter">The center of the circle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle with center circleCenter intersects the horizontal line</returns>
-        protected static bool CircleIntersectsHorizontalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
+        private static bool CircleIntersectsHorizontalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
         {
             // This is exactly the same process as CircleIntersectsLine, except the projetions are easier
             var lineY = line.Start.Y;
@@ -697,7 +696,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (strict)
                 return distClosestEdgeToCircleSq < circle.Radius * circle.Radius;
-            
+
             return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
         }
 
@@ -710,11 +709,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="circleCenter">The center of the circle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle with center circleCenter intersects the line</returns>
-        protected static bool CircleIntersectsVerticalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
+        private static bool CircleIntersectsVerticalLine(Circle2 circle, Line2 line, Vector2 circleCenter, bool strict)
         {
             // Same process as horizontal, but axis flipped
             var lineX = line.Start.X;
-            
+
             // Step 1 - Find closest distance
             var vecCircleCenterToLine1D = lineX - circleCenter.X;
             var closestDistance = Math.Abs(vecCircleCenterToLine1D);
@@ -750,7 +749,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (strict)
                 return distClosestEdgeToCircleSq < circle.Radius * circle.Radius;
-            
+
             return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
         }
         #region NoRotation

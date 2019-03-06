@@ -425,18 +425,18 @@ namespace CollisionFloatTestNewMono.Engine
 
             if (Shape2.Intersects(testPoly, testCircle,
                 polyA.Position + polyA.Velocity,
-                (circleB.Position - new Vector2(circleB.Radius)) + circleB.Velocity,
+                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity,
                 rota, true))
             {
-                return Vector2.One;
+                //return Vector2.One;
 
-                //var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
-                //    polyA.Position + polyA.Velocity,
-                //    circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
-                //    new Rotation2(polyA.Rotation));
+                var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
+                    polyA.Position + polyA.Velocity,
+                    circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                    rota);
 
-                //if (intercectsMtv != null)
-                //    return intercectsMtv.Item1 * intercectsMtv.Item2;
+                if (intercectsMtv != null)
+                    return intercectsMtv.Item1 * intercectsMtv.Item2;
             }
 
             return Vector2.Zero;
