@@ -8,7 +8,7 @@
         Polygon,
         PolygonAndCircle,
         Circle,
-        PolygonAndLine,
+        LineAndPolygon,
         LineAndCircle
     }
 }

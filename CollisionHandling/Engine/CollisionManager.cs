@@ -17,32 +17,6 @@ namespace CollisionFloatTestNewMono.Engine
     {
         /// <summary>
         /// </summary>
-        private const float MaxFloat = float.MaxValue;
-
-        /// <summary>
-        /// </summary>
-        private const float Epsilon = 1.192092896e-07f;
-
-        /// <summary>
-        /// </summary>
-        private const float LinearSlop = 0.005f;
-
-        /// <summary>
-        /// The maximum number of contact points between two convex shapes.
-        /// DO NOT CHANGE THIS VALUE!
-        /// </summary>
-        private const int MaxManifoldPoints = 2;
-
-        /// <summary>
-        /// The radius of the polygon/edge shape skin. This should not be modified. Making
-        /// this smaller means polygons will have an insufficient buffer for continuous collision.
-        /// Making it larger may create artifacts for vertex collision.
-        /// </summary>
-        private const float PolygonRadius = (2.0f * LinearSlop);
-
-
-        /// <summary>
-        /// </summary>
         [Flags]
         private enum BorderlineType
         {
@@ -362,15 +336,15 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        /// <param name="lineShape"></param>
-        /// <param name="circleShape"></param>
+        /// <param name="lineA"></param>
+        /// <param name="circleB"></param>
         /// <returns></returns>
-        public Vector2 CollidesLineAndCircle(LineShape lineShape, CircleShape circleShape)
+        public Vector2 CollidesLineAndCircle(LineShape lineA, CircleShape circleB)
         {
-            var center = circleShape.Position + circleShape.Velocity;
-            var radius = circleShape.Radius;
-            var lineStart = lineShape.Start;
-            var lineEnd = lineShape.End;
+            var center = circleB.Position + circleB.Velocity;
+            var radius = circleB.Radius;
+            var lineStart = lineA.Start;
+            var lineEnd = lineA.End;
             var nearestVector = Vector2.Zero;
             var pointOnLine = ProjectPointOnLine(lineStart, lineEnd, center);
             var localNearestVector = FindNearestExitVector(pointOnLine, center, radius);
@@ -408,40 +382,53 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         ///     Compute the collision between a polygon and a circle.
         /// </summary>
-        /// <param name="polygonShape"></param>
-        /// <param name="circleShape"></param>
-        public Vector2 CollidesPolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
+        /// <param name="polyA"></param>
+        /// <param name="circleB"></param>
+        public Vector2 CollidesPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
         {
-            // Testing
-            var lines = new List<LineShape>();
-            var rotation = new Rotation2(polygonShape.Rotation);
+            //// Testing
+            //var lines = new List<LineShape>();
+            //var rotation = new Rotation2(polygonShape.Rotation);
 
-            var polygonVertices = polygonShape.Vertices;
-            for (var i = 0; i < polygonVertices.Length - 1; i++)
-            {
-                var vertex1 = Math2.Math2.Rotate(polygonVertices[i], polygonShape.Center, rotation);
-                var vertex2 = Math2.Math2.Rotate(polygonVertices[i + 1], polygonShape.Center, rotation);
+            //var polygonVertices = polygonShape.Vertices;
+            //for (var i = 0; i < polygonVertices.Length - 1; i++)
+            //{
+            //    var vertex1 = Math2.Math2.Rotate(polygonVertices[i], polygonShape.Center, rotation);
+            //    var vertex2 = Math2.Math2.Rotate(polygonVertices[i + 1], polygonShape.Center, rotation);
 
-                lines.Add(new LineShape(
-                    vertex1 + polygonShape.Position,
-                    vertex2 + polygonShape.Position
-                ));
+            //    lines.Add(new LineShape(
+            //        vertex1 + polygonShape.Position,
+            //        vertex2 + polygonShape.Position
+            //    ));
 
-                var finalVertex1 = Math2.Math2.Rotate(polygonVertices[polygonVertices.Length - 1], polygonShape.Center, rotation);
-                var finalVertex2 = Math2.Math2.Rotate(polygonVertices[0], polygonShape.Center, rotation);
+            //    var finalVertex1 = Math2.Math2.Rotate(polygonVertices[polygonVertices.Length - 1], polygonShape.Center, rotation);
+            //    var finalVertex2 = Math2.Math2.Rotate(polygonVertices[0], polygonShape.Center, rotation);
 
-                lines.Add(new LineShape(
-                    finalVertex1 + polygonShape.Position,
-                    finalVertex2 + polygonShape.Position
-                ));
-            }
+            //    lines.Add(new LineShape(
+            //        finalVertex1 + polygonShape.Position,
+            //        finalVertex2 + polygonShape.Position
+            //    ));
+            //}
 
-            foreach (var lineShape in lines)
-            {
-                var result = this.CollidesLineAndCircle(lineShape, circleShape);
-                if (result != Vector2.Zero)
-                    return result;
-            }
+            //foreach (var lineShape in lines)
+            //{
+            //    var result = this.CollidesLineAndCircle(lineShape, circleShape);
+            //    if (result != Vector2.Zero)
+            //        return result;
+            //}
+
+            //return Vector2.Zero;
+
+            var testPoly = new Polygon2(polyA.Vertices);
+            var testCircle = new Circle2(circleB.Radius);
+
+            var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
+                polyA.Position + polyA.Velocity,
+                circleB.Position + circleB.Velocity,
+                new Rotation2(polyA.Rotation));
+
+            if (intercectsMtv != null)
+                return intercectsMtv.Item1 * intercectsMtv.Item2;
 
             return Vector2.Zero;
         }
@@ -449,21 +436,33 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        /// <param name="circleShape"></param>
-        /// <param name="circleShapeObs"></param>
+        /// <param name="circleA"></param>
+        /// <param name="circleB"></param>
         /// <returns></returns>
-        public Vector2 CollidesCircles(CircleShape circleShape, CircleShape circleShapeObs)
+        public Vector2 CollidesCircles(CircleShape circleA, CircleShape circleB)
         {
-            var direction = (circleShape.Position + circleShape.Velocity) - (circleShapeObs.Position + circleShapeObs.Velocity);
-            var distance = (float)Math.Round(direction.Length());
-            var sumOfRadii = circleShape.Radius + circleShapeObs.Radius;
+            //var direction = (circleShape.Position + circleShape.Velocity) - (circleShapeObs.Position + circleShapeObs.Velocity);
+            //var distance = (float)Math.Round(direction.Length());
+            //var sumOfRadii = circleShape.Radius + circleShapeObs.Radius;
 
-            if (!(sumOfRadii - distance <= 0))
-            {
-                var depth = sumOfRadii - distance;
-                direction.Normalize();
-                return direction * depth;
-            }
+            //if (!(sumOfRadii - distance <= 0))
+            //{
+            //    var depth = sumOfRadii - distance;
+            //    direction.Normalize();
+            //    return direction * depth;
+            //}
+
+            //return Vector2.Zero;
+            
+            var testCircle1 = new Circle2(circleA.Radius);
+            var testCircle2 = new Circle2(circleB.Radius);
+
+            var intercectsMtv = Circle2.IntersectMtv(testCircle1, testCircle2,
+                circleA.Position + circleA.Velocity,
+                circleB.Position + circleB.Velocity);
+
+            if (intercectsMtv != null)
+                return intercectsMtv.Item1 * intercectsMtv.Item2;
 
             return Vector2.Zero;
         }
@@ -487,10 +486,19 @@ namespace CollisionFloatTestNewMono.Engine
                 new Rotation2(polyB.Rotation));
 
             if (intercectsMtv != null)
-            {
                 return intercectsMtv.Item1 * intercectsMtv.Item2;
-            }
 
+            return Vector2.Zero;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="lineA"></param>
+        /// <param name="polyB"></param>
+        /// <returns></returns>
+        public Vector2 CollidesLineAndPolygon(LineShape lineA, PolygonShape polyB)
+        {
             return Vector2.Zero;
         }
     }

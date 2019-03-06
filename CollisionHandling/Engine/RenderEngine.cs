@@ -97,11 +97,11 @@ namespace CollisionFloatTestNewMono.Engine
             {
                 ShapeContactType.LineAndCircle, // 1,0 = Line->Circle
                 ShapeContactType.NotSupported, // 1,1 = Line->Line
-                ShapeContactType.PolygonAndLine // 1,2 = Line->Polygon
+                ShapeContactType.LineAndPolygon // 1,2 = Line->Polygon
             },
             {
                 ShapeContactType.PolygonAndCircle, // 2,0 = Polygon->Circle
-                ShapeContactType.PolygonAndLine, // 2,1 = Polygon->Line
+                ShapeContactType.LineAndPolygon, // 2,1 = Polygon->Line
                 ShapeContactType.Polygon // 2,2 = Polygon->Polygon
             }
         };
@@ -159,7 +159,7 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(-15, 0),
                 new Vector2(15, 0)
             });
-            var polygon = new PolygonShape("Polygon1", new Vector2(500, 200), polygonVertices, 45f);
+            var polygon = new PolygonShape("Polygon1", new Vector2(500, 200), polygonVertices, 0f);
             this.shapes.Add(polygon);
 
 
@@ -498,7 +498,11 @@ namespace CollisionFloatTestNewMono.Engine
                                 newVelocity += this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
 
                                 break;
-                            case ShapeContactType.PolygonAndLine:
+                            case ShapeContactType.LineAndPolygon:
+
+                                // Polygon->Circle
+                                newVelocity += this.collisionManager.CollidesLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
+
                                 break;
                         }
 
