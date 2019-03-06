@@ -156,14 +156,14 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         /// <param name="vertices"></param>
-        /// <param name="count"></param>
         /// <param name="color"></param>
         /// <param name="closed"></param>
-        public void DrawPolygon(Vector2[] vertices, int count, Color color, bool closed = true)
+        public void DrawPolygon(Vector2[] vertices, Color color, bool closed = true)
         {
             if (!this.IsReady())
                 throw new InvalidOperationException("BeginCustomDraw must be called before drawing anything.");
 
+            var count = vertices.Length;
             for (var i = 0; i < count - 1; i++)
             {
                 this.AddVertex(vertices[i], color, PrimitiveType.LineList);

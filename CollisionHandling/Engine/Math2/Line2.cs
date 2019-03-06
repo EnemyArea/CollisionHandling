@@ -106,8 +106,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             this.MinY = Math.Min(this.Start.Y, this.End.Y);
             this.MaxX = Math.Max(this.Start.X, this.End.X);
             this.MaxY = Math.Max(this.Start.X, this.End.X);
-            this.Horizontal = Math.Abs(this.End.X - this.Start.X) <= Math2.DEFAULT_EPSILON;
-            this.Vertical = Math.Abs(this.End.Y - this.Start.Y) <= Math2.DEFAULT_EPSILON;
+            this.Horizontal = Math.Abs(this.End.X - this.Start.X) <= Math2.DefaultEpsilon;
+            this.Vertical = Math.Abs(this.End.Y - this.Start.Y) <= Math2.DefaultEpsilon;
 
             if (this.Vertical)
                 this.Slope = float.PositiveInfinity;
@@ -192,7 +192,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var line1YInt = line1.Start.Y + pos1.Y - line1.Slope * (line1.Start.X + pos1.X);
             var line2YInt = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
 
-            if (Math.Abs(line1.Slope - line2.Slope) <= Math2.DEFAULT_EPSILON)
+            if (Math.Abs(line1.Slope - line2.Slope) <= Math2.DefaultEpsilon)
             {
                 // parallel lines
                 if (line1YInt != line2YInt)

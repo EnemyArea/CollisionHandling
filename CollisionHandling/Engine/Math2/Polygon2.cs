@@ -37,7 +37,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <summary>
         /// The bounding box.
         /// </summary>
-        public readonly Rect2 AABB;
+        public readonly Rect2 Aabb;
 
         /// <summary>
         /// The longest line that can be created inside this polygon. 
@@ -93,7 +93,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 max.X = Math.Max(max.X, vertices[i].X);
                 max.Y = Math.Max(max.Y, vertices[i].Y);
             }
-            this.AABB = new Rect2(min, max);
+            this.Aabb = new Rect2(min, max);
 
             this.Center = new Vector2(0, 0);
             foreach (var vert in this.Vertices)
@@ -144,7 +144,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     ccwCounter++;
 
                 this.Clockwise = clockwise;
-                if (Math.Abs(angLast - angCurr) > Math2.DEFAULT_EPSILON)
+                if (Math.Abs(angLast - angCurr) > Math2.DefaultEpsilon)
                 {
                     foundDefinitiveResult = true;
                     break;
@@ -158,6 +158,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 this.Clockwise = cwCounter > ccwCounter;
         }
 
+
         /// <summary>
         /// Determines if the specified polygon at the specified position and rotation contains the specified point
         /// </summary>
@@ -169,7 +170,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <returns>If the polygon at pos with rotation rot about its center contains point</returns>
         public static bool Contains(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 point, bool strict)
         {
-            if (!Rect2.Contains(poly.AABB, pos, point, strict))
+            if (!Rect2.Contains(poly.Aabb, pos, point, strict))
                 return false;
 
             // Calculate the area of the triangles constructed by the lines of the polygon. If it
@@ -225,7 +226,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot1">Rotation of the first polyogn</param>
         /// <param name="rot2">Rotation of the second polygon</param>
         /// <returns>MTV to move poly1 to prevent intersection with poly2</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
         {
             Vector2 bestAxis = Vector2.Zero;
             float bestMagn = float.MaxValue;
@@ -233,7 +234,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
             {
                 var axis = Math2.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
-                var mtv = IntersectMTVAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
+                var mtv = IntersectMtvAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
                 if (!mtv.HasValue)
                     return null;
                 else if (Math.Abs(mtv.Value) < Math.Abs(bestMagn))
@@ -278,12 +279,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot2">polygon 2 rotation</param>
         /// <param name="axis">Axis to check</param>
         /// <returns>a number to shift pos1 along axis by to prevent poly1 at pos1 from intersecting poly2 at pos2, or null if no int. along axis</returns>
-        public static float? IntersectMTVAlongAxis(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2, Vector2 axis)
+        public static float? IntersectMtvAlongAxis(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(poly1, pos1, rot1, axis);
             var proj2 = ProjectAlongAxis(poly2, pos2, rot2, axis);
 
-            return AxisAlignedLine2.IntersectMTV(proj1, proj2);
+            return AxisAlignedLine2.IntersectMtv(proj1, proj2);
         }
         /// <summary>
         /// Projects the polygon at position onto the specified axis.
@@ -482,9 +483,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">Origin of first polygon</param>
         /// <param name="pos2">Origin of second polygon</param>
         /// <returns>If poly1 at pos1 not rotated intersects poly2 at pos2 not rotated</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMTV(poly1, poly2, pos1, pos2, Rotation2.Zero, Rotation2.Zero);
+            return IntersectMtv(poly1, poly2, pos1, pos2, Rotation2.Zero, Rotation2.Zero);
         }
 
         /// <summary>

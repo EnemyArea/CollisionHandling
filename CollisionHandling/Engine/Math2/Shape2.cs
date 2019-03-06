@@ -10,6 +10,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// </summary>
     public class Shape2
     {
+        public Color Color { get; set; } = Color.Yellow;
+
         /// <summary>
         /// Determines if polygon at position 1 intersects the rectangle at position 2. Polygon may
         /// be rotated, but the rectangle cannot (use a polygon if you want to rotate it).
@@ -54,7 +56,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">Origin of rectangle</param>
         /// <param name="rot1">Rotation of the polygon.</param>
         /// <returns>The vector to move pos1 by or null</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly, Rect2 rect, Vector2 pos1, Vector2 pos2, Rotation2 rot1)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly, Rect2 rect, Vector2 pos1, Vector2 pos2, Rotation2 rot1)
         {
             bool checkedX = false, checkedY = false;
 
@@ -64,7 +66,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             for (int i = 0; i < poly.Normals.Count; i++)
             {
                 var norm = Math2.Rotate(poly.Normals[i], Vector2.Zero, rot1);
-                var mtv = IntersectMTVAlongAxis(poly, rect, pos1, pos2, rot1, norm);
+                var mtv = IntersectMtvAlongAxis(poly, rect, pos1, pos2, rot1, norm);
                 if (!mtv.HasValue)
                     return null;
 
@@ -82,7 +84,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (!checkedX)
             {
-                var mtv = IntersectMTVAlongAxis(poly, rect, pos1, pos2, rot1, Vector2.UnitX);
+                var mtv = IntersectMtvAlongAxis(poly, rect, pos1, pos2, rot1, Vector2.UnitX);
                 if (!mtv.HasValue)
                     return null;
 
@@ -95,7 +97,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (!checkedY)
             {
-                var mtv = IntersectMTVAlongAxis(poly, rect, pos1, pos2, rot1, Vector2.UnitY);
+                var mtv = IntersectMtvAlongAxis(poly, rect, pos1, pos2, rot1, Vector2.UnitY);
                 if (!mtv.HasValue)
                     return null;
 
@@ -119,9 +121,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">Origin of </param>
         /// <param name="rot2">Rotation of the polygon</param>
         /// <returns>Offset of pos1 to get rect not to intersect poly</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Rect2 rect, Polygon2 poly, Vector2 pos1, Vector2 pos2, Rotation2 rot2)
+        public static Tuple<Vector2, float> IntersectMtv(Rect2 rect, Polygon2 poly, Vector2 pos1, Vector2 pos2, Rotation2 rot2)
         {
-            var res = IntersectMTV(poly, rect, pos2, pos1, rot2);
+            var res = IntersectMtv(poly, rect, pos2, pos1, rot2);
             return res != null ? Tuple.Create(-res.Item1, res.Item2) : res;
         }
 
@@ -188,12 +190,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot1">Rotation of polygon in radians</param>
         /// <param name="axis">Axis to check</param>
         /// <returns>Number if poly intersects rect along axis, null otherwise</returns>
-        public static float? IntersectMTVAlongAxis(Polygon2 poly, Rect2 rect, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Vector2 axis)
+        public static float? IntersectMtvAlongAxis(Polygon2 poly, Rect2 rect, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Vector2 axis)
         {
             var proj1 = Polygon2.ProjectAlongAxis(poly, pos1, rot1, axis);
             var proj2 = Rect2.ProjectAlongAxis(rect, pos2, axis);
 
-            return AxisAlignedLine2.IntersectMTV(proj1, proj2);
+            return AxisAlignedLine2.IntersectMtv(proj1, proj2);
         }
 
         /// <summary>
@@ -206,12 +208,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot2">Rotation of the polygon in radians</param>
         /// <param name="axis">Axis to check</param>
         /// <returns>Number if rect intersects poly along axis, null otherwise</returns>
-        public static float? IntersectMTVAlongAxis(Rect2 rect, Polygon2 poly, Vector2 pos1, Vector2 pos2, Rotation2 rot2, Vector2 axis)
+        public static float? IntersectMtvAlongAxis(Rect2 rect, Polygon2 poly, Vector2 pos1, Vector2 pos2, Rotation2 rot2, Vector2 axis)
         {
             var proj1 = Rect2.ProjectAlongAxis(rect, pos1, axis);
             var proj2 = Polygon2.ProjectAlongAxis(poly, pos2, rot2, axis);
 
-            return AxisAlignedLine2.IntersectMTV(proj1, proj2);
+            return AxisAlignedLine2.IntersectMtv(proj1, proj2);
         }
 
         /// <summary>
@@ -245,7 +247,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <param name="rot1">The rotation of the polygon</param>
         /// <returns></returns>
-        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly, Circle2 circle, Vector2 pos1, Vector2 pos2, Rotation2 rot1)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly, Circle2 circle, Vector2 pos1, Vector2 pos2, Rotation2 rot1)
         {
             // We have two situations, either the circle is not strictly intersecting the polygon, or
             // there exists at least one shortest line that you could push the polygon to prevent 
@@ -282,7 +284,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     var polyProj = Polygon2.ProjectAlongAxis(poly, pos1, rot1, axis);
                     var circleProj = Circle2.ProjectAlongAxis(circle, pos2, axis);
 
-                    var mtv = AxisAlignedLine2.IntersectMTV(polyProj, circleProj);
+                    var mtv = AxisAlignedLine2.IntersectMtv(polyProj, circleProj);
                     if (!mtv.HasValue)
                         return false;
 
@@ -345,9 +347,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">The origin of the polygon</param>
         /// <param name="rot2">The rotation of the polygon</param>
         /// <returns>The mtv to move the circle at pos1 to prevent overlap with the poly at pos2 with rotation rot2</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Circle2 circle, Polygon2 poly, Vector2 pos1, Vector2 pos2, Rotation2 rot2)
+        public static Tuple<Vector2, float> IntersectMtv(Circle2 circle, Polygon2 poly, Vector2 pos1, Vector2 pos2, Rotation2 rot2)
         {
-            var res = IntersectMTV(poly, circle, pos2, pos1, rot2);
+            var res = IntersectMtv(poly, circle, pos2, pos1, rot2);
             if (res != null)
                 return Tuple.Create(-res.Item1, res.Item2);
             return null;
@@ -395,7 +397,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The rectangles origin</param>
         /// <returns>MTV for circle at pos1 to prevent overlap with rect at pos2</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Circle2 circle, Rect2 rect, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Circle2 circle, Rect2 rect, Vector2 pos1, Vector2 pos2)
         {
             // Same as polygon rect, just converted to rects points
             HashSet<Vector2> checkedAxis = new HashSet<Vector2>();
@@ -412,7 +414,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     var circleProj = Circle2.ProjectAlongAxis(circle, pos1, axis);
                     var rectProj = Rect2.ProjectAlongAxis(rect, pos2, axis);
 
-                    var mtv = AxisAlignedLine2.IntersectMTV(circleProj, rectProj);
+                    var mtv = AxisAlignedLine2.IntersectMtv(circleProj, rectProj);
                     if (!mtv.HasValue)
                         return false;
 
@@ -471,9 +473,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">The origin of the rectangle</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <returns>MTV for rect at pos1 to prevent overlap with circle at pos2</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Rect2 rect, Circle2 circle, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Rect2 rect, Circle2 circle, Vector2 pos1, Vector2 pos2)
         {
-            var res = IntersectMTV(circle, rect, pos2, pos1);
+            var res = IntersectMtv(circle, rect, pos2, pos1);
             if (res != null)
                 return Tuple.Create(-res.Item1, res.Item2);
             return null;
@@ -770,9 +772,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1"></param>
         /// <param name="pos2"></param>
         /// <returns></returns>
-        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly, Rect2 rect, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly, Rect2 rect, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMTV(poly, rect, pos1, pos2, Rotation2.Zero);
+            return IntersectMtv(poly, rect, pos1, pos2, Rotation2.Zero);
         }
 
         /// <summary>
@@ -784,9 +786,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">The origin of the rect</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <returns>MTV to move rect at pos1 to prevent overlap with poly at pos2</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Rect2 rect, Polygon2 poly, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Rect2 rect, Polygon2 poly, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMTV(rect, poly, pos1, pos2, Rotation2.Zero);
+            return IntersectMtv(rect, poly, pos1, pos2, Rotation2.Zero);
         }
 
         /// <summary>
@@ -826,9 +828,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">The position of the polygon</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <returns>MTV to move poly at pos1 to prevent overlap with circle at pos2</returns>
-        public static Tuple<Vector2, float> IntersectMTV(Polygon2 poly, Circle2 circle, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly, Circle2 circle, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMTV(poly, circle, pos1, pos2, Rotation2.Zero);
+            return IntersectMtv(poly, circle, pos1, pos2, Rotation2.Zero);
         }
 
         /// <summary>
@@ -840,9 +842,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <returns></returns>
-        public static Tuple<Vector2, float> IntersectMTV(Circle2 circle, Polygon2 poly, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Circle2 circle, Polygon2 poly, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMTV(circle, poly, pos1, pos2, Rotation2.Zero);
+            return IntersectMtv(circle, poly, pos1, pos2, Rotation2.Zero);
         }
         #endregion
     }

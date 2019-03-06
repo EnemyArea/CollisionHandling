@@ -8,7 +8,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <summary>
         /// Default epsilon
         /// </summary>
-        public const float DEFAULT_EPSILON = 0.001f;
+        public const float DefaultEpsilon = 0.001f;
 
         /// <summary>
         /// Determines if v1, v2, and v3 are collinear
@@ -21,7 +21,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="v3">Vector 3</param>
         /// <param name="epsilon">How close is close enough</param>
         /// <returns>If v1, v2, v3 is collinear</returns>
-        public static bool IsOnLine(Vector2 v1, Vector2 v2, Vector2 v3, float epsilon = DEFAULT_EPSILON)
+        public static bool IsOnLine(Vector2 v1, Vector2 v2, Vector2 v3, float epsilon = DefaultEpsilon)
         {
             return AreaOfTriangle(v1, v2, v3) <= epsilon;
         }
@@ -68,7 +68,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="f1">F1.</param>
         /// <param name="f2">F2.</param>
         /// <param name="epsilon">Epsilon.</param>
-        public static bool Approximately(float f1, float f2, float epsilon = DEFAULT_EPSILON)
+        public static bool Approximately(float f1, float f2, float epsilon = DefaultEpsilon)
         {
             return Math.Abs(f1 - f2) <= epsilon;
         }
@@ -81,7 +81,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="v1">V1.</param>
         /// <param name="v2">V2.</param>
         /// <param name="epsilon">Epsilon.</param>
-        public static bool Approximately(Vector2 v1, Vector2 v2, float epsilon = DEFAULT_EPSILON)
+        public static bool Approximately(Vector2 v1, Vector2 v2, float epsilon = DefaultEpsilon)
         {
             return Approximately(v1.X, v2.X, epsilon) && Approximately(v1.Y, v2.Y, epsilon);
         }

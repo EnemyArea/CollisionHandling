@@ -50,12 +50,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="line1">Line1</param>
         /// <param name="line2">Line2</param>
         /// <returns>MTV for line1</returns>
-        public static float? IntersectMTV(AxisAlignedLine2 line1, AxisAlignedLine2 line2)
+        public static float? IntersectMtv(AxisAlignedLine2 line1, AxisAlignedLine2 line2)
         {
             if (line1.Axis != line2.Axis)
                 throw new ArgumentException($"Lines {line1} and {line2} are not aligned - you will need to convert to Line2 to check intersection.");
 
-            return IntersectMTV(line1.Min, line1.Max, line2.Min, line2.Max, false);
+            return IntersectMtv(line1.Min, line1.Max, line2.Min, line2.Max, false);
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="max2">Line 2 max</param>
         /// <param name="correctMinMax">If mins and maxs might be reversed</param>
         /// <returns>a number to move along the projected axis (positive or negative) or null if no intersection</returns>
-        public static float? IntersectMTV(float min1, float max1, float min2, float max2, bool correctMinMax = true)
+        public static float? IntersectMtv(float min1, float max1, float min2, float max2, bool correctMinMax = true)
         {
             if (correctMinMax)
             {

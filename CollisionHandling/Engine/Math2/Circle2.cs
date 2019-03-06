@@ -6,7 +6,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// <summary>
     /// Describes a circle in the x-y plane.
     /// </summary>
-    public struct Circle2
+    public class Circle2 : Shape2
     {
         /// <summary>
         /// The radius of the circle
@@ -20,6 +20,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         public Circle2(float radius)
         {
             this.Radius = radius;
+            this.Color = Color.Yellow;
         }
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             return c1.Radius != c2.Radius;
         }
-        
+
         public override bool Equals(object obj)
         {
             if (obj.GetType() != typeof(Circle2))
@@ -81,7 +82,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             else
                 return distSq <= circle.Radius * circle.Radius;
         }
-        
+
         /// <summary>
         /// Determines if the first circle at the specified position intersects the second circle
         /// at the specified position.
@@ -109,11 +110,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <returns>If circle1 of radius=radius1, topleft=pos1 intersects circle2 of radius=radius2, topleft=pos2</returns>
         public static bool Intersects(float radius1, float radius2, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            var betweenVec = (pos2 + new Vector2(radius2, radius2)) - (pos1 + new Vector2(radius1, radius1));
+            var betweenVec = (pos2 + new Vector2(radius2)) - (pos1 + new Vector2(radius1));
 
             var betweenDistSq = betweenVec.LengthSquared();
 
-            var distOfNoOverlapSq = (radius1 + radius1) * (radius1 + radius1);
+            var distOfNoOverlapSq = (radius1 + radius2) * (radius1 + radius2);
 
             if (strict)
                 return betweenDistSq < distOfNoOverlapSq;
@@ -130,9 +131,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">Top-left of the first circles bounding box</param>
         /// <param name="pos2">Top-left of the second circles bounding box</param>
         /// <returns></returns>
-        public static Tuple<Vector2, float> IntersectMTV(Circle2 circle1, Circle2 circle2, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Circle2 circle1, Circle2 circle2, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMTV(circle1.Radius, circle2.Radius, pos1, pos2);
+            return IntersectMtv(circle1.Radius, circle2.Radius, pos1, pos2);
         }
 
         /// <summary>
@@ -145,17 +146,15 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1"></param>
         /// <param name="pos2"></param>
         /// <returns></returns>
-        public static Tuple<Vector2, float> IntersectMTV(float radius1, float radius2, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(float radius1, float radius2, Vector2 pos1, Vector2 pos2)
         {
-            var betweenVec = (pos2 + new Vector2(radius2, radius2)) - (pos1 + new Vector2(radius1 + radius1));
+            var betweenVec = pos1 - pos2;
+            var distanceBetween = (float)Math.Round(betweenVec.Length());
+            var distOfNoOverlap = (radius1) + (radius2);
 
-            var distanceBetweenSquared = betweenVec.LengthSquared();
-
-            var distOfNoOverlapSq = (radius1 + radius2) * (radius1 + radius2);
-
-            if(distanceBetweenSquared < distOfNoOverlapSq)
+            if (!(distOfNoOverlap - distanceBetween <= 0))
             {
-                return Tuple.Create(Vector2.Normalize(betweenVec), (float)Math.Sqrt(distanceBetweenSquared));
+                return Tuple.Create(Vector2.Normalize(betweenVec), distOfNoOverlap - distanceBetween);
             }
 
             return null;
@@ -167,6 +166,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="pos">The position of the circle</param>
+        /// <param name="axis"></param>
         /// <returns>Projects circle at pos along axis</returns>
         public static AxisAlignedLine2 ProjectAlongAxis(Circle2 circle, Vector2 pos, Vector2 axis)
         {
