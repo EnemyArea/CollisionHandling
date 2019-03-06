@@ -323,14 +323,19 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     return null;
 
                 // Test along line normal
-                if (!checkAxis(Vector2.Normalize(Math2.Perpendicular(lastVec - currVec))))
+                var n = Math2.Perpendicular(currVec - lastVec);
+                var n2 = Vector2.Normalize(n);
+
+                if (!checkAxis(n2))
                     return null;
 
                 last = curr;
                 lastVec = currVec;
             }
 
-            return Tuple.Create(bestAxis, shortestOverlap);
+
+            // TODO: -bestAxis wenn wir den circle steuern und bestAxis wenn wir das polygon nehmen :(
+            return Tuple.Create(-bestAxis, shortestOverlap);
         }
 
         /// <summary>
