@@ -422,13 +422,21 @@ namespace CollisionFloatTestNewMono.Engine
             var testPoly = new Polygon2(polyA.Vertices);
             var testCircle = new Circle2(circleB.Radius);
 
-            var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
+            if (Shape2.Intersects(testPoly, testCircle,
                 polyA.Position + polyA.Velocity,
                 circleB.Position + circleB.Velocity,
-                new Rotation2(polyA.Rotation));
+                new Rotation2(polyA.Rotation), true))
+            {
+                return Vector2.One;
 
-            if (intercectsMtv != null)
-                return intercectsMtv.Item1 * intercectsMtv.Item2;
+                //var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
+                //    polyA.Position + polyA.Velocity,
+                //    circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                //    new Rotation2(polyA.Rotation));
+
+                //if (intercectsMtv != null)
+                //    return intercectsMtv.Item1 * intercectsMtv.Item2;
+            }
 
             return Vector2.Zero;
         }
@@ -453,7 +461,7 @@ namespace CollisionFloatTestNewMono.Engine
             //}
 
             //return Vector2.Zero;
-            
+
             var testCircle1 = new Circle2(circleA.Radius);
             var testCircle2 = new Circle2(circleB.Radius);
 
@@ -466,7 +474,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             return Vector2.Zero;
         }
-        
+
 
         /// <summary>
         ///  Compute the collision manifold between two polygons.

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -127,22 +128,23 @@ namespace CollisionFloatTestNewMono.Engine
             this.camera.SetZoomLevel(1);
             this.camera.SetFocusPosition(Vector2.Zero);
 
-            // Polygon-Player
-            var size = new Vector2(20, 30);
-            var playerVertices = GameHelper.GetConvexHull(new[]
-            {
-                new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-20, 0),
-                new Vector2(20, 0)
-            });
-            this.playerShape = new PolygonShape("P", new Vector2(400, 200), playerVertices);
-            this.shapes.Add(this.playerShape);
 
-
-            //// Circle-Player
-            //this.playerShape = new CircleShape("P", new Vector2(400, 50), 15);
+            //// Polygon-Player
+            //var size = new Vector2(20, 30);
+            //var playerVertices = GameHelper.GetConvexHull(new[]
+            //{
+            //    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-20, 0),
+            //    new Vector2(20, 0)
+            //});
+            //this.playerShape = new PolygonShape("P", new Vector2(400, 200), playerVertices);
             //this.shapes.Add(this.playerShape);
+
+
+            // Circle-Player
+            this.playerShape = new CircleShape("P", new Vector2(400, 50), 15);
+            this.shapes.Add(this.playerShape);
 
 
             //
@@ -159,33 +161,36 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(-15, 0),
                 new Vector2(15, 0)
             });
-            var polygon = new PolygonShape("Polygon1", new Vector2(500, 200), polygonVertices, 0f);
+            var polygon = new PolygonShape("Polygon1", new Vector2(500, 200), polygonVertices);
             this.shapes.Add(polygon);
 
-
-            // Circles
-            this.shapes.Add(new CircleShape("C1", new Vector2(100 + 50, 100 + 50), 50));
-            this.shapes.Add(new CircleShape("C2", new Vector2(250 + 50, 100 + 50), 50));
+            var polygon2 =  new PolygonShape("Polygon2", new Vector2(200, 200), ShapeUtils.CreateRectangle(150, 150).Vertices);
+            this.shapes.Add(polygon2);
 
 
-            // Lines
-            var offset = new Vector2(120, 140);
-            this.shapes.Add(new LineShape(
-                new Vector2(100 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 100 + offset.Y)
-            ));
-            this.shapes.Add(new LineShape(
-                new Vector2(200 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 200 + offset.Y)
-            ));
-            this.shapes.Add(new LineShape(
-                new Vector2(200 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 200 + offset.Y)
-            ));
-            this.shapes.Add(new LineShape(
-                new Vector2(100 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 100 + offset.Y)
-            ));
+            //// Circles
+            //this.shapes.Add(new CircleShape("C1", new Vector2(150, 150), 50));
+            //this.shapes.Add(new CircleShape("C2", new Vector2(250 + 50, 100 + 50), 50));
+
+
+            //// Lines
+            //var offset = new Vector2(120, 140);
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(100 + offset.X, 100 + offset.Y),
+            //    new Vector2(200 + offset.X, 100 + offset.Y)
+            //));
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(200 + offset.X, 100 + offset.Y),
+            //    new Vector2(200 + offset.X, 200 + offset.Y)
+            //));
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(200 + offset.X, 200 + offset.Y),
+            //    new Vector2(100 + offset.X, 200 + offset.Y)
+            //));
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(100 + offset.X, 200 + offset.Y),
+            //    new Vector2(100 + offset.X, 100 + offset.Y)
+            //));
 
 
             //this.shapes.Add(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
@@ -493,7 +498,7 @@ namespace CollisionFloatTestNewMono.Engine
 
                                 break;
                             case ShapeContactType.Polygon:
-                                
+
                                 // Polygon->Polygon
                                 newVelocity += this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
 
@@ -508,7 +513,7 @@ namespace CollisionFloatTestNewMono.Engine
 
                         if (newVelocity != Vector2.Zero)
                         {
-                            shapeA.ApplyVelocity(newVelocity);
+                            //shapeA.ApplyVelocity(newVelocity);
                             shapeB.Color = Color.Red;
                             hasCollison = true;
                         }
@@ -541,11 +546,11 @@ namespace CollisionFloatTestNewMono.Engine
                             }
                             break;
                     }
-                }   
-                
+                }
+
                 shape.ResetVelocity();
             }
-            
+
             // Camera
             this.camera.SetFocusPosition(this.playerShape.Position);
             this.camera.Update(gameTime);
@@ -568,7 +573,7 @@ namespace CollisionFloatTestNewMono.Engine
                 spriteBatch.Draw(this.texture, Vector2.Zero, new Rectangle((int)-this.camera.ViewMatrixWithOffset.Translation.X, (int)-this.camera.ViewMatrixWithOffset.Translation.Y, this.camera.Viewport.Width, this.camera.Viewport.Height), Color.White);
                 spriteBatch.End();
             }
-            
+
 
             this.primitiveBatch.Begin(ref this.projection, ref this.view);
 
@@ -593,7 +598,7 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                 }
             }
-            
+
             this.primitiveBatch.End();
 
 
