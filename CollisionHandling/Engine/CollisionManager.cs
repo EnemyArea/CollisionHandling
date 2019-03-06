@@ -421,11 +421,12 @@ namespace CollisionFloatTestNewMono.Engine
 
             var testPoly = new Polygon2(polyA.Vertices);
             var testCircle = new Circle2(circleB.Radius);
+            var rota = new Rotation2(polyA.Rotation);
 
             if (Shape2.Intersects(testPoly, testCircle,
                 polyA.Position + polyA.Velocity,
-                circleB.Position + circleB.Velocity,
-                new Rotation2(polyA.Rotation), true))
+                (circleB.Position - new Vector2(circleB.Radius)) + circleB.Velocity,
+                rota, true))
             {
                 return Vector2.One;
 

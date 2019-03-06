@@ -143,7 +143,8 @@ namespace CollisionFloatTestNewMono.Engine
 
 
             // Circle-Player
-            this.playerShape = new CircleShape("P", new Vector2(400, 50), 15);
+            //this.playerShape = new CircleShape("P", new Vector2(336, 179), 15);
+            this.playerShape = new CircleShape("P", new Vector2(196, 234), 15);
             this.shapes.Add(this.playerShape);
 
 
@@ -152,20 +153,41 @@ namespace CollisionFloatTestNewMono.Engine
             //
 
 
-            // Polygons
-            var sizePolygon = new Vector2(150, 250);
-            var polygonVertices = GameHelper.GetConvexHull(new[]
-            {
-                new Vector2(sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-15, 0),
-                new Vector2(15, 0)
-            });
-            var polygon = new PolygonShape("Polygon1", new Vector2(500, 200), polygonVertices);
-            this.shapes.Add(polygon);
+            //// Polygons
+            //var sizePolygon = new Vector2(150, 250);
+            //var polygonVertices = GameHelper.GetConvexHull(new[]
+            //{
+            //    new Vector2(sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-15, 0),
+            //    new Vector2(15, 0)
+            //});
+            //var polygon = new PolygonShape("Polygon1", new Vector2(500, 200), polygonVertices);
+            //this.shapes.Add(polygon);
 
-            var polygon2 =  new PolygonShape("Polygon2", new Vector2(200, 200), ShapeUtils.CreateRectangle(150, 150).Vertices);
+            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 200), ShapeUtils.CreateRectangle(150, 150).Vertices);
             this.shapes.Add(polygon2);
+
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(0, 150) + polygon2.Position,
+            //    new Vector2(0, 0) + polygon2.Position
+            //));
+
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(0, 0) + polygon2.Position,
+            //    new Vector2(150, 0) + polygon2.Position
+            //));
+
+            // Hit!?
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(150, 0) + polygon2.Position,
+            //    new Vector2(150, 150) + polygon2.Position
+            //));
+
+            //this.shapes.Add(new LineShape(
+            //    new Vector2(150, 150) + polygon2.Position,
+            //    new Vector2(0, 150) + polygon2.Position
+            //));
 
 
             //// Circles
@@ -380,231 +402,231 @@ namespace CollisionFloatTestNewMono.Engine
         ///     Update the tile engine.
         /// </summary>
         public void Update(GameTime gameTime)
+{
+    var newState = Keyboard.GetState();
+
+    // Time
+    var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+    if (newState.IsKeyDown(Keys.F1) && !this.oldState.IsKeyDown(Keys.F1))
+        this.showTexture = !this.showTexture;
+
+    if (newState.IsKeyDown(Keys.F4) && !this.oldState.IsKeyDown(Keys.F4))
+        this.playerShape.SetPosition(Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(this.camera.ViewMatrixWithOffset)));
+
+    var velocityDirection = Vector2.Zero;
+    if (newState.IsKeyDown(Keys.LeftShift) || newState.IsKeyDown(Keys.RightShift))
+    {
+        if (newState.IsKeyDown(Keys.Left) && !this.oldState.IsKeyDown(Keys.Left))
         {
-            var newState = Keyboard.GetState();
-
-            // Time
-            var elapsed = (float)gameTime.ElapsedGameTime.TotalSeconds;
-
-            if (newState.IsKeyDown(Keys.F1) && !this.oldState.IsKeyDown(Keys.F1))
-                this.showTexture = !this.showTexture;
-
-            if (newState.IsKeyDown(Keys.F4) && !this.oldState.IsKeyDown(Keys.F4))
-                this.playerShape.SetPosition(Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(this.camera.ViewMatrixWithOffset)));
-
-            var velocityDirection = Vector2.Zero;
-            if (newState.IsKeyDown(Keys.LeftShift) || newState.IsKeyDown(Keys.RightShift))
-            {
-                if (newState.IsKeyDown(Keys.Left) && !this.oldState.IsKeyDown(Keys.Left))
-                {
-                    velocityDirection.X = -1;
-                }
-                else if (newState.IsKeyDown(Keys.Right) && !this.oldState.IsKeyDown(Keys.Right))
-                {
-                    velocityDirection.X = 1;
-                }
-
-                if (newState.IsKeyDown(Keys.Up) && !this.oldState.IsKeyDown(Keys.Up))
-                {
-                    velocityDirection.Y = -1;
-                }
-                else if (newState.IsKeyDown(Keys.Down) && !this.oldState.IsKeyDown(Keys.Down))
-                {
-                    velocityDirection.Y = 1;
-                }
-            }
-            else
-            {
-                // Handle Keyboard Input
-                velocityDirection.X = newState.IsKeyDown(Keys.A) ? -1 : newState.IsKeyDown(Keys.D) ? 1 : 0;
-                velocityDirection.Y = newState.IsKeyDown(Keys.W) ? -1 : newState.IsKeyDown(Keys.S) ? 1 : 0;
-            }
-
-            this.oldState = newState;
-
-            //// Bewegen....
-            //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
-            //this.rotation = (int)MathHelper.Lerp(0, 360, time);
-
-            this.playerShape.Color = Color.Fuchsia;
-            this.playerShape.ResetVelocity();
-
-            if (velocityDirection != Vector2.Zero)
-            {
-                velocityDirection.Normalize();
-                this.playerShape.ApplyVelocity(velocityDirection * this.playerSpeed * elapsed);
-            }
-
-            foreach (var shape in this.shapes)
-                shape.Color = Color.Fuchsia;
-
-            // Umliegende Shapes
-            var currentWorldPosition = this.playerShape.Position;
-            var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
-            var allShapesAround = this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
-
-            foreach (var shape in allShapesAround)
-                shape.Color = Color.Yellow;
-
-            foreach (var shapeA in allShapesAround)
-            {
-                var iterations = 0;
-                bool hasCollison;
-                do
-                {
-                    hasCollison = false;
-
-                    foreach (var shapeB in allShapesAround)
-                    {
-                        if (shapeA == shapeB || (this.playerShape == shapeB))
-                            continue;
-
-                        var type1 = shapeA.ShapeType;
-                        var type2 = shapeB.ShapeType;
-                        Shape sortedShapeA;
-                        Shape sortedShapeB;
-
-                        if ((type1 >= type2 || (type1 == ShapeType.Line && type2 == ShapeType.Polygon)) && !(type2 == ShapeType.Line && type1 == ShapeType.Polygon))
-                        {
-                            sortedShapeA = shapeA;
-                            sortedShapeB = shapeB;
-                        }
-                        else
-                        {
-                            sortedShapeA = shapeB;
-                            sortedShapeB = shapeA;
-                        }
-
-                        var newVelocity = Vector2.Zero;
-                        var shapeContactType = registers[(int)shapeA.ShapeType, (int)shapeB.ShapeType];
-                        switch (shapeContactType)
-                        {
-                            case ShapeContactType.Circle:
-
-                                // Circle->Circle
-                                newVelocity += this.collisionManager.CollidesCircles((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
-
-                                break;
-                            case ShapeContactType.PolygonAndCircle:
-
-                                // Polygon->Circle
-                                newVelocity += this.collisionManager.CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
-
-                                break;
-                            case ShapeContactType.LineAndCircle:
-
-                                // Line->Circle
-                                newVelocity += this.collisionManager.CollidesLineAndCircle((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
-
-                                break;
-                            case ShapeContactType.Polygon:
-
-                                // Polygon->Polygon
-                                newVelocity += this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
-
-                                break;
-                            case ShapeContactType.LineAndPolygon:
-
-                                // Polygon->Circle
-                                newVelocity += this.collisionManager.CollidesLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
-
-                                break;
-                        }
-
-                        if (newVelocity != Vector2.Zero)
-                        {
-                            //shapeA.ApplyVelocity(newVelocity);
-                            shapeB.Color = Color.Red;
-                            hasCollison = true;
-                        }
-                    }
-
-                    iterations++;
-                }
-                while (hasCollison && iterations <= 10);
-            }
-
-            // Bewegen
-            foreach (var shape in allShapesAround)
-            {
-                if (shape.Velocity != Vector2.Zero)
-                {
-                    switch (shape)
-                    {
-                        case CircleShape circleShape:
-                            {
-                                var result = circleShape.Velocity;
-                                circleShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
-                                //this.grid.Move(shape, circleShape.TilePosition);
-                            }
-                            break;
-                        case PolygonShape polygonShape:
-                            {
-                                var result = polygonShape.Velocity;
-                                polygonShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
-                                //this.grid.Move(shape, polygonShape.TilePosition);
-                            }
-                            break;
-                    }
-                }
-
-                shape.ResetVelocity();
-            }
-
-            // Camera
-            this.camera.SetFocusPosition(this.playerShape.Position);
-            this.camera.Update(gameTime);
-
-            // Zwischenspeichern
-            this.projection = Matrix.CreateOrthographicOffCenter(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, 0, 1);
-            this.view = this.camera.ViewMatrixWithOffset;
+            velocityDirection.X = -1;
+        }
+        else if (newState.IsKeyDown(Keys.Right) && !this.oldState.IsKeyDown(Keys.Right))
+        {
+            velocityDirection.X = 1;
         }
 
-
-        /// <summary>
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="spriteBatch"></param>
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        if (newState.IsKeyDown(Keys.Up) && !this.oldState.IsKeyDown(Keys.Up))
         {
-            if (this.showTexture)
+            velocityDirection.Y = -1;
+        }
+        else if (newState.IsKeyDown(Keys.Down) && !this.oldState.IsKeyDown(Keys.Down))
+        {
+            velocityDirection.Y = 1;
+        }
+    }
+    else
+    {
+        // Handle Keyboard Input
+        velocityDirection.X = newState.IsKeyDown(Keys.A) ? -1 : newState.IsKeyDown(Keys.D) ? 1 : 0;
+        velocityDirection.Y = newState.IsKeyDown(Keys.W) ? -1 : newState.IsKeyDown(Keys.S) ? 1 : 0;
+    }
+
+    this.oldState = newState;
+
+    //// Bewegen....
+    //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
+    //this.rotation = (int)MathHelper.Lerp(0, 360, time);
+
+    this.playerShape.Color = Color.Fuchsia;
+    this.playerShape.ResetVelocity();
+
+    if (velocityDirection != Vector2.Zero)
+    {
+        velocityDirection.Normalize();
+        this.playerShape.ApplyVelocity(velocityDirection * this.playerSpeed * elapsed);
+    }
+
+    foreach (var shape in this.shapes)
+        shape.Color = Color.Fuchsia;
+
+    // Umliegende Shapes
+    var currentWorldPosition = this.playerShape.Position;
+    var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
+    var allShapesAround = this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
+
+    foreach (var shape in allShapesAround)
+        shape.Color = Color.Yellow;
+
+    foreach (var shapeA in allShapesAround)
+    {
+        var iterations = 0;
+        bool hasCollison;
+        do
+        {
+            hasCollison = false;
+
+            foreach (var shapeB in allShapesAround)
             {
-                spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap);
-                spriteBatch.Draw(this.texture, Vector2.Zero, new Rectangle((int)-this.camera.ViewMatrixWithOffset.Translation.X, (int)-this.camera.ViewMatrixWithOffset.Translation.Y, this.camera.Viewport.Width, this.camera.Viewport.Height), Color.White);
-                spriteBatch.End();
-            }
+                if (shapeA == shapeB || (this.playerShape == shapeB))
+                    continue;
 
+                var type1 = shapeA.ShapeType;
+                var type2 = shapeB.ShapeType;
+                Shape sortedShapeA;
+                Shape sortedShapeB;
 
-            this.primitiveBatch.Begin(ref this.projection, ref this.view);
-
-            foreach (var shape in this.shapes)
-            {
-                switch (shape)
+                if ((type1 >= type2 || (type1 == ShapeType.Line && type2 == ShapeType.Polygon)) && !(type2 == ShapeType.Line && type1 == ShapeType.Polygon))
                 {
-                    case CircleShape circleShape:
+                    sortedShapeA = shapeA;
+                    sortedShapeB = shapeB;
+                }
+                else
+                {
+                    sortedShapeA = shapeB;
+                    sortedShapeB = shapeA;
+                }
 
-                        this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, shape.Color);
+                var newVelocity = Vector2.Zero;
+                var shapeContactType = registers[(int)shapeA.ShapeType, (int)shapeB.ShapeType];
+                switch (shapeContactType)
+                {
+                    case ShapeContactType.Circle:
+
+                        // Circle->Circle
+                        newVelocity += this.collisionManager.CollidesCircles((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
 
                         break;
-                    case LineShape lineShape:
+                    case ShapeContactType.PolygonAndCircle:
 
-                        this.primitiveBatch.DrawSegment(lineShape.Start, lineShape.End, lineShape.Color);
+                        // Polygon->Circle
+                        newVelocity += this.collisionManager.CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
 
                         break;
-                    case PolygonShape polygonShape:
+                    case ShapeContactType.LineAndCircle:
 
-                        this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Transform.Position, polygonShape.Transform.Rotation.GetAngle(), polygonShape.Color);
+                        // Line->Circle
+                        newVelocity += this.collisionManager.CollidesLineAndCircle((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
+
+                        break;
+                    case ShapeContactType.Polygon:
+
+                        // Polygon->Polygon
+                        newVelocity += this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
+
+                        break;
+                    case ShapeContactType.LineAndPolygon:
+
+                        // Polygon->Circle
+                        newVelocity += this.collisionManager.CollidesLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
 
                         break;
                 }
+
+                if (newVelocity != Vector2.Zero)
+                {
+                    //shapeA.ApplyVelocity(newVelocity);
+                    shapeB.Color = Color.Red;
+                    hasCollison = true;
+                }
             }
 
-            this.primitiveBatch.End();
-
-
-            spriteBatch.Begin();
-            spriteBatch.DrawString(this.font, $"{this.playerShape.Position}  / {this.camera.CameraPosition}", new Vector2(20, 20), Color.White);
-            spriteBatch.End();
+            iterations++;
         }
+        while (hasCollison && iterations <= 10);
+    }
+
+    // Bewegen
+    foreach (var shape in allShapesAround)
+    {
+        if (shape.Velocity != Vector2.Zero)
+        {
+            switch (shape)
+            {
+                case CircleShape circleShape:
+                    {
+                        var result = circleShape.Velocity;
+                        circleShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
+                        //this.grid.Move(shape, circleShape.TilePosition);
+                    }
+                    break;
+                case PolygonShape polygonShape:
+                    {
+                        var result = polygonShape.Velocity;
+                        polygonShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
+                        //this.grid.Move(shape, polygonShape.TilePosition);
+                    }
+                    break;
+            }
+        }
+
+        shape.ResetVelocity();
+    }
+
+    // Camera
+    this.camera.SetFocusPosition(this.playerShape.Position);
+    this.camera.Update(gameTime);
+
+    // Zwischenspeichern
+    this.projection = Matrix.CreateOrthographicOffCenter(0, this.graphicsDevice.Viewport.Width, this.graphicsDevice.Viewport.Height, 0, 0, 1);
+    this.view = this.camera.ViewMatrixWithOffset;
+}
+
+
+/// <summary>
+/// </summary>
+/// <param name="gameTime"></param>
+/// <param name="spriteBatch"></param>
+public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+{
+    if (this.showTexture)
+    {
+        spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap);
+        spriteBatch.Draw(this.texture, Vector2.Zero, new Rectangle((int)-this.camera.ViewMatrixWithOffset.Translation.X, (int)-this.camera.ViewMatrixWithOffset.Translation.Y, this.camera.Viewport.Width, this.camera.Viewport.Height), Color.White);
+        spriteBatch.End();
+    }
+
+
+    this.primitiveBatch.Begin(ref this.projection, ref this.view);
+
+    foreach (var shape in this.shapes)
+    {
+        switch (shape)
+        {
+            case CircleShape circleShape:
+
+                this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, shape.Color);
+
+                break;
+            case LineShape lineShape:
+
+                this.primitiveBatch.DrawSegment(lineShape.Start, lineShape.End, lineShape.Color);
+
+                break;
+            case PolygonShape polygonShape:
+
+                this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Transform.Position, polygonShape.Transform.Rotation.GetAngle(), polygonShape.Color);
+
+                break;
+        }
+    }
+
+    this.primitiveBatch.End();
+
+
+    spriteBatch.Begin();
+    spriteBatch.DrawString(this.font, $"{this.playerShape.Position}  / {this.camera.CameraPosition}", new Vector2(20, 20), Color.White);
+    spriteBatch.End();
+}
     }
 }

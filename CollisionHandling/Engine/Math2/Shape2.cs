@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
 
@@ -231,7 +232,23 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             // look at pictures of https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection if you don't
             // believe this is true
-            return poly.Lines.Any((l) => CircleIntersectsLine(circle, l, pos2, pos1, rot1, poly.Center, strict)) || Polygon2.Contains(poly, pos1, rot1, new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius), strict);
+
+            var isLineHit = false;
+            foreach (var line in poly.Lines)
+            {
+                if (line.Start == new Vector2(0, 0) && line.End == new Vector2(150, 0))
+                {
+
+                }
+
+                isLineHit = CircleIntersectsLine(circle, line, pos2, pos1, rot1, poly.Center, strict);
+                if (isLineHit)
+                {
+                    break;
+                }
+            }
+
+            return isLineHit;// || Polygon2.Contains(poly, pos1, rot1, new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius), strict);
         }
 
         /// <summary>
@@ -300,7 +317,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var circleCenter = new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius);
             int last = poly.Vertices.Length - 1;
             var lastVec = Math2.Rotate(poly.Vertices[last], poly.Center, rot1) + pos1;
-            for(int curr = 0; curr < poly.Vertices.Length; curr++)
+            for (int curr = 0; curr < poly.Vertices.Length; curr++)
             {
                 var currVec = Math2.Rotate(poly.Vertices[curr], poly.Center, rot1) + pos1;
 
@@ -433,7 +450,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             for (int curr = 0; curr < 4; curr++)
             {
                 Vector2 currVec = Vector2.Zero;
-                switch(curr)
+                switch (curr)
                 {
                     case 0:
                         currVec = rect.Min + pos2;
@@ -446,7 +463,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                         break;
                     case 3:
                         currVec = rect.UpperRight + pos2;
-                        break; 
+                        break;
                 }
 
                 // Test along circle center -> vector
@@ -566,11 +583,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var closestDistance = Math.Abs(centerOfCircleProjectedOntoNormalOfLine - lineProjectedOntoItsNormal);
 
             // Step 1a
-            if(strict)
+            if (strict)
             {
                 if (closestDistance >= circle.Radius)
                     return false;
-            }else
+            }
+            else
             {
                 if (closestDistance > circle.Radius)
                     return false;
@@ -629,7 +647,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             // If you had trouble following, see the horizontal and vertical cases which are the same process but the projections
             // are simpler
         }
-        
+
         /// <summary>
         /// Determines if the circle at the specified position intersects the line, 
         /// which is at its true position and rotation, when the line is assumed to be horizontal.
@@ -649,11 +667,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var closestDistance = Math.Abs(vecCircleCenterToLine1D);
 
             // Step 1a
-            if(strict)
+            if (strict)
             {
                 if (closestDistance >= circle.Radius)
                     return false;
-            }else
+            }
+            else
             {
                 if (closestDistance > circle.Radius)
                     return false;
@@ -678,8 +697,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (strict)
                 return distClosestEdgeToCircleSq < circle.Radius * circle.Radius;
-            else
-                return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
+            
+            return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
         }
 
         /// <summary>
@@ -695,6 +714,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             // Same process as horizontal, but axis flipped
             var lineX = line.Start.X;
+            
             // Step 1 - Find closest distance
             var vecCircleCenterToLine1D = lineX - circleCenter.X;
             var closestDistance = Math.Abs(vecCircleCenterToLine1D);
@@ -730,8 +750,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (strict)
                 return distClosestEdgeToCircleSq < circle.Radius * circle.Radius;
-            else
-                return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
+            
+            return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
         }
         #region NoRotation
         /// <summary>
