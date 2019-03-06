@@ -127,22 +127,22 @@ namespace CollisionFloatTestNewMono.Engine
             this.camera.SetZoomLevel(1);
             this.camera.SetFocusPosition(Vector2.Zero);
 
-            //// Polygon-Player
-            //var size = new Vector2(20, 30);
-            //var playerVertices = GameHelper.GetConvexHull(new[]
-            //{
-            //    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
-            //    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
-            //    new Vector2(-20, 0),
-            //    new Vector2(20, 0)
-            //});
-            //this.playerShape = new PolygonShape("P", new Vector2(150, 150), playerVertices);
-            //this.shapes.Add(this.playerShape);
-
-
-            // Circle-Player
-            this.playerShape = new CircleShape("P", new Vector2(400, 50), 15);
+            // Polygon-Player
+            var size = new Vector2(20, 30);
+            var playerVertices = GameHelper.GetConvexHull(new[]
+            {
+                new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-20, 0),
+                new Vector2(20, 0)
+            });
+            this.playerShape = new PolygonShape("P", new Vector2(400, 200), playerVertices);
             this.shapes.Add(this.playerShape);
+
+
+            //// Circle-Player
+            //this.playerShape = new CircleShape("P", new Vector2(400, 50), 15);
+            //this.shapes.Add(this.playerShape);
 
 
             //

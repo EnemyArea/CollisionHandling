@@ -477,18 +477,19 @@ namespace CollisionFloatTestNewMono.Engine
         /// <returns></returns>
         public Vector2 CollidePolygons(PolygonShape polyA, PolygonShape polyB)
         {
-            //var testPoly1 = new Polygon2(((PolygonShape)sortedShapeA).Vertices);
-            //var testPoly2 = new Polygon2(((PolygonShape)sortedShapeB).Vertices);
+            var testPoly1 = new Polygon2(polyA.Vertices);
+            var testPoly2 = new Polygon2(polyB.Vertices);
 
-            //var intercectsMtv = Polygon2.IntersectMtv(testPoly1, testPoly2,
-            //    sortedShapeA.Position + sortedShapeA.Velocity,
-            //    sortedShapeB.Position + sortedShapeB.Velocity,
-            //    new Rotation2(sortedShapeA.Rotation),
-            //    new Rotation2(sortedShapeB.Rotation));
-            //if (intercectsMtv != null)
-            //{
-            //    newVelocity += intercectsMtv.Item1 * intercectsMtv.Item2;
-            //}
+            var intercectsMtv = Polygon2.IntersectMtv(testPoly1, testPoly2,
+                polyA.Position + polyA.Velocity,
+                polyB.Position + polyB.Velocity,
+                new Rotation2(polyA.Rotation),
+                new Rotation2(polyB.Rotation));
+
+            if (intercectsMtv != null)
+            {
+                return intercectsMtv.Item1 * intercectsMtv.Item2;
+            }
 
             return Vector2.Zero;
         }
