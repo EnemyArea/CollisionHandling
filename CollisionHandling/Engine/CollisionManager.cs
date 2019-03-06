@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using CollisionFloatTestNewMono.Engine.Math2;
@@ -436,7 +437,10 @@ namespace CollisionFloatTestNewMono.Engine
                     rota);
 
                 if (intercectsMtv != null)
+                {
+                    Debug.WriteLine($"{circleB.Name} => {intercectsMtv.Item1 * intercectsMtv.Item2}");
                     return intercectsMtv.Item1 * intercectsMtv.Item2;
+                }
             }
 
             return Vector2.Zero;

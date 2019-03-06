@@ -323,7 +323,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     return null;
 
                 // Test along line normal
-                if (!checkAxis(Vector2.Normalize(Math2.Perpendicular(currVec - lastVec))))
+                if (!checkAxis(Vector2.Normalize(Math2.Perpendicular(lastVec - currVec))))
                     return null;
 
                 last = curr;

@@ -144,8 +144,14 @@ namespace CollisionFloatTestNewMono.Engine
 
             // Circle-Player
             //this.playerShape = new CircleShape("P", new Vector2(336, 179), 15);
-            this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
-            this.shapes.Add(this.playerShape);
+            //this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
+            this.playerShape = new CircleShape("P", new Vector2(232, 194), 15);
+            //this.shapes.Add(this.playerShape);
+            
+            this.shapes.Add(new CircleShape("P1", new Vector2(232, 194), 15));
+            this.shapes.Add(new CircleShape("P2", new Vector2(192, 260), 15));
+            this.shapes.Add(new CircleShape("P3", new Vector2(280, 350), 15));
+            this.shapes.Add(new CircleShape("P4", new Vector2(352, 260), 15));
 
 
             //
@@ -479,7 +485,7 @@ namespace CollisionFloatTestNewMono.Engine
 
                     foreach (var shapeB in allShapesAround)
                     {
-                        if (shapeA == shapeB || (this.playerShape == shapeB))
+                        if (shapeA == shapeB || (this.playerShape == shapeB) || !(shapeA is CircleShape))
                             continue;
 
                         var type1 = shapeA.ShapeType;
@@ -536,7 +542,7 @@ namespace CollisionFloatTestNewMono.Engine
 
                         if (newVelocity != Vector2.Zero)
                         {
-                            shapeA.ApplyVelocity(newVelocity);
+                            //shapeA.ApplyVelocity(newVelocity);
                             shapeB.Color = Color.Red;
                             hasCollison = true;
                         }
@@ -544,8 +550,17 @@ namespace CollisionFloatTestNewMono.Engine
 
                     iterations++;
                 }
-                while (hasCollison && iterations <= 10);
+                while (hasCollison && iterations <= 0); // 10
             }
+
+            //P1 => {X:0 Y:9}
+            //P2 => {X:7 Y:0}
+            //P3 => {X:0 Y:-15}
+            //P4 => {X:-13 Y:0}
+            //this.shapes.Add(new CircleShape("P1", new Vector2(232, 194), 15)); oben   ->  0, -9
+            //this.shapes.Add(new CircleShape("P2", new Vector2(192, 260), 15)); links  -> -7,  0
+            //this.shapes.Add(new CircleShape("P3", new Vector2(280, 350), 15)); unten  ->  0, 15
+            //this.shapes.Add(new CircleShape("P4", new Vector2(352, 260), 15)); rechts -> 13,  0
 
             // Bewegen
             foreach (var shape in allShapesAround)
