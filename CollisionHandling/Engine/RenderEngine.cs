@@ -129,24 +129,24 @@ namespace CollisionFloatTestNewMono.Engine
             this.camera.SetFocusPosition(Vector2.Zero);
 
 
-            // Polygon-Player
-            var size = new Vector2(20, 30);
-            var playerVertices = GameHelper.GetConvexHull(new[]
-            {
-                new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-20, 0),
-                new Vector2(20, 0)
-            });
-            this.playerShape = new PolygonShape("P", new Vector2(400, 200), playerVertices);
-            this.shapes.Add(this.playerShape);
-
-
-            //// Circle-Player
-            ////this.playerShape = new CircleShape("P", new Vector2(336, 179), 15);
-            ////this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
-            //this.playerShape = new CircleShape("P", new Vector2(232, 194), 15);
+            //// Polygon-Player
+            //var size = new Vector2(20, 30);
+            //var playerVertices = GameHelper.GetConvexHull(new[]
+            //{
+            //    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-20, 0),
+            //    new Vector2(20, 0)
+            //});
+            //this.playerShape = new PolygonShape("P", new Vector2(400, 200), playerVertices);
             //this.shapes.Add(this.playerShape);
+
+
+            // Circle-Player
+            //this.playerShape = new CircleShape("P", new Vector2(336, 179), 15);
+            //this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
+            this.playerShape = new CircleShape("P", new Vector2(232, 194), 15);
+            this.shapes.Add(this.playerShape);
 
             //this.shapes.Add(new CircleShape("P1", new Vector2(232, 194), 15));
             //this.shapes.Add(new CircleShape("P2", new Vector2(192, 260), 15));
@@ -172,10 +172,13 @@ namespace CollisionFloatTestNewMono.Engine
             this.shapes.Add(polygon);
 
             var a1 = ShapeUtils.CreateRectangle(150, 150).Vertices;
-            var a2 = GameHelper.GetConvexHull(a1);
-            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), a2, 45);
+            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), GameHelper.GetConvexHull(a1), 45);
             this.shapes.Add(polygon2);
-            
+
+            var a2 = ShapeUtils.CreateRectangle(150, 150).Vertices;
+            var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), GameHelper.GetConvexHull(a2));
+            this.shapes.Add(polygon3);
+
 
             // Circles
             this.shapes.Add(new CircleShape("C1", new Vector2(150, 150), 50));
@@ -496,8 +499,16 @@ namespace CollisionFloatTestNewMono.Engine
                                 break;
                             case ShapeContactType.PolygonAndCircle:
 
-                                // Polygon->Circle
-                                newVelocity += this.collisionManager.CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                if (shapeA is PolygonShape && shapeB is CircleShape)
+                                {
+                                    // Polygon->Circle
+                                    newVelocity += this.collisionManager.CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                }
+                                else
+                                {
+                                    // Polygon->Circle
+                                    newVelocity += this.collisionManager.CollidesPolygonAndCircle((CircleShape)sortedShapeB, (PolygonShape)sortedShapeA);
+                                }
 
                                 break;
                             case ShapeContactType.LineAndCircle:

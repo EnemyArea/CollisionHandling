@@ -387,61 +387,40 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="circleB"></param>
         public Vector2 CollidesPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
         {
-            //// Testing
-            //var lines = new List<LineShape>();
-            //var rotation = new Rotation2(polygonShape.Rotation);
-
-            //var polygonVertices = polygonShape.Vertices;
-            //for (var i = 0; i < polygonVertices.Length - 1; i++)
-            //{
-            //    var vertex1 = Math2.Math2.Rotate(polygonVertices[i], polygonShape.Center, rotation);
-            //    var vertex2 = Math2.Math2.Rotate(polygonVertices[i + 1], polygonShape.Center, rotation);
-
-            //    lines.Add(new LineShape(
-            //        vertex1 + polygonShape.Position,
-            //        vertex2 + polygonShape.Position
-            //    ));
-
-            //    var finalVertex1 = Math2.Math2.Rotate(polygonVertices[polygonVertices.Length - 1], polygonShape.Center, rotation);
-            //    var finalVertex2 = Math2.Math2.Rotate(polygonVertices[0], polygonShape.Center, rotation);
-
-            //    lines.Add(new LineShape(
-            //        finalVertex1 + polygonShape.Position,
-            //        finalVertex2 + polygonShape.Position
-            //    ));
-            //}
-
-            //foreach (var lineShape in lines)
-            //{
-            //    var result = this.CollidesLineAndCircle(lineShape, circleShape);
-            //    if (result != Vector2.Zero)
-            //        return result;
-            //}
-
-            //return Vector2.Zero;
-
             var testPoly = new Polygon2(polyA.Vertices);
             var testCircle = new Circle2(circleB.Radius);
             var rota = new Rotation2(polyA.Rotation);
 
-            if (Shape2.Intersects(testPoly, testCircle,
+            var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
                 polyA.Position + polyA.Velocity,
-                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity,
-                rota, true))
-            {
-                //return Vector2.One;
+                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                rota);
 
-                var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
-                    polyA.Position + polyA.Velocity,
-                    circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
-                    rota);
+            if (intercectsMtv != null)
+                return intercectsMtv.Item1 * intercectsMtv.Item2;
 
-                if (intercectsMtv != null)
-                {
-                    Debug.WriteLine($"{circleB.Name} => {intercectsMtv.Item1 * intercectsMtv.Item2}");
-                    return intercectsMtv.Item1 * intercectsMtv.Item2;
-                }
-            }
+            return Vector2.Zero;
+        }
+
+
+        /// <summary>
+        ///     Compute the collision between a polygon and a circle.
+        /// </summary>
+        /// <param name="polyA"></param>
+        /// <param name="circleB"></param>
+        public Vector2 CollidesPolygonAndCircle(CircleShape circleB, PolygonShape polyA)
+        {
+            var testPoly = new Polygon2(polyA.Vertices);
+            var testCircle = new Circle2(circleB.Radius);
+            var rota = new Rotation2(polyA.Rotation);
+
+            var intercectsMtv = Shape2.IntersectMtv(testCircle, testPoly,
+                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                polyA.Position + polyA.Velocity,
+                rota);
+
+            if (intercectsMtv != null)
+                return intercectsMtv.Item1 * intercectsMtv.Item2;
 
             return Vector2.Zero;
         }

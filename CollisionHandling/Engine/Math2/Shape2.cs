@@ -335,8 +335,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
 
             // TODO: -bestAxis wenn wir den circle steuern und bestAxis wenn wir das polygon nehmen :(
-            return Tuple.Create(-bestAxis, shortestOverlap);
+            return Tuple.Create(bestAxis, shortestOverlap);
         }
+
 
         /// <summary>
         ///     Determines if the specified circle, at the given position, intersects the specified polygon,
@@ -353,6 +354,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             return Intersects(poly, circle, pos2, pos1, rot2, strict);
         }
+
 
         /// <summary>
         ///     Determines the minimum translation vector that must be applied to the circle at the given position to
@@ -371,8 +373,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var res = IntersectMtv(poly, circle, pos2, pos1, rot2);
             if (res != null)
                 return Tuple.Create(-res.Item1, res.Item2);
+
             return null;
         }
+
 
         /// <summary>
         ///     Determines if the specified circle an rectangle intersect at their given positions.
@@ -855,6 +859,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             return IntersectMtv(poly, circle, pos1, pos2, Rotation2.Zero);
         }
+
 
         /// <summary>
         ///     Determines the minimum translation vector to be applied to the circle to prevent
