@@ -143,17 +143,63 @@ namespace CollisionFloatTestNewMono.Engine
             this.camera.SetZoomLevel(1);
             this.camera.SetFocusPosition(Vector2.Zero);
 
+            //// Polygon-Player
+            //var size = new Vector2(20, 30);
+            //var playerVertices = GameHelper.GetConvexHull(new[]
+            //{
+            //    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-20, 0),
+            //    new Vector2(20, 0)
+            //});
+            //this.playerShape = new PolygonShape("P", new Vector2(150, 150), playerVertices);
+            //this.shapes.Add(this.playerShape);
 
-            var size = new Vector2(50, 50);
-            var playerVertices = GameHelper.GetConvexHull(new[]
-            {
-                new Vector2(0, 0),
-                new Vector2(size.X, 0),
-                new Vector2(size.X, size.Y),
-                new Vector2(0, size.Y)
-            });
-            this.playerShape = new PolygonShape("P", new Vector2(150, 150), playerVertices);
+
+            // Circle-Player
+            this.playerShape = new CircleShape("P", new Vector2(400, 50), 15);
             this.shapes.Add(this.playerShape);
+
+
+
+            //
+            // Test geometries
+            //
+
+            var sizePolygon = new Vector2(150, 250);
+            var polygonVertices = GameHelper.GetConvexHull(new[]
+            {
+                new Vector2(sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(-15, 0),
+                new Vector2(15, 0)
+            });
+            var polygon = new PolygonShape("Polygon1", new Vector2(500, 200), polygonVertices);
+            polygon.SetRotation(MathHelper.ToRadians(90));
+            this.shapes.Add(polygon);
+
+            this.shapes.Add(new CircleShape("C1", new Vector2(100 + 50, 100 + 50), 50));
+            this.shapes.Add(new CircleShape("C2", new Vector2(250 + 50, 100 + 50), 50));
+
+            var offset = new Vector2(120, 140);
+
+            this.shapes.Add(new LineShape(
+                new Vector2(100 + offset.X, 100 + offset.Y),
+                new Vector2(200 + offset.X, 100 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(200 + offset.X, 100 + offset.Y),
+                new Vector2(200 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(200 + offset.X, 200 + offset.Y),
+                new Vector2(100 + offset.X, 200 + offset.Y)
+            ));
+            this.shapes.Add(new LineShape(
+                new Vector2(100 + offset.X, 200 + offset.Y),
+                new Vector2(100 + offset.X, 100 + offset.Y)
+            ));
+
 
 
             //this.world = new World(Vector2.Zero);
@@ -557,9 +603,6 @@ namespace CollisionFloatTestNewMono.Engine
                                 var testPoly1 = new Polygon2(((PolygonShape)sortedShapeA).Vertices);
                                 var testPoly2 = new Polygon2(((PolygonShape)sortedShapeB).Vertices);
 
-                                var rot = MathHelper.ToRadians(this.rotation);
-                                sortedShapeB.SetRotation(rot);
-
                                 var intercectsMtv = Polygon2.IntersectMtv(testPoly1, testPoly2,
                                     sortedShapeA.Position + sortedShapeA.Velocity,
                                     sortedShapeB.Position + sortedShapeB.Velocity,
@@ -599,7 +642,7 @@ namespace CollisionFloatTestNewMono.Engine
                             {
                                 var result = circleShape.Velocity;
                                 circleShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
-                                this.grid.Move(shape, circleShape.TilePosition);
+                                //this.grid.Move(shape, circleShape.TilePosition);
                                 circleShape.ResetVelocity();
                             }
                             break;
@@ -650,27 +693,27 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.primitiveBatch.Begin(ref this.projection, ref this.view);
 
-            //foreach (var shape in this.shapes)
-            //{
-            //    switch (shape)
-            //    {
-            //        case CircleShape circleShape:
+            foreach (var shape in this.shapes)
+            {
+                switch (shape)
+                {
+                    case CircleShape circleShape:
 
-            //            this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, shape.Color);
+                        this.primitiveBatch.DrawCircle(circleShape.Position, circleShape.Radius, shape.Color);
 
-            //            break;
-            //        case LineShape lineShape:
+                        break;
+                    case LineShape lineShape:
 
-            //            this.primitiveBatch.DrawSegment(lineShape.Start, lineShape.End, lineShape.Color);
+                        this.primitiveBatch.DrawSegment(lineShape.Start, lineShape.End, lineShape.Color);
 
-            //            break;
-            //        case PolygonShape polygonShape:
+                        break;
+                    case PolygonShape polygonShape:
 
-            //            this.DrawPolygon(polygonShape.Vertices, polygonShape.Transform.Position, polygonShape.Transform.Rotation.GetAngle(), polygonShape.Color);
+                        this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Transform.Position, polygonShape.Transform.Rotation.GetAngle(), polygonShape.Color);
 
-            //            break;
-            //    }
-            //}
+                        break;
+                }
+            }
 
 
             //var rotation = MathHelper.ToRadians(180);
@@ -686,8 +729,8 @@ namespace CollisionFloatTestNewMono.Engine
 
 
 
-            var testRectangle1 = new RelativeRectangle2(350, 350, 150, 150);
-            var testRectangle2 = new RelativeRectangle2(450, 450, 150, 150);
+            //var testRectangle1 = new RelativeRectangle2(350, 350, 150, 150);
+            //var testRectangle2 = new RelativeRectangle2(450, 450, 150, 150);
 
 
             //// Circle->Circle test
@@ -758,38 +801,74 @@ namespace CollisionFloatTestNewMono.Engine
             //}
 
 
-            // Circle->Polygon test
-            {
-                var velocity = Vector2.Zero;
+            //// Circle->Polygon test
+            //{
+            //    var velocity = Vector2.Zero;
 
-                var testCircle1 = new Circle2(20);
-                var testCircle1Position = this.playerShape.Position;
-                testCircle1.Color = Color.Yellow;
+            //    var testCircle1 = new Circle2(20);
+            //    var testCircle1Position = this.playerShape.Position;
+            //    testCircle1.Color = Color.Yellow;
 
-                var testPolygon2 = ShapeUtils.CreateRectangle(150, 250);
-                var testPolygon2Position = new Vector2(200, 200);
-                var testPolygon2Angle = MathHelper.ToRadians(0);
-                testPolygon2.Color = Color.Yellow;
+            //    var testPolygon2 = ShapeUtils.CreateRectangle(150, 250);
+            //    var testPolygon2Position = new Vector2(200, 200);
+            //    var testPolygon2Angle = MathHelper.ToRadians(0);
+            //    testPolygon2.Color = Color.Yellow;
 
-                var intercects = Shape2.Intersects(testCircle1, testPolygon2, testCircle1Position, testPolygon2Position, new Rotation2(testPolygon2Angle), true);
-                if (intercects)
-                {
-                    testCircle1.Color = Color.Red;
-                    testPolygon2.Color = Color.Red;
+            //    var intercects = Shape2.Intersects(testCircle1, testPolygon2, testCircle1Position, testPolygon2Position, new Rotation2(testPolygon2Angle), true);
+            //    if (intercects)
+            //    {
+            //        testCircle1.Color = Color.Red;
+            //        testPolygon2.Color = Color.Red;
 
-                    var intercectsMtv = Shape2.IntersectMtv(testCircle1, testPolygon2, testCircle1Position, testPolygon2Position, new Rotation2(testPolygon2Angle));
-                    if (intercectsMtv != null)
-                    {
-                        velocity = intercectsMtv.Item1 * intercectsMtv.Item2;
-                    }
-                }
+            //        //var intercectsMtv = Shape2.IntersectMtv(testCircle1, testPolygon2, testCircle1Position, testPolygon2Position, new Rotation2(testPolygon2Angle));
+            //        //if (intercectsMtv != null)
+            //        //{
+            //        //    velocity = intercectsMtv.Item1 * intercectsMtv.Item2;
+            //        //}
+            //    }
 
-                this.primitiveBatch.DrawCircle(testCircle1Position, testCircle1.Radius, testCircle1.Color);
-                this.DrawPolygon(testPolygon2.Vertices, testPolygon2Position, testPolygon2Angle, testPolygon2.Color);
+            //    this.primitiveBatch.DrawCircle(testCircle1Position, testCircle1.Radius, testCircle1.Color);
+            //    this.DrawPolygon(testPolygon2.Vertices, testPolygon2Position, testPolygon2Angle, testPolygon2.Color);
 
-                if (velocity != Vector2.Zero)
-                    this.playerShape.MoveByVelocity(velocity);
-            }
+            //    if (velocity != Vector2.Zero)
+            //        this.playerShape.MoveByVelocity(velocity);
+            //}
+
+
+            //// Circle->Line test
+            //{
+            //    var velocity = Vector2.Zero;
+
+            //    var testCircle1 = new Circle2(20);
+            //    var testCircle1Position = this.playerShape.Position;
+            //    testCircle1.Color = Color.Yellow;
+
+            //    var testLine2 = new Line2(new Vector2(200, 200), new Vector2(400, 200));
+            //    var testLine2Position = new Vector2(200, 200);
+            //    var testLine2Angle = MathHelper.ToRadians(0);
+            //    testLine2.Color = Color.Yellow;
+
+            //    // (Circle2 circle, Line2 line, Vector2 pos1, Vector2 pos2, Rotation2 rot2, Vector2 about2, bool strict)
+            //    var intercects = Shape2.CircleIntersectsLine(testCircle1, testLine2, testCircle1Position,);
+            //    if (intercects)
+            //    {
+            //        testCircle1.Color = Color.Red;
+            //        testPolygon2.Color = Color.Red;
+
+            //        //var intercectsMtv = Shape2.IntersectMtv(testCircle1, testPolygon2, testCircle1Position, testPolygon2Position, new Rotation2(testPolygon2Angle));
+            //        //if (intercectsMtv != null)
+            //        //{
+            //        //    velocity = intercectsMtv.Item1 * intercectsMtv.Item2;
+            //        //}
+            //    }
+
+            //    this.primitiveBatch.DrawCircle(testCircle1Position, testCircle1.Radius, testCircle1.Color);
+            //    this.primitiveBatch.DrawSegment(testLine2.Start, testLine2.End, testCircle1.Color);
+
+            //    if (velocity != Vector2.Zero)
+            //        this.playerShape.MoveByVelocity(velocity);
+            //}
+
 
 
             //var intercects = Polygon2.Intersects(this.testPolygon1, this.testPolygon2, test1Pos, test2Pos, new Rotation2(0), new Rotation2(rotation), true);
@@ -810,30 +889,8 @@ namespace CollisionFloatTestNewMono.Engine
 
 
             spriteBatch.Begin();
-            spriteBatch.DrawString(this.font, $"{this.playerShape.Position}  / {this.camera.CameraPosition} / {this.rotation}", new Vector2(20, 20), Color.White);
+            spriteBatch.DrawString(this.font, $"{this.playerShape.Position}  / {this.camera.CameraPosition}", new Vector2(20, 20), Color.White);
             spriteBatch.End();
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="vertices"></param>
-        /// <param name="position"></param>
-        /// <param name="angle"></param>
-        /// <param name="color"></param>
-        private void DrawPolygon(Vector2[] vertices, Vector2 position, float angle, Color color)
-        {
-            var testPoly2 = new Polygon2(vertices);
-            var origin = testPoly2.Center;
-            var roation = new Rotation2(angle);
-
-            var vertexCount = vertices.Length;
-            var tempVertices = new Vector2[vertexCount];
-            for (var i = 0; i < vertexCount; ++i)
-                tempVertices[i] = position + Math2.Math2.Rotate(vertices[i], origin, roation);
-
-            this.primitiveBatch.DrawPolygon(tempVertices, color);
         }
     }
 }

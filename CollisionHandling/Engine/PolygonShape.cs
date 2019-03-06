@@ -23,7 +23,11 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         public Point[] PointVertices { get; private set; }
-        
+
+        /// <summary>
+        /// </summary>
+        public Vector2 Center { get; }
+
 
         /// <summary>
         /// </summary>
@@ -35,6 +39,12 @@ namespace CollisionFloatTestNewMono.Engine
         {
             this.Vertices = vertices.ToArray();
             this.Normals = VectorHelper.CreateNormals(this.Vertices);
+
+            var vertexCount = this.Vertices.Length;
+            for (var i = 0; i < vertexCount; ++i)
+                this.Center += this.Vertices[i];
+
+            this.Center *= 1.0f / this.Vertices.Length;
         }
 
 
@@ -46,8 +56,8 @@ namespace CollisionFloatTestNewMono.Engine
             foreach (var vertex in this.Vertices)
                 yield return GameHelper.ConvertPositionToTilePosition(vertex);
         }
-        
-        
+
+
         /// <summary>
         /// </summary>
         /// <returns></returns>

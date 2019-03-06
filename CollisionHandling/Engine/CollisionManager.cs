@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 using VelcroPhysics.Collision.ContactSystem;
 using VelcroPhysics.Collision.Narrowphase;
@@ -408,76 +409,43 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         ///     Compute the collision between a polygon and a circle.
-        ///     https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/VelcroPhysics/Collision/Narrowphase/CollideCircle.cs
         /// </summary>
         /// <param name="polygonShape"></param>
         /// <param name="circleShape"></param>
         public Vector2 CollidesPolygonAndCircle(PolygonShape polygonShape, CircleShape circleShape)
         {
-            // Find the min separating edge.
-            var normalIndex = 0;
-            var separation = -MaxFloat;
-            var radius = circleShape.Radius;
-            var vertexCount = polygonShape.Vertices.Length;
-            var vertices = polygonShape.Vertices;
-            var normals = VectorHelper.CreateNormals(vertices);
-            var center = circleShape.Position + circleShape.Velocity;
+            // Testing
+            var lines = new List<LineShape>();
+            var rotation = new Rotation2(polygonShape.Rotation);
 
-            for (var i = 0; i < vertexCount; ++i)
+            var polygonVertices = polygonShape.Vertices;
+            for (var i = 0; i < polygonVertices.Length - 1; i++)
             {
-                var s = Vector2.Dot(normals[i], center - vertices[i]);
-                if (s > radius)
-                    return Vector2.Zero;
+                var vertex1 = Math2.Math2.Rotate(polygonVertices[i], polygonShape.Center, rotation);
+                var vertex2 = Math2.Math2.Rotate(polygonVertices[i + 1], polygonShape.Center, rotation);
 
-                if (s > separation)
-                {
-                    separation = s;
-                    normalIndex = i;
-                }
+                lines.Add(new LineShape(
+                    vertex1 + polygonShape.Position,
+                    vertex2 + polygonShape.Position
+                ));
+
+                var finalVertex1 = Math2.Math2.Rotate(polygonVertices[polygonVertices.Length - 1], polygonShape.Center, rotation);
+                var finalVertex2 = Math2.Math2.Rotate(polygonVertices[0], polygonShape.Center, rotation);
+
+                lines.Add(new LineShape(
+                    finalVertex1 + polygonShape.Position,
+                    finalVertex2 + polygonShape.Position
+                ));
             }
 
-            // Vertices that subtend the incident face.
-            var vertIndex1 = normalIndex;
-            var vertIndex2 = vertIndex1 + 1 < vertexCount ? vertIndex1 + 1 : 0;
-            var v1 = vertices[vertIndex1];
-            var v2 = vertices[vertIndex2];
-
-            // If the center is inside the polygon ...
-            if (separation < Epsilon)
-                return new Vector2(circleShape.Radius) * normals[normalIndex] - separation * normals[normalIndex];
-
-            // Compute barycentric coordinates
-            var u1 = Vector2.Dot(center - v1, v2 - v1);
-            var u2 = Vector2.Dot(center - v2, v1 - v2);
-
-            if (u1 <= 0.0f)
+            foreach (var lineShape in lines)
             {
-                if (Vector2.DistanceSquared(center, v1) > radius * radius)
-                    return Vector2.Zero;
-
-                var localNormal = center - v1;
-                localNormal.Normalize();
-
-                return new Vector2(circleShape.Radius) * localNormal - separation * localNormal;
+                var result = this.CircleAndLine(lineShape, circleShape);
+                if (result != Vector2.Zero)
+                    return result;
             }
 
-            if (u2 <= 0.0f)
-            {
-                if (Vector2.DistanceSquared(center, v2) > radius * radius)
-                    return Vector2.Zero;
-
-                var localNormal = center - v2;
-                localNormal.Normalize();
-
-                return new Vector2(circleShape.Radius) * localNormal - separation * localNormal;
-            }
-
-            var faceCenter = 0.5f * (v1 + v2);
-            var sDot = Vector2.Dot(center - faceCenter, normals[vertIndex1]);
-            if (sDot > radius)
-                return Vector2.Zero;
-
-            return new Vector2(circleShape.Radius) * normals[vertIndex1] - sDot * normals[vertIndex1];
+            return Vector2.Zero;
         }
 
 
@@ -548,7 +516,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             return numOut;
         }
-        
+
 
         /// <summary>
         /// Find the max separation between poly1 and poly2 using edge normals from poly1.
@@ -752,12 +720,12 @@ namespace CollisionFloatTestNewMono.Engine
 
             if (np < 2)
                 return Vector2.Zero;
-            
+
             // Now clipPoints2 contains the clipped points.
             var manifold = new Manifold();
             manifold.LocalNormal = localNormal;
             manifold.LocalPoint = planePoint;
-            
+
             var pointCount = 0;
             for (var i = 0; i < MaxManifoldPoints; ++i)
             {

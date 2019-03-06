@@ -1,30 +1,34 @@
-﻿using System;
+﻿#region
+
+using System;
+
+#endregion
 
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
     /// <summary>
-    /// Describes a rotation about the z axis, with sin and cos of theta
-    /// cached.
+    ///     Describes a rotation about the z axis, with sin and cos of theta
+    ///     cached.
     /// </summary>
     public struct Rotation2
     {
         /// <summary>
-        /// Rotation Theta=0
+        ///     Rotation Theta=0
         /// </summary>
         public static readonly Rotation2 Zero = new Rotation2(0, 1, 0);
 
         /// <summary>
-        /// Theta in radians.
+        ///     Theta in radians.
         /// </summary>
         public readonly float Theta;
 
         /// <summary>
-        /// Math.Cos(Theta)
+        ///     Math.Cos(Theta)
         /// </summary>
         public readonly float CosTheta;
 
         /// <summary>
-        /// Math.Sin(Theta)
+        ///     Math.Sin(Theta)
         /// </summary>
         public readonly float SinTheta;
 
@@ -48,7 +52,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             this.SinTheta = sinTheta;
         }
 
-        public Rotation2(float theta) : this(theta, (float)Math.Cos(theta), (float)Math.Sin(theta))
+        public Rotation2(float theta)
+            : this(theta, (float)Math.Cos(theta), (float)Math.Sin(theta))
         {
         }
 

@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -156,6 +157,31 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         /// <param name="vertices"></param>
+        /// <param name="position"></param>
+        /// <param name="angle"></param>
+        /// <param name="color"></param>
+        public void DrawPolygon(Vector2[] vertices, Vector2 position, float angle, Color color)
+        {
+            var roation = new Rotation2(angle);
+            
+            var vertexCount = vertices.Length;
+            var origin = Vector2.Zero;
+            for (var i = 0; i < vertexCount; ++i)
+                origin += vertices[i];
+
+            origin *= 1.0f / vertices.Length;
+
+            var tempVertices = new Vector2[vertexCount];
+            for (var i = 0; i < vertexCount; ++i)
+                tempVertices[i] = position + Math2.Math2.Rotate(vertices[i], origin, roation);
+
+            this.DrawPolygon(tempVertices, color);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="vertices"></param>
         /// <param name="color"></param>
         /// <param name="closed"></param>
         public void DrawPolygon(Vector2[] vertices, Color color, bool closed = true)
@@ -240,7 +266,6 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        /// 
         /// </summary>
         private void FlushTriangles()
         {
@@ -262,7 +287,6 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        /// 
         /// </summary>
         private void FlushLines()
         {

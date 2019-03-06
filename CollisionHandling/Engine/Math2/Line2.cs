@@ -6,7 +6,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// <summary>
     /// Describes a line. Does not have position and is meant to be reused.
     /// </summary>
-    public class Line2
+    public class Line2 : Shape2
     {
         /// <summary>
         /// Where the line begins
@@ -124,6 +124,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 this.YIntercept = this.Start.Y - this.Slope * this.Start.X;
             }
         }
+        
 
         /// <summary>
         /// Determines if line1 intersects line2, when line1 is offset by pos1 and line2 

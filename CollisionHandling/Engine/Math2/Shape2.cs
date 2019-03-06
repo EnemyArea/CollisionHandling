@@ -526,7 +526,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="about2">What the line is rotated about</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle at pos1 intersects the line at pos2 rotated rot2 about about2</returns>
-        protected static bool CircleIntersectsLine(Circle2 circle, Line2 line, Vector2 pos1, Vector2 pos2, Rotation2 rot2, Vector2 about2, bool strict)
+        private static bool CircleIntersectsLine(Circle2 circle, Line2 line, Vector2 pos1, Vector2 pos2, Rotation2 rot2, Vector2 about2, bool strict)
         {
             // Make more math friendly
             var actualLine = new Line2(Math2.Rotate(line.Start, about2, rot2) + pos2, Math2.Rotate(line.End, about2, rot2) + pos2);
