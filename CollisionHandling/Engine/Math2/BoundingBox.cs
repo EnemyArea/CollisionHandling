@@ -10,7 +10,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// <summary>
     ///     Describes a rectangle. Meant to be reused.
     /// </summary>
-    public class Rect2 : Shape2
+    public class BoundingBox : Shape
     {
         /// <summary>
         ///     The corner with the smallest x and y coordinates on this
@@ -58,13 +58,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="min">Min x, min y</param>
         /// <param name="max">Max x, max y</param>
         /// <exception cref="ArgumentException">If min and max do not make a box</exception>
-        public Rect2(Vector2 min, Vector2 max)
+        public BoundingBox(Vector2 min, Vector2 max)
         {
-            if (Math2.Approximately(min, max))
+            if (MathHelper.Approximately(min, max))
                 throw new ArgumentException($"Min is approximately max: min={min}, max={max} - tha'ts a point, not a box");
-            if (Math.Abs(min.X - max.X) <= Math2.DefaultEpsilon)
+            if (Math.Abs(min.X - max.X) <= MathHelper.DefaultEpsilon)
                 throw new ArgumentException($"Min x is approximately max x: min={min}, max={max} - that's a line, not a box");
-            if (Math.Abs(min.Y - max.Y) <= Math2.DefaultEpsilon)
+            if (Math.Abs(min.Y - max.Y) <= MathHelper.DefaultEpsilon)
                 throw new ArgumentException($"Min y is approximately max y: min={min}, max={max} - that's a line, not a box");
 
             float tmpX1 = min.X, tmpX2 = max.X;
@@ -93,7 +93,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="minY">Min or max y (different from maxY)</param>
         /// <param name="maxX">Min or max x (different from minX)</param>
         /// <param name="maxY">Min or max y (different from minY)</param>
-        public Rect2(float minX, float minY, float maxX, float maxY)
+        public BoundingBox(float minX, float minY, float maxX, float maxY)
             : this(new Vector2(minX, minY), new Vector2(maxX, maxY))
         {
         }
@@ -107,10 +107,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">Origin of box 2</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If box1 intersects box2 when box1 is at pos1 and box2 is at pos2</returns>
-        public static bool Intersects(Rect2 box1, Rect2 box2, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(BoundingBox box1, BoundingBox box2, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            return AxisAlignedLine2.Intersects(box1.Min.X + pos1.X, box1.Max.X + pos1.X, box2.Min.X + pos2.X, box2.Max.X + pos2.X, strict, false)
-                   && AxisAlignedLine2.Intersects(box1.Min.Y + pos1.Y, box1.Max.Y + pos1.Y, box2.Min.Y + pos2.Y, box2.Max.Y + pos2.Y, strict, false);
+            return AxisAlignedLine.Intersects(box1.Min.X + pos1.X, box1.Max.X + pos1.X, box2.Min.X + pos2.X, box2.Max.X + pos2.X, strict, false)
+                   && AxisAlignedLine.Intersects(box1.Min.Y + pos1.Y, box1.Max.Y + pos1.Y, box2.Min.Y + pos2.Y, box2.Max.Y + pos2.Y, strict, false);
         }
 
         /// <summary>
@@ -121,10 +121,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="point">Point to check</param>
         /// <param name="strict">true if the edges do not count</param>
         /// <returns>If the box at pos contains point</returns>
-        public static bool Contains(Rect2 box, Vector2 pos, Vector2 point, bool strict)
+        public static bool Contains(BoundingBox box, Vector2 pos, Vector2 point, bool strict)
         {
-            return AxisAlignedLine2.Contains(box.Min.X + pos.X, box.Max.X + pos.X, point.X, strict, false)
-                   && AxisAlignedLine2.Contains(box.Min.Y + pos.Y, box.Max.Y + pos.Y, point.Y, strict, false);
+            return AxisAlignedLine.Contains(box.Min.X + pos.X, box.Max.X + pos.X, point.X, strict, false)
+                   && AxisAlignedLine.Contains(box.Min.Y + pos.Y, box.Max.Y + pos.Y, point.Y, strict, false);
         }
 
         /// <summary>
@@ -134,9 +134,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos">The origin of the rectangle</param>
         /// <param name="axis">The axis to project on</param>
         /// <returns>The projection of rect at pos along axis</returns>
-        public static AxisAlignedLine2 ProjectAlongAxis(Rect2 rect, Vector2 pos, Vector2 axis)
+        public static AxisAlignedLine ProjectAlongAxis(BoundingBox rect, Vector2 pos, Vector2 axis)
         {
-            return ProjectAlongAxis(axis, pos, Rotation2.Zero, rect.Center, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
+            return ProjectAlongAxis(axis, pos, Rotation.Zero, rect.Center, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
         }
     }
 }

@@ -162,7 +162,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="color"></param>
         public void DrawPolygon(Vector2[] vertices, Vector2 position, float angle, Color color)
         {
-            var roation = new Rotation2(angle);
+            var roation = new Math2.Rotation(angle);
             
             var vertexCount = vertices.Length;
             var origin = Vector2.Zero;
@@ -173,7 +173,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             var tempVertices = new Vector2[vertexCount];
             for (var i = 0; i < vertexCount; ++i)
-                tempVertices[i] = position + Math2.Math2.Rotate(vertices[i], origin, roation);
+                tempVertices[i] = position + Math2.MathHelper.Rotate(vertices[i], origin, roation);
 
             this.DrawPolygon(tempVertices, color);
         }

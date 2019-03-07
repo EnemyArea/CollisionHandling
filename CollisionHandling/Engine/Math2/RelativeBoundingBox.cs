@@ -10,14 +10,14 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     ///     Describes a rectangle that is describing the percentages to go
     ///     of the true rectangle. Useful in some UI circumstances.
     /// </summary>
-    public class RelativeRectangle2 : Rect2
+    public class RelativeBoundingBox : BoundingBox
     {
         /// <summary>
         ///     Create a new relative rectangle
         /// </summary>
         /// <param name="min">vector of smallest x and y coordinates</param>
         /// <param name="max">vector of largest x and y coordinates</param>
-        public RelativeRectangle2(Vector2 min, Vector2 max)
+        public RelativeBoundingBox(Vector2 min, Vector2 max)
             : base(min, max)
         {
         }
@@ -29,7 +29,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="y">smallest y</param>
         /// <param name="w">width</param>
         /// <param name="h">height</param>
-        public RelativeRectangle2(float x, float y, float w, float h)
+        public RelativeBoundingBox(float x, float y, float w, float h)
             : base(new Vector2(x, y), new Vector2(x + w, y + h))
         {
         }
@@ -40,9 +40,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// </summary>
         /// <param name="original">the original</param>
         /// <returns>scaled rect</returns>
-        public Rect2 ToRect(Rect2 original)
+        public BoundingBox ToRect(BoundingBox original)
         {
-            return new Rect2(original.Min * this.Min, original.Max * this.Max);
+            return new BoundingBox(original.Min * this.Min, original.Max * this.Max);
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// </summary>
         /// <param name="original">the monogame original</param>
         /// <returns>the rect</returns>
-        public Rect2 ToRect(Rectangle original)
+        public BoundingBox ToRect(Rectangle original)
         {
-            return new Rect2(
+            return new BoundingBox(
                 new Vector2(original.Left + original.Width * this.Min.X, original.Top + original.Height * this.Min.Y),
                 new Vector2(original.Left + original.Width * this.Max.X, original.Top + original.Height * this.Max.Y)
             );

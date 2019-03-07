@@ -14,7 +14,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     ///     have position - most functions require specifying the origin of the
     ///     polygon. Polygons are meant to be reused.
     /// </summary>
-    public class Polygon2 : Shape2
+    public class Polygon : Shape
     {
         /// <summary>
         ///     The vertices of this polygon, such that any two adjacent vertices
@@ -26,7 +26,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     The lines of this polygon, such that any two adjacent (wrapping)
         ///     lines share a vertex
         /// </summary>
-        public readonly Line2[] Lines;
+        public readonly Line[] Lines;
 
         /// <summary>
         ///     The center of this polyogn
@@ -41,7 +41,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <summary>
         ///     The bounding box.
         /// </summary>
-        public readonly Rect2 Aabb;
+        public readonly BoundingBox Aabb;
 
         /// <summary>
         ///     The longest line that can be created inside this polygon.
@@ -68,7 +68,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// </summary>
         /// <param name="vertices">Vertices</param>
         /// <exception cref="ArgumentNullException">If vertices is null</exception>
-        public Polygon2(Vector2[] vertices)
+        public Polygon(Vector2[] vertices)
         {
             if (vertices == null)
                 throw new ArgumentNullException(nameof(vertices));
@@ -79,12 +79,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             Vector2 tmp;
             for (var i = 1; i < vertices.Length; i++)
             {
-                tmp = Math2.MakeStandardNormal(Vector2.Normalize(Math2.Perpendicular(vertices[i] - vertices[i - 1])));
+                tmp = MathHelper.MakeStandardNormal(Vector2.Normalize(MathHelper.Perpendicular(vertices[i] - vertices[i - 1])));
                 if (!this.Normals.Contains(tmp))
                     this.Normals.Add(tmp);
             }
 
-            tmp = Math2.MakeStandardNormal(Vector2.Normalize(Math2.Perpendicular(vertices[0] - vertices[vertices.Length - 1])));
+            tmp = MathHelper.MakeStandardNormal(Vector2.Normalize(MathHelper.Perpendicular(vertices[0] - vertices[vertices.Length - 1])));
             if (!this.Normals.Contains(tmp))
                 this.Normals.Add(tmp);
 
@@ -98,7 +98,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 max.Y = Math.Max(max.Y, vertices[i].Y);
             }
 
-            this.Aabb = new Rect2(min, max);
+            this.Aabb = new BoundingBox(min, max);
 
             this.Center = new Vector2(0, 0);
             foreach (var vert in this.Vertices)
@@ -121,13 +121,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             // Area and lines
             float area = 0;
-            this.Lines = new Line2[this.Vertices.Length];
+            this.Lines = new Line[this.Vertices.Length];
             var last = this.Vertices[this.Vertices.Length - 1];
             for (var i = 0; i < this.Vertices.Length; i++)
             {
                 var next = this.Vertices[i];
-                this.Lines[i] = new Line2(last, next);
-                area += Math2.AreaOfTriangle(last, next, this.Center);
+                this.Lines[i] = new Line(last, next);
+                area += MathHelper.AreaOfTriangle(last, next, this.Center);
                 last = next;
             }
 
@@ -152,14 +152,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     ccwCounter++;
 
                 this.Clockwise = clockwise;
-                if (Math.Abs(angLast - angCurr) > Math2.DefaultEpsilon)
+                if (Math.Abs(angLast - angCurr) > MathHelper.DefaultEpsilon)
                 {
                     foundDefinitiveResult = true;
                     break;
                 }
-
-                last = curr;
-                centToLast = centToCurr;
+                
                 angLast = angCurr;
             }
 
@@ -176,9 +174,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="point">Point to check</param>
         /// <param name="strict">True if the edges do not count as inside</param>
         /// <returns>If the polygon at pos with rotation rot about its center contains point</returns>
-        public static bool Contains(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 point, bool strict)
+        public static bool Contains(Polygon poly, Vector2 pos, Rotation rot, Vector2 point, bool strict)
         {
-            if (!Rect2.Contains(poly.Aabb, pos, point, strict))
+            if (!BoundingBox.Contains(poly.Aabb, pos, point, strict))
                 return false;
 
             // Calculate the area of the triangles constructed by the lines of the polygon. If it
@@ -186,17 +184,17 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             float myArea = 0;
 
             var center = poly.Center + pos;
-            var last = Math2.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
+            var last = MathHelper.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
             for (var i = 0; i < poly.Vertices.Length; i++)
             {
-                var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
+                var curr = MathHelper.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
 
-                myArea += Math2.AreaOfTriangle(center, last, curr);
+                myArea += MathHelper.AreaOfTriangle(center, last, curr);
 
                 last = curr;
             }
 
-            return Math2.Approximately(myArea, poly.Area, poly.Area / 1000);
+            return MathHelper.Approximately(myArea, poly.Area, poly.Area / 1000);
         }
 
         /// <summary>
@@ -211,11 +209,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot2">Rotation fo the second polyogn</param>
         /// <param name="strict">If overlapping is required for intersection</param>
         /// <returns>If poly1 at pos1 with rotation rot1 intersects poly2 at pos2with rotation rot2</returns>
-        public static bool Intersects(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2, bool strict)
+        public static bool Intersects(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, bool strict)
         {
-            foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
+            foreach (var norm in poly1.Normals.Select(v => Tuple.Create(v, rot1)).Union(poly2.Normals.Select(v => Tuple.Create(v, rot2))))
             {
-                var axis = Math2.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
+                var axis = MathHelper.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
                 if (!IntersectsAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, strict, axis))
                     return false;
             }
@@ -234,14 +232,14 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot1">Rotation of the first polyogn</param>
         /// <param name="rot2">Rotation of the second polygon</param>
         /// <returns>MTV to move poly1 to prevent intersection with poly2</returns>
-        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
         {
             var bestAxis = Vector2.Zero;
             var bestMagn = float.MaxValue;
 
-            foreach (var norm in poly1.Normals.Select((v) => Tuple.Create(v, rot1)).Union(poly2.Normals.Select((v) => Tuple.Create(v, rot2))))
+            foreach (var norm in poly1.Normals.Select(v => Tuple.Create(v, rot1)).Union(poly2.Normals.Select(v => Tuple.Create(v, rot2))))
             {
-                var axis = Math2.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
+                var axis = MathHelper.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
                 var mtv = IntersectMtvAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
                 if (!mtv.HasValue)
                     return null;
@@ -267,12 +265,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="strict">If overlapping is required for intersection</param>
         /// <param name="axis">The axis to check</param>
         /// <returns>If poly1 at pos1 intersects poly2 at pos2 along axis</returns>
-        public static bool IntersectsAlongAxis(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2, bool strict, Vector2 axis)
+        public static bool IntersectsAlongAxis(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, bool strict, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(poly1, pos1, rot1, axis);
             var proj2 = ProjectAlongAxis(poly2, pos2, rot2, axis);
 
-            return AxisAlignedLine2.Intersects(proj1, proj2, strict);
+            return AxisAlignedLine.Intersects(proj1, proj2, strict);
         }
 
         /// <summary>
@@ -290,12 +288,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     a number to shift pos1 along axis by to prevent poly1 at pos1 from intersecting poly2 at pos2, or null if no
         ///     int. along axis
         /// </returns>
-        public static float? IntersectMtvAlongAxis(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2, Vector2 axis)
+        public static float? IntersectMtvAlongAxis(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(poly1, pos1, rot1, axis);
             var proj2 = ProjectAlongAxis(poly2, pos2, rot2, axis);
 
-            return AxisAlignedLine2.IntersectMtv(proj1, proj2);
+            return AxisAlignedLine.IntersectMtv(proj1, proj2);
         }
 
         /// <summary>
@@ -306,7 +304,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot">the rotation of the polygon</param>
         /// <param name="axis">The axis to project onto</param>
         /// <returns>poly at pos projected along axis</returns>
-        public static AxisAlignedLine2 ProjectAlongAxis(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 axis)
+        public static AxisAlignedLine ProjectAlongAxis(Polygon poly, Vector2 pos, Rotation rot, Vector2 axis)
         {
             return ProjectAlongAxis(axis, pos, rot, poly.Center, poly.Vertices);
         }
@@ -321,7 +319,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos">Origin of the polygon</param>
         /// <param name="rot">Rotation of the polygon</param>
         /// <param name="pt">Point to check.</param>
-        public static Tuple<Vector2, float> MinDistance(Polygon2 poly, Vector2 pos, Rotation2 rot, Vector2 pt)
+        public static Tuple<Vector2, float> MinDistance(Polygon poly, Vector2 pos, Rotation rot, Vector2 pt)
         {
             /*
              * Definitions
@@ -345,16 +343,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
              * If this is not true for ANY of the lines, the polygon does not contain the point.
              */
 
-            var last = Math2.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
+            var last = MathHelper.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
             for (var i = 0; i < poly.Vertices.Length; i++)
             {
-                var curr = Math2.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
+                var curr = MathHelper.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
                 var axis = curr - last;
-                Vector2 norm;
-                if (poly.Clockwise)
-                    norm = new Vector2(-axis.Y, axis.X);
-                else
-                    norm = new Vector2(axis.Y, -axis.X);
+               
+                var norm = poly.Clockwise ? new Vector2(-axis.Y, axis.X) : new Vector2(axis.Y, -axis.X);
                 norm = Vector2.Normalize(norm);
                 axis = Vector2.Normalize(axis);
 
@@ -391,7 +386,16 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             return null;
         }
 
-        private static IEnumerable<Vector2> GetExtraMinDistanceVecsPolyPoly(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="poly1"></param>
+        /// <param name="poly2"></param>
+        /// <param name="pos1"></param>
+        /// <param name="pos2"></param>
+        /// <returns></returns>
+        private static IEnumerable<Vector2> GetExtraMinDistanceVecsPolyPoly(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
         {
             foreach (var vert in poly1.Vertices)
             {
@@ -399,7 +403,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 {
                     var roughAxis = vert2 + pos2 - (vert + pos1);
                     roughAxis.Normalize();
-                    yield return Math2.MakeStandardNormal(roughAxis);
+                    yield return MathHelper.MakeStandardNormal(roughAxis);
                 }
             }
         }
@@ -415,7 +419,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">Origin of second polygon</param>
         /// <param name="rot1">Rotation of first polygon</param>
         /// <param name="rot2">Rotation of second polygon</param>
-        public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, Rotation2 rot1, Rotation2 rot2)
+        public static Tuple<Vector2, float> MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
         {
             if (rot1.Theta != 0 || rot2.Theta != 0)
             {
@@ -431,7 +435,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 var proj1 = ProjectAlongAxis(poly1, pos1, rot1, norm);
                 var proj2 = ProjectAlongAxis(poly2, pos2, rot2, norm);
 
-                var dist = AxisAlignedLine2.MinDistance(proj1, proj2);
+                var dist = AxisAlignedLine.MinDistance(proj1, proj2);
                 if (dist.HasValue && (bestAxis == null || dist.Value > bestDist))
                 {
                     bestDist = dist.Value;
@@ -456,7 +460,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <returns>The rotated polygon.</returns>
         /// <param name="original">Original.</param>
         /// <param name="rot">Rot.</param>
-        public static Polygon2 GetRotated(Polygon2 original, Rotation2 rot)
+        public static Polygon GetRotated(Polygon original, Rotation rot)
         {
             if (rot.Theta == 0)
                 return original;
@@ -464,10 +468,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var rotatedVerts = new Vector2[original.Vertices.Length];
             for (var i = 0; i < original.Vertices.Length; i++)
             {
-                rotatedVerts[i] = Math2.Rotate(original.Vertices[i], original.Center, rot);
+                rotatedVerts[i] = MathHelper.Rotate(original.Vertices[i], original.Center, rot);
             }
 
-            return new Polygon2(rotatedVerts);
+            return new Polygon(rotatedVerts);
         }
 
 
@@ -482,9 +486,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">Origin of second polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If poly1 at pos1 not rotated and poly2 at pos2 not rotated intersect</returns>
-        public static bool Intersects(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            return Intersects(poly1, poly2, pos1, pos2, Rotation2.Zero, Rotation2.Zero, strict);
+            return Intersects(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero, strict);
         }
 
         /// <summary>
@@ -496,9 +500,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">Origin of first polygon</param>
         /// <param name="pos2">Origin of second polygon</param>
         /// <returns>If poly1 at pos1 not rotated intersects poly2 at pos2 not rotated</returns>
-        public static Tuple<Vector2, float> IntersectMtv(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMtv(poly1, poly2, pos1, pos2, Rotation2.Zero, Rotation2.Zero);
+            return IntersectMtv(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero);
         }
 
         /// <summary>
@@ -510,9 +514,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos">Position of the polygon</param>
         /// <param name="pt">Point to check</param>
         /// <returns>axis to go in, distance to go if pos is not in poly, otherwise null</returns>
-        public static Tuple<Vector2, float> MinDistance(Polygon2 poly, Vector2 pos, Vector2 pt)
+        public static Tuple<Vector2, float> MinDistance(Polygon poly, Vector2 pos, Vector2 pt)
         {
-            return MinDistance(poly, pos, Rotation2.Zero, pt);
+            return MinDistance(poly, pos, Rotation.Zero, pt);
         }
 
         /// <summary>
@@ -524,9 +528,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">Position of first polygon</param>
         /// <param name="pos2">Position of second polygon</param>
         /// <returns>axis to go in, distance to go if poly1 does not intersect poly2, otherwise null</returns>
-        public static Tuple<Vector2, float> MinDistance(Polygon2 poly1, Polygon2 poly2, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
         {
-            return MinDistance(poly1, poly2, pos1, pos2, Rotation2.Zero, Rotation2.Zero);
+            return MinDistance(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero);
         }
 
         #endregion

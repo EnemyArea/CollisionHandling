@@ -10,7 +10,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// <summary>
     ///     Describes a circle in the x-y plane.
     /// </summary>
-    public class Circle2
+    public class Circle
     {
         /// <summary>
         ///     The radius of the circle
@@ -21,7 +21,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     Constructs a circle with the specified radius
         /// </summary>
         /// <param name="radius">Radius of the circle</param>
-        public Circle2(float radius)
+        public Circle(float radius)
         {
             this.Radius = radius;
         }
@@ -32,7 +32,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="c1">The first circle</param>
         /// <param name="c2">The second circle</param>
         /// <returns>If c1 is equal to c2</returns>
-        public static bool operator ==(Circle2 c1, Circle2 c2)
+        public static bool operator ==(Circle c1, Circle c2)
         {
             if (ReferenceEquals(c1, null) || ReferenceEquals(c2, null))
                 return ReferenceEquals(c1, c2);
@@ -46,7 +46,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="c1">The first circle</param>
         /// <param name="c2">The second circle</param>
         /// <returns>If c1 is not equal to c2</returns>
-        public static bool operator !=(Circle2 c1, Circle2 c2)
+        public static bool operator !=(Circle c1, Circle c2)
         {
             if (ReferenceEquals(c1, null) || ReferenceEquals(c2, null))
                 return !ReferenceEquals(c1, c2);
@@ -65,10 +65,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             if (obj == null)
                 return false;
 
-            if (!(obj is Circle2))
+            if (!(obj is Circle))
                 return false;
 
-            var other = (Circle2)obj;
+            var other = (Circle)obj;
             return this == other;
         }
 
@@ -89,7 +89,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="point">The point to check if is in the circle at pos</param>
         /// <param name="strict">If the edges do not count</param>
         /// <returns>If the circle at pos contains point</returns>
-        public static bool Contains(Circle2 circle, Vector2 pos, Vector2 point, bool strict)
+        public static bool Contains(Circle circle, Vector2 pos, Vector2 point, bool strict)
         {
             var distSq = (point - new Vector2(pos.X + circle.Radius, pos.Y + circle.Radius)).LengthSquared();
 
@@ -104,14 +104,14 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     at the specified position.
         /// </summary>
         /// <param name="circle1">First circle</param>
-        /// <param name="circle2">Second circle</param>
+        /// <param name="circle">Second circle</param>
         /// <param name="pos1">Top-left of the bounding box of the first circle</param>
         /// <param name="pos2">Top-left of the bounding box of the second circle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If circle1 at pos1 intersects circle2 at pos2</returns>
-        public static bool Intersects(Circle2 circle1, Circle2 circle2, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(Circle circle1, Circle circle, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            return Intersects(circle1.Radius, circle2.Radius, pos1, pos2, strict);
+            return Intersects(circle1.Radius, circle.Radius, pos1, pos2, strict);
         }
 
         /// <summary>
@@ -142,13 +142,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     overlaps the second circle at the specified position. If the circles do not overlap, returns null.
         /// </summary>
         /// <param name="circle1">First circle</param>
-        /// <param name="circle2">Second circle</param>
+        /// <param name="circle">Second circle</param>
         /// <param name="pos1">Top-left of the first circles bounding box</param>
         /// <param name="pos2">Top-left of the second circles bounding box</param>
         /// <returns></returns>
-        public static Tuple<Vector2, float> IntersectMtv(Circle2 circle1, Circle2 circle2, Vector2 pos1, Vector2 pos2)
+        public static Tuple<Vector2, float> IntersectMtv(Circle circle1, Circle circle, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMtv(circle1.Radius, circle2.Radius, pos1, pos2);
+            return IntersectMtv(circle1.Radius, circle.Radius, pos1, pos2);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos">The position of the circle</param>
         /// <param name="axis">the axis to project along</param>
         /// <returns>Projects circle at pos along axis</returns>
-        public static AxisAlignedLine2 ProjectAlongAxis(Circle2 circle, Vector2 pos, Vector2 axis)
+        public static AxisAlignedLine ProjectAlongAxis(Circle circle, Vector2 pos, Vector2 axis)
         {
             return ProjectAlongAxis(circle.Radius, pos, axis);
         }
@@ -200,10 +200,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos">Position of the circle</param>
         /// <param name="axis">Axis to project on</param>
         /// <returns></returns>
-        public static AxisAlignedLine2 ProjectAlongAxis(float radius, Vector2 pos, Vector2 axis)
+        public static AxisAlignedLine ProjectAlongAxis(float radius, Vector2 pos, Vector2 axis)
         {
             var centerProj = Vector2.Dot(new Vector2(pos.X + radius, pos.Y + radius), axis);
-            return new AxisAlignedLine2(axis, centerProj - radius, centerProj + radius);
+            return new AxisAlignedLine(axis, centerProj - radius, centerProj + radius);
         }
     }
 }

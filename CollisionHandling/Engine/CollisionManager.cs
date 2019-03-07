@@ -387,11 +387,11 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="circleB"></param>
         public Vector2 CollidesPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
         {
-            var testPoly = new Polygon2(polyA.Vertices);
-            var testCircle = new Circle2(circleB.Radius);
-            var rota = new Rotation2(polyA.Rotation);
+            var testPoly = new Polygon(polyA.Vertices);
+            var testCircle = new Circle(circleB.Radius);
+            var rota = new Math2.Rotation(polyA.Rotation);
 
-            var intercectsMtv = Shape2.IntersectMtv(testPoly, testCircle,
+            var intercectsMtv = Math2.Shape.IntersectMtv(testPoly, testCircle,
                 polyA.Position + polyA.Velocity,
                 circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
                 rota);
@@ -410,11 +410,11 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="circleB"></param>
         public Vector2 CollidesPolygonAndCircle(CircleShape circleB, PolygonShape polyA)
         {
-            var testPoly = new Polygon2(polyA.Vertices);
-            var testCircle = new Circle2(circleB.Radius);
-            var rota = new Rotation2(polyA.Rotation);
+            var testPoly = new Polygon(polyA.Vertices);
+            var testCircle = new Circle(circleB.Radius);
+            var rota = new Math2.Rotation(polyA.Rotation);
 
-            var intercectsMtv = Shape2.IntersectMtv(testCircle, testPoly,
+            var intercectsMtv = Math2.Shape.IntersectMtv(testCircle, testPoly,
                 circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
                 polyA.Position + polyA.Velocity,
                 rota);
@@ -446,10 +446,10 @@ namespace CollisionFloatTestNewMono.Engine
 
             //return Vector2.Zero;
 
-            var testCircle1 = new Circle2(circleA.Radius);
-            var testCircle2 = new Circle2(circleB.Radius);
+            var testCircle1 = new Circle(circleA.Radius);
+            var testCircle2 = new Circle(circleB.Radius);
 
-            var intercectsMtv = Circle2.IntersectMtv(testCircle1, testCircle2,
+            var intercectsMtv = Circle.IntersectMtv(testCircle1, testCircle2,
                 circleA.Position - new Vector2(circleA.Radius) + circleA.Velocity,
                 circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity);
 
@@ -468,14 +468,14 @@ namespace CollisionFloatTestNewMono.Engine
         /// <returns></returns>
         public Vector2 CollidePolygons(PolygonShape polyA, PolygonShape polyB)
         {
-            var testPoly1 = new Polygon2(polyA.Vertices);
-            var testPoly2 = new Polygon2(polyB.Vertices);
+            var testPoly1 = new Polygon(polyA.Vertices);
+            var testPoly2 = new Polygon(polyB.Vertices);
 
-            var intercectsMtv = Polygon2.IntersectMtv(testPoly1, testPoly2,
+            var intercectsMtv = Polygon.IntersectMtv(testPoly1, testPoly2,
                 polyA.Position + polyA.Velocity,
                 polyB.Position + polyB.Velocity,
-                new Rotation2(polyA.Rotation),
-                new Rotation2(polyB.Rotation));
+                new Math2.Rotation(polyA.Rotation),
+                new Math2.Rotation(polyB.Rotation));
 
             if (intercectsMtv != null)
                 return intercectsMtv.Item1 * intercectsMtv.Item2;

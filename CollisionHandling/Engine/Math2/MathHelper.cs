@@ -11,7 +11,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     ///     Contains utility functions for doing math in two-dimensions that
     ///     don't fit elsewhere. Also contains any necessary constants.
     /// </summary>
-    public static class Math2
+    public static class MathHelper
     {
         /// <summary>
         ///     Default epsilon
@@ -102,10 +102,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="about">The point to rotate vec around</param>
         /// <param name="rotation">The rotation</param>
         /// <returns>The vector vec rotated about about rotation.Theta radians.</returns>
-        public static Vector2 Rotate(Vector2 vec, Vector2 about, Rotation2 rotation)
+        public static Vector2 Rotate(Vector2 vec, Vector2 about, Rotation rotation)
         {
             if (rotation.Theta == 0)
                 return vec;
+
             var tmp = vec - about;
             return new Vector2(tmp.X * rotation.CosTheta - tmp.Y * rotation.SinTheta + about.X,
                 tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta + about.Y);

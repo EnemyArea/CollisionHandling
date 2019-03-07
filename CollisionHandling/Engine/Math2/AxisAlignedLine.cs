@@ -12,7 +12,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     ///     mathematical concept. Axis aligned lines *do* have position because they
     ///     are only used as an interim calculation, where position won't change.
     /// </summary>
-    public class AxisAlignedLine2
+    public class AxisAlignedLine
     {
         /// <summary>
         ///     The axis that this projected line is on. Optional.
@@ -35,7 +35,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="axis">The axis</param>
         /// <param name="min">The min</param>
         /// <param name="max">The max</param>
-        public AxisAlignedLine2(Vector2 axis, float min, float max)
+        public AxisAlignedLine(Vector2 axis, float min, float max)
         {
             this.Axis = axis;
 
@@ -47,30 +47,30 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     Determines if line1 intersects line2.
         /// </summary>
         /// <param name="line1">Line 1</param>
-        /// <param name="line2">Line 2</param>
+        /// <param name="line">Line 2</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If line1 and line2 intersect</returns>
         /// <exception cref="ArgumentException">if line1.Axis != line2.Axis</exception>
-        public static bool Intersects(AxisAlignedLine2 line1, AxisAlignedLine2 line2, bool strict)
+        public static bool Intersects(AxisAlignedLine line1, AxisAlignedLine line, bool strict)
         {
-            if (line1.Axis != line2.Axis)
-                throw new ArgumentException($"Lines {line1} and {line2} are not aligned - you will need to convert to Line2 to check intersection.");
+            if (line1.Axis != line.Axis)
+                throw new ArgumentException($"Lines {line1} and {line} are not aligned - you will need to convert to Line2 to check intersection.");
 
-            return Intersects(line1.Min, line1.Max, line2.Min, line2.Max, strict, false);
+            return Intersects(line1.Min, line1.Max, line.Min, line.Max, strict, false);
         }
 
         /// <summary>
         ///     Determines the best way for line1 to move to prevent intersection with line2
         /// </summary>
         /// <param name="line1">Line1</param>
-        /// <param name="line2">Line2</param>
+        /// <param name="line">Line2</param>
         /// <returns>MTV for line1</returns>
-        public static float? IntersectMtv(AxisAlignedLine2 line1, AxisAlignedLine2 line2)
+        public static float? IntersectMtv(AxisAlignedLine line1, AxisAlignedLine line)
         {
-            if (line1.Axis != line2.Axis)
-                throw new ArgumentException($"Lines {line1} and {line2} are not aligned - you will need to convert to Line2 to check intersection.");
+            if (line1.Axis != line.Axis)
+                throw new ArgumentException($"Lines {line1} and {line} are not aligned - you will need to convert to Line2 to check intersection.");
 
-            return IntersectMtv(line1.Min, line1.Max, line2.Min, line2.Max, false);
+            return IntersectMtv(line1.Min, line1.Max, line.Min, line.Max, false);
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="point">The point</param>
         /// <param name="strict">If the edges of the line are excluded</param>
         /// <returns>if line contains point</returns>
-        public static bool Contains(AxisAlignedLine2 line, float point, bool strict)
+        public static bool Contains(AxisAlignedLine line, float point, bool strict)
         {
             return Contains(line.Min, line.Max, point, strict, false);
         }
@@ -179,7 +179,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <returns>The distance.</returns>
         /// <param name="line">Line.</param>
         /// <param name="point">Point.</param>
-        public static float? MinDistance(AxisAlignedLine2 line, float point)
+        public static float? MinDistance(AxisAlignedLine line, float point)
         {
             return MinDistance(line.Min, line.Max, point, false);
         }
@@ -190,10 +190,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// </summary>
         /// <returns>The distance.</returns>
         /// <param name="line1">Line1.</param>
-        /// <param name="line2">Line2.</param>
-        public static float? MinDistance(AxisAlignedLine2 line1, AxisAlignedLine2 line2)
+        /// <param name="line">Line2.</param>
+        public static float? MinDistance(AxisAlignedLine line1, AxisAlignedLine line)
         {
-            return MinDistance(line1.Min, line1.Max, line2.Min, line2.Max, false);
+            return MinDistance(line1.Min, line1.Max, line.Min, line.Max, false);
         }
 
         /// <summary>

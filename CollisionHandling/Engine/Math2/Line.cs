@@ -10,7 +10,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// <summary>
     ///     Describes a line. Does not have position and is meant to be reused.
     /// </summary>
-    public class Line2
+    public class Line
     {
         /// <summary>
         ///     Where the line begins
@@ -87,14 +87,15 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// </summary>
         public readonly bool Vertical;
 
+
         /// <summary>
         ///     Creates a line from start to end
         /// </summary>
         /// <param name="start">Start</param>
         /// <param name="end">End</param>
-        public Line2(Vector2 start, Vector2 end)
+        public Line(Vector2 start, Vector2 end)
         {
-            if (Math2.Approximately(start, end))
+            if (MathHelper.Approximately(start, end))
                 throw new ArgumentException($"start is approximately end - that's a point, not a line. start={start}, end={end}");
 
             this.Start = start;
@@ -103,7 +104,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             this.Delta = this.End - this.Start;
             this.Axis = Vector2.Normalize(this.Delta);
-            this.Normal = Vector2.Normalize(Math2.Perpendicular(this.Delta));
+            this.Normal = Vector2.Normalize(MathHelper.Perpendicular(this.Delta));
             this.MagnitudeSquared = this.Delta.LengthSquared();
             this.Magnitude = (float)Math.Sqrt(this.MagnitudeSquared);
 
@@ -143,77 +144,77 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     is offset by pos2.
         /// </summary>
         /// <param name="line1">Line 1</param>
-        /// <param name="line2">Line 2</param>
+        /// <param name="line">Line 2</param>
         /// <param name="pos1">Origin of line 1</param>
         /// <param name="pos2">Origin of line 2</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If line1 intersects line2</returns>
-        public static bool Intersects(Line2 line1, Line2 line2, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(Line line1, Line line, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            if (line1.Horizontal && line2.Horizontal)
+            if (line1.Horizontal && line.Horizontal)
             {
-                return AxisAlignedLine2.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.MinX + pos2.X, line2.MaxX + pos2.X, strict, false);
+                return AxisAlignedLine.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line.MinX + pos2.X, line.MaxX + pos2.X, strict, false);
             }
 
-            if (line1.Vertical && line2.Vertical)
+            if (line1.Vertical && line.Vertical)
             {
-                return AxisAlignedLine2.Intersects(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line2.MinY + pos2.Y, line2.MaxY + pos2.Y, strict, false);
+                return AxisAlignedLine.Intersects(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line.MinY + pos2.Y, line.MaxY + pos2.Y, strict, false);
             }
 
-            if (line1.Horizontal || line2.Horizontal)
+            if (line1.Horizontal || line.Horizontal)
             {
-                if (line2.Horizontal)
+                if (line.Horizontal)
                 {
                     // swap line 1 and 2 to prevent duplicating everything
                     var tmp = line1;
                     var tmpp = pos1;
-                    line1 = line2;
+                    line1 = line;
                     pos1 = pos2;
-                    line2 = tmp;
+                    line = tmp;
                     pos2 = tmpp;
                 }
 
-                if (line2.Vertical)
+                if (line.Vertical)
                 {
-                    return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.Start.X + pos2.X, strict, false)
-                           && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line1.Start.Y + pos1.Y, strict, false);
+                    return AxisAlignedLine.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line.Start.X + pos2.X, strict, false)
+                           && AxisAlignedLine.Contains(line.MinY + pos2.Y, line.MaxY + pos2.Y, line1.Start.Y + pos1.Y, strict, false);
                 }
 
                 // recalculate line2 y intercept
                 // y = mx + b
                 // b = y - mx
-                var line2YIntInner = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
+                var line2YIntInner = line.Start.Y + pos2.Y - line.Slope * (line.Start.X + pos2.X);
                 // check line2.x at line1.y
                 // line2.y = line2.slope * line2.x + line2.yintercept
                 // line1.y = line2.slope * line2.x + line2.yintercept
                 // line1.y - line2.yintercept = line2.slope * line2.x
                 // (line1.y - line2.yintercept) / line2.slope = line2.x
-                var line2XAtLine1Y = (line1.Start.Y + pos1.Y - line2YIntInner) / line2.Slope;
-                return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2XAtLine1Y, strict, false)
-                       && AxisAlignedLine2.Contains(line2.MinX + pos2.X, line2.MaxX + pos2.X, line2XAtLine1Y, strict, false);
+                var line2XAtLine1Y = (line1.Start.Y + pos1.Y - line2YIntInner) / line.Slope;
+                return AxisAlignedLine.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2XAtLine1Y, strict, false)
+                       && AxisAlignedLine.Contains(line.MinX + pos2.X, line.MaxX + pos2.X, line2XAtLine1Y, strict, false);
             }
 
             if (line1.Vertical)
             {
                 // vertical line with regular line
-                var line2YIntInner = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
-                var line2YAtLine1X = line2.Slope * (line1.Start.X + pos1.X) + line2YIntInner;
-                return AxisAlignedLine2.Contains(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line2YAtLine1X, strict, false)
-                       && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line2YAtLine1X, strict, false);
+                var line2YIntInner = line.Start.Y + pos2.Y - line.Slope * (line.Start.X + pos2.X);
+                var line2YAtLine1X = line.Slope * (line1.Start.X + pos1.X) + line2YIntInner;
+                return AxisAlignedLine.Contains(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line2YAtLine1X, strict, false)
+                       && AxisAlignedLine.Contains(line.MinY + pos2.Y, line.MaxY + pos2.Y, line2YAtLine1X, strict, false);
             }
 
             // two non-vertical, non-horizontal lines
             var line1YInt = line1.Start.Y + pos1.Y - line1.Slope * (line1.Start.X + pos1.X);
-            var line2YInt = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
+            var line2YInt = line.Start.Y + pos2.Y - line.Slope * (line.Start.X + pos2.X);
 
-            if (Math.Abs(line1.Slope - line2.Slope) <= Math2.DefaultEpsilon)
+            if (Math.Abs(line1.Slope - line.Slope) <= MathHelper.DefaultEpsilon)
             {
                 // parallel lines
                 if (line1YInt != line2YInt)
                     return false; // infinite lines don't intersect
 
                 // parallel lines with equal y intercept. Intersect if ever at same X coordinate.
-                return AxisAlignedLine2.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.MinX + pos2.X, line2.MaxX + pos2.X, strict, false);
+                return AxisAlignedLine.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line.MinX + pos2.X, line.MaxX + pos2.X, strict, false);
             }
             // two non-parallel lines. Only one possible intersection point
 
@@ -222,10 +223,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             // line1.Slope * x - line2.Slope * x = line2.YIntercept - line1.YIntercept
             // x (line1.Slope - line2.Slope) = line2.YIntercept - line1.YIntercept
             // x = (line2.YIntercept - line1.YIntercept) / (line1.Slope - line2.Slope)
-            var x = (line2YInt - line1YInt) / (line1.Slope - line2.Slope);
+            var x = (line2YInt - line1YInt) / (line1.Slope - line.Slope);
 
-            return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, x, strict, false)
-                   && AxisAlignedLine2.Contains(line2.MinX + pos1.X, line2.MaxX + pos2.X, x, strict, false);
+            return AxisAlignedLine.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, x, strict, false)
+                   && AxisAlignedLine.Contains(line.MinX + pos1.X, line.MaxX + pos2.X, x, strict, false);
         }
 
         /// <summary>

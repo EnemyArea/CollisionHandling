@@ -18,24 +18,24 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <summary>
         ///     A dictionary containing the circle shapes.
         /// </summary>
-        private static readonly Dictionary<Tuple<float, float, float, float>, Polygon2> circleCache = new Dictionary<Tuple<float, float, float, float>, Polygon2>();
+        private static readonly Dictionary<Tuple<float, float, float, float>, Polygon> circleCache = new Dictionary<Tuple<float, float, float, float>, Polygon>();
 
         /// <summary>
         ///     A dictionary containing the rectangle shapes.
         /// </summary>
-        private static readonly Dictionary<Tuple<float, float, float, float>, Polygon2> rectangleCache = new Dictionary<Tuple<float, float, float, float>, Polygon2>();
+        private static readonly Dictionary<Tuple<float, float, float, float>, Polygon> rectangleCache = new Dictionary<Tuple<float, float, float, float>, Polygon>();
 
         /// <summary>
         ///     A dictionary containing the convex polygon shapes.
         /// </summary>
-        private static readonly Dictionary<int, Polygon2> convexPolygonCache = new Dictionary<int, Polygon2>();
+        private static readonly Dictionary<int, Polygon> convexPolygonCache = new Dictionary<int, Polygon>();
 
         /// <summary>
         ///     Fetches the convex polygon (the smallest possible polygon containing all the non-transparent pixels) of the given
         ///     texture.
         /// </summary>
         /// <param name="texture">The texture.</param>
-        public static Polygon2 CreateConvexPolygon(Texture2D texture)
+        public static Polygon CreateConvexPolygon(Texture2D texture)
         {
             var key = texture.GetHashCode();
 
@@ -81,7 +81,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             }
 
             points = h.Take(k - 1).ToList();
-            return convexPolygonCache[key] = new Polygon2(points.ToArray());
+            return convexPolygonCache[key] = new Polygon(points.ToArray());
         }
 
         /// <summary>
@@ -104,14 +104,14 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="x">The X center of the rectangle.</param>
         /// <param name="y">The Y center of the rectangle.</param>
         /// <returns>A rectangle shape with the given width, height, x and y center.</returns>
-        public static Polygon2 CreateRectangle(float width, float height, float x = 0, float y = 0)
+        public static Polygon CreateRectangle(float width, float height, float x = 0, float y = 0)
         {
             var key = new Tuple<float, float, float, float>(width, height, x, y);
 
             if (rectangleCache.ContainsKey(key))
                 return rectangleCache[key];
 
-            return rectangleCache[key] = new Polygon2(new[]
+            return rectangleCache[key] = new Polygon(new[]
             {
                 new Vector2(x, y),
                 new Vector2(x + width, y),
@@ -128,7 +128,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="y">The Y center of the circle.</param>
         /// <param name="segments">The amount of segments (more segments equals higher detailed circle)</param>
         /// <returns>A circle with the given radius, center, and segments, as a polygon2 shape.</returns>
-        public static Polygon2 CreateCircle(float radius, float x = 0, float y = 0, int segments = 32)
+        public static Polygon CreateCircle(float radius, float x = 0, float y = 0, int segments = 32)
         {
             var key = new Tuple<float, float, float, float>(radius, x, y, segments);
 
@@ -151,7 +151,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 theta += increment;
             }
 
-            return circleCache[key] = new Polygon2(verts.ToArray());
+            return circleCache[key] = new Polygon(verts.ToArray());
         }
     }
 }

@@ -10,12 +10,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     ///     Describes a rotation about the z axis, with sin and cos of theta
     ///     cached.
     /// </summary>
-    public struct Rotation2
+    public struct Rotation
     {
         /// <summary>
         ///     Rotation Theta=0
         /// </summary>
-        public static readonly Rotation2 Zero = new Rotation2(0, 1, 0);
+        public static readonly Rotation Zero = new Rotation(0, 1, 0);
 
         /// <summary>
         ///     Theta in radians.
@@ -39,7 +39,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="theta"></param>
         /// <param name="cosTheta"></param>
         /// <param name="sinTheta"></param>
-        public Rotation2(float theta, float cosTheta, float sinTheta)
+        public Rotation(float theta, float cosTheta, float sinTheta)
         {
             if (float.IsInfinity(theta) || float.IsNaN(theta))
                 throw new ArgumentException($"Invalid theta: {theta}", nameof(theta));
@@ -65,7 +65,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         ///     Theta will be normalized to 0 &lt;= theta &lt;= 2pi
         /// </summary>
         /// <param name="theta"></param>
-        public Rotation2(float theta)
+        public Rotation(float theta)
             : this(theta, (float)Math.Cos(theta), (float)Math.Sin(theta))
         {
         }
@@ -76,7 +76,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="r1">First rotation</param>
         /// <param name="r2">Second rotation</param>
         /// <returns>if r1 and r2 are the same logical rotation</returns>
-        public static bool operator ==(Rotation2 r1, Rotation2 r2)
+        public static bool operator ==(Rotation r1, Rotation r2)
         {
             return r1.Theta == r2.Theta;
         }
@@ -87,7 +87,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="r1">first rotation</param>
         /// <param name="r2">second rotation</param>
         /// <returns>if r1 and r2 are not the same logical rotation</returns>
-        public static bool operator !=(Rotation2 r1, Rotation2 r2)
+        public static bool operator !=(Rotation r1, Rotation r2)
         {
             return r1.Theta != r2.Theta;
         }
@@ -99,10 +99,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <returns>if it is logically equal</returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is Rotation2))
+            if (!(obj is Rotation))
                 return false;
 
-            return this == (Rotation2)obj;
+            return this == (Rotation)obj;
         }
 
         /// <summary>
