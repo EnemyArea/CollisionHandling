@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
+using MathHelper = CollisionFloatTestNewMono.Engine.Math2.MathHelper;
 
 #endregion
 
@@ -391,7 +392,7 @@ namespace CollisionFloatTestNewMono.Engine
             var testCircle = new Circle(circleB.Radius);
             var rota = new Math2.Rotation(polyA.Rotation);
 
-            var intercectsMtv = Math2.Shape.IntersectMtv(testPoly, testCircle,
+            var intercectsMtv = Math2.MathHelper.IntersectMtv(testPoly, testCircle,
                 polyA.Position + polyA.Velocity,
                 circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
                 rota);
@@ -411,7 +412,7 @@ namespace CollisionFloatTestNewMono.Engine
             var testCircle = new Circle(circleB.Radius);
             var rota = new Math2.Rotation(polyA.Rotation);
 
-            var intercectsMtv = Math2.Shape.IntersectMtv(testCircle, testPoly,
+            var intercectsMtv = Math2.MathHelper.IntersectMtv(testCircle, testPoly,
                 circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
                 polyA.Position + polyA.Velocity,
                 rota);
@@ -443,7 +444,7 @@ namespace CollisionFloatTestNewMono.Engine
             var testCircle1 = new Circle(circleA.Radius);
             var testCircle2 = new Circle(circleB.Radius);
 
-            var intercectsMtv = Circle.IntersectMtv(testCircle1, testCircle2,
+            var intercectsMtv = MathHelper.IntersectMtv(testCircle1, testCircle2,
                 circleA.Position - new Vector2(circleA.Radius) + circleA.Velocity,
                 circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity);
 
@@ -462,7 +463,7 @@ namespace CollisionFloatTestNewMono.Engine
             var testPoly1 = new Polygon(polyA.Vertices);
             var testPoly2 = new Polygon(polyB.Vertices);
 
-            var intercectsMtv = Polygon.IntersectMtv(testPoly1, testPoly2,
+            var intercectsMtv = MathHelper.IntersectMtv(testPoly1, testPoly2,
                 polyA.Position + polyA.Velocity,
                 polyB.Position + polyB.Velocity,
                 new Math2.Rotation(polyA.Rotation),

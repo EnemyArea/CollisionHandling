@@ -13,7 +13,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// <summary>
     ///     A class containing utilities that help creating shapes.
     /// </summary>
-    public class ShapeUtils
+    public static class ShapeUtils
     {
         /// <summary>
         ///     A dictionary containing the circle shapes.
@@ -43,7 +43,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 return convexPolygonCache[key];
 
             var uints = new uint[texture.Width * texture.Height];
-            texture.GetData<uint>(uints);
+            texture.GetData(uints);
 
             var points = new List<Vector2>();
 

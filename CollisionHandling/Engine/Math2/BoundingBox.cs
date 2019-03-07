@@ -10,7 +10,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     /// <summary>
     ///     Describes a rectangle. Meant to be reused.
     /// </summary>
-    public class BoundingBox : Shape
+    public class BoundingBox
     {
         /// <summary>
         ///     The corner with the smallest x and y coordinates on this
@@ -96,47 +96,6 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         public BoundingBox(float minX, float minY, float maxX, float maxY)
             : this(new Vector2(minX, minY), new Vector2(maxX, maxY))
         {
-        }
-
-        /// <summary>
-        ///     Determines if box1 with origin pos1 intersects box2 with origin pos2.
-        /// </summary>
-        /// <param name="box1">Box 1</param>
-        /// <param name="box2">Box 2</param>
-        /// <param name="pos1">Origin of box 1</param>
-        /// <param name="pos2">Origin of box 2</param>
-        /// <param name="strict">If overlap is required for intersection</param>
-        /// <returns>If box1 intersects box2 when box1 is at pos1 and box2 is at pos2</returns>
-        public static bool Intersects(BoundingBox box1, BoundingBox box2, Vector2 pos1, Vector2 pos2, bool strict)
-        {
-            return AxisAlignedLine.Intersects(box1.Min.X + pos1.X, box1.Max.X + pos1.X, box2.Min.X + pos2.X, box2.Max.X + pos2.X, strict, false)
-                   && AxisAlignedLine.Intersects(box1.Min.Y + pos1.Y, box1.Max.Y + pos1.Y, box2.Min.Y + pos2.Y, box2.Max.Y + pos2.Y, strict, false);
-        }
-
-        /// <summary>
-        ///     Determines if the box when at pos contains point.
-        /// </summary>
-        /// <param name="box">The box</param>
-        /// <param name="pos">Origin of box</param>
-        /// <param name="point">Point to check</param>
-        /// <param name="strict">true if the edges do not count</param>
-        /// <returns>If the box at pos contains point</returns>
-        public static bool Contains(BoundingBox box, Vector2 pos, Vector2 point, bool strict)
-        {
-            return AxisAlignedLine.Contains(box.Min.X + pos.X, box.Max.X + pos.X, point.X, strict, false)
-                   && AxisAlignedLine.Contains(box.Min.Y + pos.Y, box.Max.Y + pos.Y, point.Y, strict, false);
-        }
-
-        /// <summary>
-        ///     Projects the rectangle at pos along axis.
-        /// </summary>
-        /// <param name="rect">The rectangle to project</param>
-        /// <param name="pos">The origin of the rectangle</param>
-        /// <param name="axis">The axis to project on</param>
-        /// <returns>The projection of rect at pos along axis</returns>
-        public static AxisAlignedLine ProjectAlongAxis(BoundingBox rect, Vector2 pos, Vector2 axis)
-        {
-            return ProjectAlongAxis(axis, pos, Rotation.Zero, rect.Center, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
         }
     }
 }

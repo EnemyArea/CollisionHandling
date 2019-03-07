@@ -56,7 +56,6 @@
     <Compile Include="Engine\Math2\BoundingBox.cs" />
     <Compile Include="Engine\Math2\RelativeBoundingBox.cs" />
     <Compile Include="Engine\Math2\Rotation.cs" />
-    <Compile Include="Engine\Math2\Shape.cs" />
     <Compile Include="Engine\Math2\ShapeUtils.cs" />
     <Compile Include="Engine\MathUtils.cs" />
     <Compile Include="Engine\PolygonShape.cs" />
