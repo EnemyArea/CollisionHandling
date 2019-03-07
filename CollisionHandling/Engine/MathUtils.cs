@@ -9,6 +9,8 @@ using Microsoft.Xna.Framework;
 
 namespace CollisionFloatTestNewMono.Engine
 {
+    /// <summary>
+    /// </summary>
     public static class MathUtils
     {
         /// <summary>

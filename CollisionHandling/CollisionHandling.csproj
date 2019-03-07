@@ -41,10 +41,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Engine\CollisionGrid.cs" />
+    <Compile Include="Engine\Collision\CollisionGrid.cs" />
     <Compile Include="Engine\Camera2D.cs" />
-    <Compile Include="Engine\CircleShape.cs" />
-    <Compile Include="Engine\CollisionManager.cs" />
+    <Compile Include="Engine\Shapes\CircleShape.cs" />
+    <Compile Include="Engine\Collision\CollisionManager.cs" />
     <Compile Include="Engine\GameHelper.cs" />
     <Compile Include="Engine\Math2\AxisAlignedLine.cs" />
     <Compile Include="Engine\Math2\Circle.cs" />
@@ -55,16 +55,16 @@
     <Compile Include="Engine\Math2\RelativeBoundingBox.cs" />
     <Compile Include="Engine\Math2\Rotation.cs" />
     <Compile Include="Engine\MathUtils.cs" />
-    <Compile Include="Engine\PolygonShape.cs" />
+    <Compile Include="Engine\Shapes\PolygonShape.cs" />
     <Compile Include="Engine\PrimitiveBatch.cs" />
-    <Compile Include="Engine\RectangleShape.cs" />
-    <Compile Include="Engine\ShapeContactType.cs" />
-    <Compile Include="Engine\ShapeType.cs" />
+    <Compile Include="Engine\Shapes\RectangleShape.cs" />
+    <Compile Include="Engine\Collision\ShapeContactType.cs" />
+    <Compile Include="Engine\Shapes\ShapeType.cs" />
     <Compile Include="GameClass.cs" />
-    <Compile Include="Engine\LineShape.cs" />
+    <Compile Include="Engine\Shapes\LineShape.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Engine\Shape.cs" />
+    <Compile Include="Engine\Shapes\Shape.cs" />
     <Compile Include="Engine\RenderEngine.cs" />
   </ItemGroup>
   <ItemGroup>

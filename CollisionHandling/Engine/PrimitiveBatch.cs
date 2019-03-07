@@ -12,22 +12,28 @@ namespace CollisionFloatTestNewMono.Engine
     /// <summary>
     ///     https://github.com/VelcroPhysics/VelcroPhysics/blob/1456abf40e4c30065bf122f409ce60ce3873ff09/DebugViews/MonoGame/PrimitiveBatch.cs
     /// </summary>
-    public class PrimitiveBatch : IDisposable
+    public sealed class PrimitiveBatch : IDisposable
     {
         private const int DefaultBufferSize = 500;
 
-        // a basic effect, which contains the shaders that we will use to draw our
-        // primitives.
+        /// <summary>
+        ///     a basic effect, which contains the shaders that we will use to draw our
+        ///     primitives.
+        /// </summary>
         private readonly BasicEffect basicEffect;
 
-        // the device that we will issue draw calls to.
+        /// <summary>
+        ///     the device that we will issue draw calls to.
+        /// </summary>
         private readonly GraphicsDevice device;
 
         private readonly VertexPositionColor[] lineVertices;
         private readonly VertexPositionColor[] triangleVertices;
 
-        // hasBegun is flipped to true once Begin is called, and is used to make
-        // sure users don't call End before Begin is called.
+        /// <summary>
+        ///     hasBegun is flipped to true once Begin is called, and is used to make
+        ///     sure users don't call End before Begin is called.
+        /// </summary>
         private bool hasBegun;
 
         private bool isDisposed;
@@ -41,10 +47,7 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="bufferSize"></param>
         public PrimitiveBatch(GraphicsDevice graphicsDevice, int bufferSize = DefaultBufferSize)
         {
-            if (graphicsDevice == null)
-                throw new ArgumentNullException(nameof(graphicsDevice));
-
-            this.device = graphicsDevice;
+            this.device = graphicsDevice ?? throw new ArgumentNullException(nameof(graphicsDevice));
 
             this.triangleVertices = new VertexPositionColor[bufferSize - bufferSize % 3];
             this.lineVertices = new VertexPositionColor[bufferSize - bufferSize % 2];
@@ -67,12 +70,11 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposing && !this.isDisposed)
             {
-                if (this.basicEffect != null)
-                    this.basicEffect.Dispose();
+                this.basicEffect?.Dispose();
 
                 this.isDisposed = true;
             }
@@ -163,7 +165,7 @@ namespace CollisionFloatTestNewMono.Engine
         public void DrawPolygon(Vector2[] vertices, Vector2 position, float angle, Color color)
         {
             var roation = new Rotation(angle);
-            
+
             var vertexCount = vertices.Length;
             var origin = Vector2.Zero;
             for (var i = 0; i < vertexCount; ++i)
