@@ -16,7 +16,7 @@ namespace CollisionFloatTestNewMono.Engine
         ///     Beinhaltet die Matrix mit der gemalt wird
         /// </summary>
         private Matrix invertedViewMatrix;
-        
+
         /// <summary>
         /// </summary>
         private Matrix offsetMatrix;
@@ -44,12 +44,12 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         private Matrix viewMatrix;
-        
+
         /// <summary>
         /// </summary>
         private Matrix viewMatrixWithOffset;
 
-        
+
         /// <summary>
         /// </summary>
         public Viewport Viewport { get; private set; }
@@ -61,18 +61,22 @@ namespace CollisionFloatTestNewMono.Engine
         /// <summary>
         /// </summary>
         public float ZoomLevel { get; private set; }
-      
-       /// <summary>
+
+        /// <summary>
         /// </summary>
         public Vector2 ViewOffset { get; private set; }
 
         /// <summary>
         /// </summary>
         public Vector3 CameraPosition => this.positionWithOffset - this.positionOffset;
-        
+
         /// <summary>
         /// </summary>
         public Matrix ViewMatrixWithOffset => this.viewMatrixWithOffset;
+
+        /// <summary>
+        /// </summary>
+        public Matrix DebugViewMatrix { get; private set; }
 
 
         /// <summary>
@@ -179,7 +183,7 @@ namespace CollisionFloatTestNewMono.Engine
                               Matrix.CreateTranslation(targetOriginVector) *
                               this.scaleMatrix *
                               Matrix.CreateTranslation(new Vector3(this.Origin, 0f));
-
+            
             // Invertieren
             Matrix.Invert(ref this.viewMatrix, out this.invertedViewMatrix);
 

@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
 #endregion
@@ -37,11 +38,69 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
+        /// <param name="coordinate"></param>
+        /// <returns></returns>
+        public static int ConvertPositionToTilePosition(double coordinate)
+        {
+            return (int)(coordinate / TileSize);
+        }
+
+
+        /// <summary>
+        /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
         public static Point ConvertPositionToTilePosition(Vector2 position)
         {
             return new Point((int)(position.X / TileSize), (int)(position.Y / TileSize));
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public static Rectangle ConvertPositionToTilePosition(Rectangle rectangle)
+        {
+            return new Rectangle(
+                ConvertPositionToTilePosition(rectangle.X),
+                ConvertPositionToTilePosition(rectangle.Y),
+                ConvertPositionToTilePosition(rectangle.Width),
+                ConvertPositionToTilePosition(rectangle.Height));
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public static IEnumerable<Vector2> CreatePreShiftVerticesFromRectangle(Rectangle rectangle)
+        {
+            yield return new Vector2(rectangle.Left, rectangle.Top);
+            yield return new Vector2(rectangle.Right, rectangle.Top);
+            yield return new Vector2(rectangle.Left, rectangle.Top);
+            yield return new Vector2(rectangle.Left, rectangle.Bottom);
+            yield return new Vector2(rectangle.Left, rectangle.Bottom);
+            yield return new Vector2(rectangle.Right, rectangle.Bottom);
+            yield return new Vector2(rectangle.Right, rectangle.Top);
+            yield return new Vector2(rectangle.Right, rectangle.Bottom);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public static IEnumerable<Vector2> CreateVerticesFromRectangle(Rectangle rectangle)
+        {
+            yield return new Vector2(0, 0);
+            yield return new Vector2(rectangle.Width, 0);
+            yield return new Vector2(0, 0);
+            yield return new Vector2(0, rectangle.Height);
+            yield return new Vector2(0, rectangle.Height);
+            yield return new Vector2(rectangle.Width, rectangle.Height);
+            yield return new Vector2(rectangle.Width, 0);
+            yield return new Vector2(rectangle.Width, rectangle.Height);
         }
     }
 }
