@@ -1,20 +1,24 @@
-﻿using System;
+﻿#region
+
+using System;
 using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
     /// <summary>
-    /// Describes a circle in the x-y plane.
+    ///     Describes a circle in the x-y plane.
     /// </summary>
-    public struct Circle2
+    public class Circle2
     {
         /// <summary>
-        /// The radius of the circle
+        ///     The radius of the circle
         /// </summary>
         public readonly float Radius;
 
         /// <summary>
-        /// Constructs a circle with the specified radius
+        ///     Constructs a circle with the specified radius
         /// </summary>
         /// <param name="radius">Radius of the circle</param>
         public Circle2(float radius)
@@ -23,7 +27,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if the first circle is equal to the second circle
+        ///     Determines if the first circle is equal to the second circle
         /// </summary>
         /// <param name="c1">The first circle</param>
         /// <param name="c2">The second circle</param>
@@ -37,7 +41,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if the first circle is not equal to the second circle
+        ///     Determines if the first circle is not equal to the second circle
         /// </summary>
         /// <param name="c1">The first circle</param>
         /// <param name="c2">The second circle</param>
@@ -49,16 +53,19 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             return c1.Radius != c2.Radius;
         }
-        
+
         /// <summary>
-        /// Determines if this circle is logically the same as the 
-        /// specified object.
+        ///     Determines if this circle is logically the same as the
+        ///     specified object.
         /// </summary>
         /// <param name="obj">The object to compare against</param>
         /// <returns>if it is a circle with the same radius</returns>
         public override bool Equals(object obj)
         {
-            if (obj.GetType() != typeof(Circle2))
+            if (obj == null)
+                return false;
+
+            if (!(obj is Circle2))
                 return false;
 
             var other = (Circle2)obj;
@@ -66,7 +73,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Calculate a hashcode based solely on the radius of this circle.
+        ///     Calculate a hashcode based solely on the radius of this circle.
         /// </summary>
         /// <returns>hashcode</returns>
         public override int GetHashCode()
@@ -75,7 +82,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if the circle at the specified position contains the point
+        ///     Determines if the circle at the specified position contains the point
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="pos">The top-left of the circles bounding box</param>
@@ -88,13 +95,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (strict)
                 return distSq < circle.Radius * circle.Radius;
-            else
-                return distSq <= circle.Radius * circle.Radius;
+
+            return distSq <= circle.Radius * circle.Radius;
         }
-        
+
         /// <summary>
-        /// Determines if the first circle at the specified position intersects the second circle
-        /// at the specified position.
+        ///     Determines if the first circle at the specified position intersects the second circle
+        ///     at the specified position.
         /// </summary>
         /// <param name="circle1">First circle</param>
         /// <param name="circle2">Second circle</param>
@@ -108,8 +115,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if the first circle of specified radius and (bounding box top left) intersects
-        /// the second circle of specified radius and (bounding box top left)
+        ///     Determines if the first circle of specified radius and (bounding box top left) intersects
+        ///     the second circle of specified radius and (bounding box top left)
         /// </summary>
         /// <param name="radius1">Radius of the first circle</param>
         /// <param name="radius2">Radius of the second circle</param>
@@ -123,12 +130,16 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             vecCenterToCenter.X += radius1 - radius2;
             vecCenterToCenter.Y += radius1 - radius2;
             var distSq = vecCenterToCenter.LengthSquared();
-            return distSq < (radius1 + radius2) * (radius1 + radius2);
+
+            if (strict)
+                return distSq < (radius1 + radius2) * (radius1 + radius2);
+
+            return distSq <= (radius1 + radius2) * (radius1 + radius2);
         }
 
         /// <summary>
-        /// Determines the shortest axis and overlap for which the first circle at the specified position
-        /// overlaps the second circle at the specified position. If the circles do not overlap, returns null.
+        ///     Determines the shortest axis and overlap for which the first circle at the specified position
+        ///     overlaps the second circle at the specified position. If the circles do not overlap, returns null.
         /// </summary>
         /// <param name="circle1">First circle</param>
         /// <param name="circle2">Second circle</param>
@@ -141,9 +152,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines the shortest axis and overlap for which the first circle, specified by its radius and its bounding
-        /// box's top-left, intersects the second circle specified by its radius and bounding box top-left. Returns null if
-        /// the circles do not overlap.
+        ///     Determines the shortest axis and overlap for which the first circle, specified by its radius and its bounding
+        ///     box's top-left, intersects the second circle specified by its radius and bounding box top-left. Returns null if
+        ///     the circles do not overlap.
         /// </summary>
         /// <param name="radius1">Radius of the first circle</param>
         /// <param name="radius2"></param>
@@ -153,23 +164,24 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         public static Tuple<Vector2, float> IntersectMtv(float radius1, float radius2, Vector2 pos1, Vector2 pos2)
         {
             var betweenVec = pos1 - pos2;
-            betweenVec.X += (radius1 - radius2);
-            betweenVec.Y += (radius1 - radius2);
+            betweenVec.X += radius1 - radius2;
+            betweenVec.Y += radius1 - radius2;
 
             var lengthSq = betweenVec.LengthSquared();
-            if(lengthSq < (radius1 + radius2) * (radius1 + radius2))
+            if (lengthSq < (radius1 + radius2) * (radius1 + radius2))
             {
                 var len = Math.Sqrt(lengthSq);
                 betweenVec *= (float)(1 / len);
 
                 return Tuple.Create(betweenVec, radius1 + radius2 - (float)len);
             }
+
             return null;
         }
 
         /// <summary>
-        /// Projects the specified circle with the upper-left at the specified position onto
-        /// the specified axis. 
+        ///     Projects the specified circle with the upper-left at the specified position onto
+        ///     the specified axis.
         /// </summary>
         /// <param name="circle">The circle</param>
         /// <param name="pos">The position of the circle</param>
@@ -181,8 +193,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Projects a circle defined by its radius and the top-left of its bounding box along
-        /// the specified axis.
+        ///     Projects a circle defined by its radius and the top-left of its bounding box along
+        ///     the specified axis.
         /// </summary>
         /// <param name="radius">Radius of the circle to project</param>
         /// <param name="pos">Position of the circle</param>
@@ -191,7 +203,6 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         public static AxisAlignedLine2 ProjectAlongAxis(float radius, Vector2 pos, Vector2 axis)
         {
             var centerProj = Vector2.Dot(new Vector2(pos.X + radius, pos.Y + radius), axis);
-
             return new AxisAlignedLine2(axis, centerProj - radius, centerProj + radius);
         }
     }

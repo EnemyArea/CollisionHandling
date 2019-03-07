@@ -1,32 +1,36 @@
-﻿using System;
+﻿#region
+
+using System;
 using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
     /// <summary>
-    /// Describes a line that's projected onto a specified axis. This is a useful
-    /// mathematical concept. Axis aligned lines *do* have position because they 
-    /// are only used as an interim calculation, where position won't change.
+    ///     Describes a line that's projected onto a specified axis. This is a useful
+    ///     mathematical concept. Axis aligned lines *do* have position because they
+    ///     are only used as an interim calculation, where position won't change.
     /// </summary>
     public class AxisAlignedLine2
     {
         /// <summary>
-        /// The axis that this projected line is on. Optional.
+        ///     The axis that this projected line is on. Optional.
         /// </summary>
         public readonly Vector2 Axis;
 
         /// <summary>
-        /// The minimum of this line
+        ///     The minimum of this line
         /// </summary>
         public readonly float Min;
 
         /// <summary>
-        /// The maximum of this line
+        ///     The maximum of this line
         /// </summary>
         public readonly float Max;
 
         /// <summary>
-        /// Initializes an an axis aligned line. Will autocorrect if min &gt; max
+        ///     Initializes an an axis aligned line. Will autocorrect if min &gt; max
         /// </summary>
         /// <param name="axis">The axis</param>
         /// <param name="min">The min</param>
@@ -40,7 +44,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if line1 intersects line2.
+        ///     Determines if line1 intersects line2.
         /// </summary>
         /// <param name="line1">Line 1</param>
         /// <param name="line2">Line 2</param>
@@ -56,7 +60,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines the best way for line1 to move to prevent intersection with line2
+        ///     Determines the best way for line1 to move to prevent intersection with line2
         /// </summary>
         /// <param name="line1">Line1</param>
         /// <param name="line2">Line2</param>
@@ -70,7 +74,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if the specified line contains the specified point.
+        ///     Determines if the specified line contains the specified point.
         /// </summary>
         /// <param name="line">The line</param>
         /// <param name="point">The point</param>
@@ -82,7 +86,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if axis aligned line (min1, max1) intersects (min2, max2)
+        ///     Determines if axis aligned line (min1, max1) intersects (min2, max2)
         /// </summary>
         /// <param name="min1">Min 1</param>
         /// <param name="max1">Max 1</param>
@@ -103,18 +107,17 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 tmp2 = max2;
                 min2 = Math.Min(tmp1, tmp2);
                 max2 = Math.Max(tmp1, tmp2);
-
             }
 
             if (strict)
-                return (min1 <= min2 && max1 > min2) || (min2 <= min1 && max2 > min1);
-            else
-                return (min1 <= min2 && max1 >= min2) || (min2 <= min1 && max2 >= min1);
+                return min1 <= min2 && max1 > min2 || min2 <= min1 && max2 > min1;
+
+            return min1 <= min2 && max1 >= min2 || min2 <= min1 && max2 >= min1;
         }
 
         /// <summary>
-        /// Determines the translation to move line 1 to have line 1 not intersect line 2. Returns
-        /// null if line1 does not intersect line1.
+        ///     Determines the translation to move line 1 to have line 1 not intersect line 2. Returns
+        ///     null if line1 does not intersect line1.
         /// </summary>
         /// <param name="min1">Line 1 min</param>
         /// <param name="max1">Line 1 max</param>
@@ -138,13 +141,15 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (min1 <= min2 && max1 > min2)
                 return min2 - max1;
-            else if (min2 <= min1 && max2 > min1)
+
+            if (min2 <= min1 && max2 > min1)
                 return max2 - min1;
+
             return null;
         }
 
         /// <summary>
-        /// Determines if the line from (min, max) contains point
+        ///     Determines if the line from (min, max) contains point
         /// </summary>
         /// <param name="min">Min of line</param>
         /// <param name="max">Max of line</param>
@@ -163,13 +168,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (strict)
                 return min < point && max > point;
-            else
-                return min <= point && max >= point;
+
+            return min <= point && max >= point;
         }
 
         /// <summary>
-        /// Detrmines the shortest distance from the line to get to point. Returns
-        /// null if the point is on the line (not strict). Always returns a positive value.
+        ///     Detrmines the shortest distance from the line to get to point. Returns
+        ///     null if the point is on the line (not strict). Always returns a positive value.
         /// </summary>
         /// <returns>The distance.</returns>
         /// <param name="line">Line.</param>
@@ -180,8 +185,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines the shortest distance for line1 to go to touch line2. Returns
-        /// null if line1 and line 2 intersect (not strictly)
+        ///     Determines the shortest distance for line1 to go to touch line2. Returns
+        ///     null if line1 and line 2 intersect (not strictly)
         /// </summary>
         /// <returns>The distance.</returns>
         /// <param name="line1">Line1.</param>
@@ -192,8 +197,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines the shortest distance from the line (min, max) to the point. Returns
-        /// null if the point is on the line (not strict). Always returns a positive value.
+        ///     Determines the shortest distance from the line (min, max) to the point. Returns
+        ///     null if the point is on the line (not strict). Always returns a positive value.
         /// </summary>
         /// <returns>The distance.</returns>
         /// <param name="min">Minimum of line.</param>
@@ -211,15 +216,16 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             if (point < min)
                 return min - point;
-            else if (point > max)
+
+            if (point > max)
                 return point - max;
-            else
-                return null;
+
+            return null;
         }
 
         /// <summary>
-        /// Calculates the shortest distance for line1 (min1, max1) to get to line2 (min2, max2).
-        /// Returns null if line1 and line2 intersect (not strictly)
+        ///     Calculates the shortest distance for line1 (min1, max1) to get to line2 (min2, max2).
+        ///     Returns null if line1 and line2 intersect (not strictly)
         /// </summary>
         /// <returns>The distance along the mutual axis or null.</returns>
         /// <param name="min1">Min1.</param>
@@ -245,22 +251,23 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             {
                 if (max1 < min2)
                     return min2 - max1;
-                else
-                    return null;
+
+                return null;
             }
-            else if (min2 < min1)
+
+            if (min2 < min1)
             {
                 if (max2 < min1)
                     return min1 - max2;
-                else
-                    return null;
+
+                return null;
             }
 
             return null;
         }
 
         /// <summary>
-        /// Creates a human-readable representation of this line
+        ///     Creates a human-readable representation of this line
         /// </summary>
         /// <returns>string representation of this vector</returns>
         public override string ToString()

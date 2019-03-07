@@ -1,33 +1,38 @@
+#region
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
+#endregion
+
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
     /// <summary>
-    /// A class containing utilities that help creating shapes.
+    ///     A class containing utilities that help creating shapes.
     /// </summary>
     public class ShapeUtils
     {
         /// <summary>
-        /// A dictionary containing the circle shapes.
+        ///     A dictionary containing the circle shapes.
         /// </summary>
-        private static Dictionary<Tuple<float, float, float, float>, Polygon2> circleCache = new Dictionary<Tuple<float, float, float, float>, Polygon2>();
+        private static readonly Dictionary<Tuple<float, float, float, float>, Polygon2> circleCache = new Dictionary<Tuple<float, float, float, float>, Polygon2>();
 
         /// <summary>
-        /// A dictionary containing the rectangle shapes.
+        ///     A dictionary containing the rectangle shapes.
         /// </summary>
-        private static Dictionary<Tuple<float, float, float, float>, Polygon2> rectangleCache = new Dictionary<Tuple<float, float, float, float>, Polygon2>();
+        private static readonly Dictionary<Tuple<float, float, float, float>, Polygon2> rectangleCache = new Dictionary<Tuple<float, float, float, float>, Polygon2>();
 
         /// <summary>
-        /// A dictionary containing the convex polygon shapes.
+        ///     A dictionary containing the convex polygon shapes.
         /// </summary>
-        private static Dictionary<int, Polygon2> convexPolygonCache = new Dictionary<int, Polygon2>();
+        private static readonly Dictionary<int, Polygon2> convexPolygonCache = new Dictionary<int, Polygon2>();
 
         /// <summary>
-        /// Fetches the convex polygon (the smallest possible polygon containing all the non-transparent pixels) of the given texture.
+        ///     Fetches the convex polygon (the smallest possible polygon containing all the non-transparent pixels) of the given
+        ///     texture.
         /// </summary>
         /// <param name="texture">The texture.</param>
         public static Polygon2 CreateConvexPolygon(Texture2D texture)
@@ -43,9 +48,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var points = new List<Vector2>();
 
             for (var i = 0; i < texture.Width; i++)
-                for (var j = 0; j < texture.Height; j++)
-                    if (uints[j * texture.Width + i] != 0)
-                        points.Add(new Vector2(i, j));
+            for (var j = 0; j < texture.Height; j++)
+                if (uints[j * texture.Width + i] != 0)
+                    points.Add(new Vector2(i, j));
 
             if (points.Count <= 2)
                 throw new Exception("Can not create a convex hull from a line.");
@@ -57,10 +62,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             points.Sort(
                 (a, b) =>
-                a.X == b.X ?
-                     a.Y.CompareTo(b.Y)
-                : (a.X > b.X ? 1 : -1)
-             );
+                    a.X == b.X ? a.Y.CompareTo(b.Y)
+                    : a.X > b.X ? 1 : -1
+            );
 
             for (var i = 0; i < n; ++i)
             {
@@ -79,8 +83,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             points = h.Take(k - 1).ToList();
             return convexPolygonCache[key] = new Polygon2(points.ToArray());
         }
+
         /// <summary>
-        /// Returns the cross product of the given three vectors.
+        ///     Returns the cross product of the given three vectors.
         /// </summary>
         /// <param name="v1">Vector 1.</param>
         /// <param name="v2">Vector 2.</param>
@@ -92,7 +97,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Fetches a rectangle shape with the given width, height, x and y center.
+        ///     Fetches a rectangle shape with the given width, height, x and y center.
         /// </summary>
         /// <param name="width">The width of the rectangle.</param>
         /// <param name="height">The height of the rectangle.</param>
@@ -106,16 +111,17 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             if (rectangleCache.ContainsKey(key))
                 return rectangleCache[key];
 
-            return rectangleCache[key] = new Polygon2(new[] {
-                 new Vector2(x, y),
-                 new Vector2(x + width, y),
-                 new Vector2(x + width, y + height),
-                 new Vector2(x, y + height)
+            return rectangleCache[key] = new Polygon2(new[]
+            {
+                new Vector2(x, y),
+                new Vector2(x + width, y),
+                new Vector2(x + width, y + height),
+                new Vector2(x, y + height)
             });
         }
 
         /// <summary>
-        /// Fetches a circle shape with the given radius, center, and segments.
+        ///     Fetches a circle shape with the given radius, center, and segments.
         /// </summary>
         /// <param name="radius">The radius of the circle.</param>
         /// <param name="x">The X center of the circle.</param>
@@ -130,7 +136,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 return circleCache[key];
 
             var center = new Vector2(radius + x, radius + y);
-            var increment = (Math.PI * 2.0) / segments;
+            var increment = Math.PI * 2.0 / segments;
             var theta = 0.0;
             var verts = new List<Vector2>(segments);
 

@@ -1,24 +1,28 @@
-﻿using System;
+﻿#region
+
+using System;
 using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
     /// <summary>
-    /// Contains utility functions for doing math in two-dimensions that
-    /// don't fit elsewhere. Also contains any necessary constants.
+    ///     Contains utility functions for doing math in two-dimensions that
+    ///     don't fit elsewhere. Also contains any necessary constants.
     /// </summary>
-    public class Math2
+    public static class Math2
     {
         /// <summary>
-        /// Default epsilon
+        ///     Default epsilon
         /// </summary>
         public const float DefaultEpsilon = 0.001f;
 
         /// <summary>
-        /// Determines if v1, v2, and v3 are collinear
+        ///     Determines if v1, v2, and v3 are collinear
         /// </summary>
         /// <remarks>
-        /// Calculates if the area of the triangle of v1, v2, v3 is less than or equal to epsilon.
+        ///     Calculates if the area of the triangle of v1, v2, v3 is less than or equal to epsilon.
         /// </remarks>
         /// <param name="v1">Vector 1</param>
         /// <param name="v2">Vector 2</param>
@@ -31,7 +35,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Calculates the square of the area of the triangle made up of the specified points.
+        ///     Calculates the square of the area of the triangle made up of the specified points.
         /// </summary>
         /// <param name="v1">First point</param>
         /// <param name="v2">Second point</param>
@@ -43,7 +47,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Finds a vector that is perpendicular to the specified vector.
+        ///     Finds a vector that is perpendicular to the specified vector.
         /// </summary>
         /// <returns>A vector perpendicular to v</returns>
         /// <param name="v">Vector</param>
@@ -53,7 +57,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Finds the dot product of (x1, y1) and (x2, y2)
+        ///     Finds the dot product of (x1, y1) and (x2, y2)
         /// </summary>
         /// <returns>The dot.</returns>
         /// <param name="x1">The first x value.</param>
@@ -66,7 +70,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if f1 and f2 are approximately the same.
+        ///     Determines if f1 and f2 are approximately the same.
         /// </summary>
         /// <returns>The approximately.</returns>
         /// <param name="f1">F1.</param>
@@ -78,8 +82,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if vectors v1 and v2 are approximately equal, such that
-        /// both coordinates are within epsilon.
+        ///     Determines if vectors v1 and v2 are approximately equal, such that
+        ///     both coordinates are within epsilon.
         /// </summary>
         /// <returns>If v1 and v2 are approximately equal.</returns>
         /// <param name="v1">V1.</param>
@@ -91,8 +95,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Rotates the specified vector about the specified vector a rotation of the
-        /// specified amount.
+        ///     Rotates the specified vector about the specified vector a rotation of the
+        ///     specified amount.
         /// </summary>
         /// <param name="vec">The vector to rotate</param>
         /// <param name="about">The point to rotate vec around</param>
@@ -104,11 +108,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 return vec;
             var tmp = vec - about;
             return new Vector2(tmp.X * rotation.CosTheta - tmp.Y * rotation.SinTheta + about.X,
-                               tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta + about.Y);
+                tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta + about.Y);
         }
 
         /// <summary>
-        /// Returns either the vector or -vector such that MakeStandardNormal(vec) == MakeStandardNormal(-vec)
+        ///     Returns either the vector or -vector such that MakeStandardNormal(vec) == MakeStandardNormal(-vec)
         /// </summary>
         /// <param name="vec">The vector</param>
         /// <returns>Normal such that vec.X is positive (unless vec.X is 0, in which such that vec.Y is positive)</returns>

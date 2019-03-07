@@ -1,89 +1,94 @@
-﻿using System;
+﻿#region
+
+using System;
 using Microsoft.Xna.Framework;
+
+#endregion
 
 namespace CollisionFloatTestNewMono.Engine.Math2
 {
     /// <summary>
-    /// Describes a line. Does not have position and is meant to be reused.
+    ///     Describes a line. Does not have position and is meant to be reused.
     /// </summary>
     public class Line2
     {
         /// <summary>
-        /// Where the line begins
+        ///     Where the line begins
         /// </summary>
         public readonly Vector2 Start;
 
         /// <summary>
-        /// Where the line ends
+        ///     Where the line ends
         /// </summary>
         public readonly Vector2 End;
 
         /// <summary>
-        /// End - Start
+        ///     End - Start
         /// </summary>
         public readonly Vector2 Delta;
 
         /// <summary>
-        /// Normalized Delta
+        ///     Normalized Delta
         /// </summary>
         public readonly Vector2 Axis;
 
         /// <summary>
-        /// The normalized normal of axis.
+        ///     The normalized normal of axis.
         /// </summary>
         public readonly Vector2 Normal;
 
         /// <summary>
-        /// Square of the magnitude of this line
+        ///     Square of the magnitude of this line
         /// </summary>
         public readonly float MagnitudeSquared;
 
         /// <summary>
-        /// Magnitude of this line
+        ///     Magnitude of this line
         /// </summary>
         public readonly float Magnitude;
 
         /// <summary>
-        /// Min x
+        ///     Min x
         /// </summary>
         public readonly float MinX;
+
         /// <summary>
-        /// Min y
+        ///     Min y
         /// </summary>
         public readonly float MinY;
 
         /// <summary>
-        /// Max x
+        ///     Max x
         /// </summary>
         public readonly float MaxX;
 
         /// <summary>
-        /// Max y
+        ///     Max y
         /// </summary>
         public readonly float MaxY;
 
         /// <summary>
-        /// Slope of this line
+        ///     Slope of this line
         /// </summary>
         public readonly float Slope;
 
         /// <summary>
-        /// Where this line would hit the y intercept. NaN if vertical line.
+        ///     Where this line would hit the y intercept. NaN if vertical line.
         /// </summary>
         public readonly float YIntercept;
 
         /// <summary>
-        /// If this line is horizontal
+        ///     If this line is horizontal
         /// </summary>
         public readonly bool Horizontal;
 
         /// <summary>
-        /// If this line is vertical
+        ///     If this line is vertical
         /// </summary>
         public readonly bool Vertical;
 
         /// <summary>
-        /// Creates a line from start to end
+        ///     Creates a line from start to end
         /// </summary>
         /// <param name="start">Start</param>
         /// <param name="end">End</param>
@@ -112,12 +117,18 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             this.Vertical = float.IsInfinity(k);
 
             if (this.Vertical)
+            {
                 this.Slope = float.PositiveInfinity;
+            }
             else
+            {
                 this.Slope = (this.End.Y - this.Start.Y) / (this.End.X - this.Start.X);
+            }
 
             if (this.Vertical)
+            {
                 this.YIntercept = float.NaN;
+            }
             else
             {
                 // y = mx + b
@@ -128,8 +139,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         }
 
         /// <summary>
-        /// Determines if line1 intersects line2, when line1 is offset by pos1 and line2 
-        /// is offset by pos2.
+        ///     Determines if line1 intersects line2, when line1 is offset by pos1 and line2
+        ///     is offset by pos2.
         /// </summary>
         /// <param name="line1">Line 1</param>
         /// <param name="line2">Line 2</param>
@@ -143,11 +154,13 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             {
                 return AxisAlignedLine2.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.MinX + pos2.X, line2.MaxX + pos2.X, strict, false);
             }
-            else if (line1.Vertical && line2.Vertical)
+
+            if (line1.Vertical && line2.Vertical)
             {
                 return AxisAlignedLine2.Intersects(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line2.MinY + pos2.Y, line2.MaxY + pos2.Y, strict, false);
             }
-            else if (line1.Horizontal || line2.Horizontal)
+
+            if (line1.Horizontal || line2.Horizontal)
             {
                 if (line2.Horizontal)
                 {
@@ -163,31 +176,30 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 if (line2.Vertical)
                 {
                     return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.Start.X + pos2.X, strict, false)
-                        && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line1.Start.Y + pos1.Y, strict, false);
+                           && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line1.Start.Y + pos1.Y, strict, false);
                 }
-                else
-                {
-                    // recalculate line2 y intercept
-                    // y = mx + b
-                    // b = y - mx
-                    var line2YIntInner = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
-                    // check line2.x at line1.y
-                    // line2.y = line2.slope * line2.x + line2.yintercept
-                    // line1.y = line2.slope * line2.x + line2.yintercept
-                    // line1.y - line2.yintercept = line2.slope * line2.x
-                    // (line1.y - line2.yintercept) / line2.slope = line2.x
-                    var line2XAtLine1Y = (line1.Start.Y + pos1.Y - line2YIntInner) / line2.Slope;
-                    return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2XAtLine1Y, strict, false)
-                        && AxisAlignedLine2.Contains(line2.MinX + pos2.X, line2.MaxX + pos2.X, line2XAtLine1Y, strict, false);
-                }
+
+                // recalculate line2 y intercept
+                // y = mx + b
+                // b = y - mx
+                var line2YIntInner = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
+                // check line2.x at line1.y
+                // line2.y = line2.slope * line2.x + line2.yintercept
+                // line1.y = line2.slope * line2.x + line2.yintercept
+                // line1.y - line2.yintercept = line2.slope * line2.x
+                // (line1.y - line2.yintercept) / line2.slope = line2.x
+                var line2XAtLine1Y = (line1.Start.Y + pos1.Y - line2YIntInner) / line2.Slope;
+                return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2XAtLine1Y, strict, false)
+                       && AxisAlignedLine2.Contains(line2.MinX + pos2.X, line2.MaxX + pos2.X, line2XAtLine1Y, strict, false);
             }
-            else if (line1.Vertical)
+
+            if (line1.Vertical)
             {
                 // vertical line with regular line
                 var line2YIntInner = line2.Start.Y + pos2.Y - line2.Slope * (line2.Start.X + pos2.X);
                 var line2YAtLine1X = line2.Slope * (line1.Start.X + pos1.X) + line2YIntInner;
                 return AxisAlignedLine2.Contains(line1.MinY + pos1.Y, line1.MaxY + pos1.Y, line2YAtLine1X, strict, false)
-                    && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line2YAtLine1X, strict, false);
+                       && AxisAlignedLine2.Contains(line2.MinY + pos2.Y, line2.MaxY + pos2.Y, line2YAtLine1X, strict, false);
             }
 
             // two non-vertical, non-horizontal lines
@@ -203,24 +215,21 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 // parallel lines with equal y intercept. Intersect if ever at same X coordinate.
                 return AxisAlignedLine2.Intersects(line1.MinX + pos1.X, line1.MaxX + pos1.X, line2.MinX + pos2.X, line2.MaxX + pos2.X, strict, false);
             }
-            else
-            {
-                // two non-parallel lines. Only one possible intersection point
+            // two non-parallel lines. Only one possible intersection point
 
-                // y1 = y2
-                // line1.Slope * x + line1.YIntercept = line2.Slope * x + line2.YIntercept
-                // line1.Slope * x - line2.Slope * x = line2.YIntercept - line1.YIntercept
-                // x (line1.Slope - line2.Slope) = line2.YIntercept - line1.YIntercept
-                // x = (line2.YIntercept - line1.YIntercept) / (line1.Slope - line2.Slope)
-                var x = (line2YInt - line1YInt) / (line1.Slope - line2.Slope);
+            // y1 = y2
+            // line1.Slope * x + line1.YIntercept = line2.Slope * x + line2.YIntercept
+            // line1.Slope * x - line2.Slope * x = line2.YIntercept - line1.YIntercept
+            // x (line1.Slope - line2.Slope) = line2.YIntercept - line1.YIntercept
+            // x = (line2.YIntercept - line1.YIntercept) / (line1.Slope - line2.Slope)
+            var x = (line2YInt - line1YInt) / (line1.Slope - line2.Slope);
 
-                return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, x, strict, false)
-                    && AxisAlignedLine2.Contains(line2.MinX + pos1.X, line2.MaxX + pos2.X, x, strict, false);
-            }
+            return AxisAlignedLine2.Contains(line1.MinX + pos1.X, line1.MaxX + pos1.X, x, strict, false)
+                   && AxisAlignedLine2.Contains(line2.MinX + pos1.X, line2.MaxX + pos2.X, x, strict, false);
         }
 
         /// <summary>
-        /// Create a human-readable representation of this line
+        ///     Create a human-readable representation of this line
         /// </summary>
         /// <returns>human-readable string</returns>
         public override string ToString()
