@@ -396,10 +396,7 @@ namespace CollisionFloatTestNewMono.Engine
                 circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
                 rota);
 
-            if (intercectsMtv != null)
-                return intercectsMtv.Item1 * intercectsMtv.Item2;
-
-            return Vector2.Zero;
+            return intercectsMtv;
         }
 
 
@@ -419,10 +416,7 @@ namespace CollisionFloatTestNewMono.Engine
                 polyA.Position + polyA.Velocity,
                 rota);
 
-            if (intercectsMtv != null)
-                return intercectsMtv.Item1 * intercectsMtv.Item2;
-
-            return Vector2.Zero;
+            return intercectsMtv;
         }
 
 
@@ -453,10 +447,7 @@ namespace CollisionFloatTestNewMono.Engine
                 circleA.Position - new Vector2(circleA.Radius) + circleA.Velocity,
                 circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity);
 
-            if (intercectsMtv != null)
-                return intercectsMtv.Item1 * intercectsMtv.Item2;
-
-            return Vector2.Zero;
+            return intercectsMtv;
         }
 
 
@@ -477,10 +468,7 @@ namespace CollisionFloatTestNewMono.Engine
                 new Math2.Rotation(polyA.Rotation),
                 new Math2.Rotation(polyB.Rotation));
 
-            if (intercectsMtv != null)
-                return intercectsMtv.Item1 * intercectsMtv.Item2;
-
-            return Vector2.Zero;
+            return intercectsMtv;
         }
 
 

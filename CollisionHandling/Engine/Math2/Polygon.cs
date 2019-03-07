@@ -157,7 +157,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     foundDefinitiveResult = true;
                     break;
                 }
-                
+
                 angLast = angCurr;
             }
 
@@ -232,7 +232,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="rot1">Rotation of the first polyogn</param>
         /// <param name="rot2">Rotation of the second polygon</param>
         /// <returns>MTV to move poly1 to prevent intersection with poly2</returns>
-        public static Tuple<Vector2, float> IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
+        public static Vector2 IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
         {
             var bestAxis = Vector2.Zero;
             var bestMagn = float.MaxValue;
@@ -242,7 +242,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 var axis = MathHelper.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
                 var mtv = IntersectMtvAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
                 if (!mtv.HasValue)
-                    return null;
+                    return Vector2.Zero;
+
                 if (Math.Abs(mtv.Value) < Math.Abs(bestMagn))
                 {
                     bestAxis = axis;
@@ -250,7 +251,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 }
             }
 
-            return Tuple.Create(bestAxis, bestMagn);
+            return bestAxis * bestMagn;
         }
 
         /// <summary>
@@ -319,7 +320,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos">Origin of the polygon</param>
         /// <param name="rot">Rotation of the polygon</param>
         /// <param name="pt">Point to check.</param>
-        public static Tuple<Vector2, float> MinDistance(Polygon poly, Vector2 pos, Rotation rot, Vector2 pt)
+        public static Vector2 MinDistance(Polygon poly, Vector2 pos, Rotation rot, Vector2 pt)
         {
             /*
              * Definitions
@@ -348,7 +349,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             {
                 var curr = MathHelper.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
                 var axis = curr - last;
-               
+
                 var norm = poly.Clockwise ? new Vector2(-axis.Y, axis.X) : new Vector2(axis.Y, -axis.X);
                 norm = Vector2.Normalize(norm);
                 axis = Vector2.Normalize(axis);
@@ -364,7 +365,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     if (ptProjOnAxis < stProjOnAxis)
                     {
                         var res = pt - last;
-                        return Tuple.Create(Vector2.Normalize(res), res.Length());
+                        return Vector2.Normalize(res) * res.Length();
                     }
 
                     var enProjOnAxis = Vector2.Dot(axis, curr);
@@ -372,23 +373,22 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     if (ptProjOnAxis > enProjOnAxis)
                     {
                         var res = pt - curr;
-                        return Tuple.Create(Vector2.Normalize(res), res.Length());
+                        return Vector2.Normalize(res) * res.Length();
                     }
 
 
                     var distOnNorm = ptProjOnNorm - lineProjOnNorm;
-                    return Tuple.Create(norm, distOnNorm);
+                    return norm * distOnNorm;
                 }
 
                 last = curr;
             }
 
-            return null;
+            return Vector2.Zero;
         }
 
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="poly1"></param>
         /// <param name="poly2"></param>
@@ -419,7 +419,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos2">Origin of second polygon</param>
         /// <param name="rot1">Rotation of first polygon</param>
         /// <param name="rot2">Rotation of second polygon</param>
-        public static Tuple<Vector2, float> MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
+        public static Vector2 MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
         {
             if (rot1.Theta != 0 || rot2.Theta != 0)
             {
@@ -447,9 +447,9 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             }
 
             if (!bestAxis.HasValue)
-                return null; // they intersect
+                return Vector2.Zero; // they intersect
 
-            return Tuple.Create(bestAxis.Value, bestDist);
+            return bestAxis.Value * bestDist;
         }
 
         /// <summary>
@@ -500,7 +500,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">Origin of first polygon</param>
         /// <param name="pos2">Origin of second polygon</param>
         /// <returns>If poly1 at pos1 not rotated intersects poly2 at pos2 not rotated</returns>
-        public static Tuple<Vector2, float> IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMtv(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero);
         }
@@ -514,7 +514,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos">Position of the polygon</param>
         /// <param name="pt">Point to check</param>
         /// <returns>axis to go in, distance to go if pos is not in poly, otherwise null</returns>
-        public static Tuple<Vector2, float> MinDistance(Polygon poly, Vector2 pos, Vector2 pt)
+        public static Vector2 MinDistance(Polygon poly, Vector2 pos, Vector2 pt)
         {
             return MinDistance(poly, pos, Rotation.Zero, pt);
         }
@@ -528,7 +528,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">Position of first polygon</param>
         /// <param name="pos2">Position of second polygon</param>
         /// <returns>axis to go in, distance to go if poly1 does not intersect poly2, otherwise null</returns>
-        public static Tuple<Vector2, float> MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
+        public static Vector2 MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
         {
             return MinDistance(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero);
         }

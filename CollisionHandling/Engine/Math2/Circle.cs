@@ -146,7 +146,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1">Top-left of the first circles bounding box</param>
         /// <param name="pos2">Top-left of the second circles bounding box</param>
         /// <returns></returns>
-        public static Tuple<Vector2, float> IntersectMtv(Circle circle1, Circle circle, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(Circle circle1, Circle circle, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMtv(circle1.Radius, circle.Radius, pos1, pos2);
         }
@@ -161,7 +161,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="pos1"></param>
         /// <param name="pos2"></param>
         /// <returns>The direction and magnitude to move pos1 to prevent intersection</returns>
-        public static Tuple<Vector2, float> IntersectMtv(float radius1, float radius2, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(float radius1, float radius2, Vector2 pos1, Vector2 pos2)
         {
             var betweenVec = pos1 - pos2;
             betweenVec.X += radius1 - radius2;
@@ -173,10 +173,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 var len = Math.Sqrt(lengthSq);
                 betweenVec *= (float)(1 / len);
 
-                return Tuple.Create(betweenVec, radius1 + radius2 - (float)len);
+                return betweenVec * (radius1 + radius2 - (float)len);
             }
 
-            return null;
+            return Vector2.Zero;
         }
 
         /// <summary>
