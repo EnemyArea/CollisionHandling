@@ -9,3 +9,11 @@ If some one needs a simple 2d camera, you will find one here too :D
 
 I opened a thread here, if someone has a good solustion for the bugs or the missing implementations.
 http://community.monogame.net/t/collision-handling-improvements/11352
+
+The devel (and the next master) based on the great SharpMath2-Library from Timothy Moore
+https://github.com/Tjstretchalot/SharpMath2
+
+And some code (PrimitiveBatch) is based on the VelcroPhysics-Engine from 
+https://github.com/VelcroPhysics/VelcroPhysics/
+
+This whole project is under MIT-License, please see the license-file for more informations.
