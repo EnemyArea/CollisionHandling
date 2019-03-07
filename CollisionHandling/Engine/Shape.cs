@@ -31,20 +31,10 @@ namespace CollisionFloatTestNewMono.Engine
         public Vector2 Position { get; private set; }
 
         /// <summary>
+        /// In radians
         /// </summary>
         public float Rotation { get; private set; }
-
-
-        /// <summary>
-        /// </summary>
-        protected Transform transform = new Transform();
-
-        /// <summary>
-        /// </summary>
-        public Transform Transform
-        {
-            get { return this.transform; }
-        }
+        
 
 
         /// <summary>
@@ -60,17 +50,8 @@ namespace CollisionFloatTestNewMono.Engine
             this.Color = Color.Gray;
             this.Position = position;
             this.Rotation = rotation;
-            this.UpdateTransform();
         }
-
-
-        /// <summary>
-        /// </summary>
-        protected virtual void UpdateTransform()
-        {
-            this.transform.Set(this.Position + this.Velocity, this.Rotation);
-        }
-
+        
 
         /// <summary>
         /// </summary>
@@ -78,7 +59,6 @@ namespace CollisionFloatTestNewMono.Engine
         public virtual void SetPosition(Vector2 position)
         {
             this.Position = position;
-            this.UpdateTransform();
         }
 
 
@@ -88,17 +68,15 @@ namespace CollisionFloatTestNewMono.Engine
         public virtual void MoveByVelocity(Vector2 velocity)
         {
             this.Position += velocity;
-            this.UpdateTransform();
         }
 
 
         /// <summary>
         /// </summary>
-        /// <param name="rotation"></param>
-        public virtual void SetRotation(float rotation)
+        /// <param name="radians"></param>
+        public virtual void SetRotation(float radians)
         {
-            this.Rotation = rotation;
-            this.UpdateTransform();
+            this.Rotation = radians;
         }
 
 
@@ -107,7 +85,6 @@ namespace CollisionFloatTestNewMono.Engine
         public void ResetVelocity()
         {
             this.Velocity = Vector2.Zero;
-            this.UpdateTransform();
         }
 
 
@@ -117,7 +94,6 @@ namespace CollisionFloatTestNewMono.Engine
         public virtual void ApplyVelocity(Vector2 velocity)
         {
             this.Velocity += velocity;
-            this.UpdateTransform();
         }
     }
 }

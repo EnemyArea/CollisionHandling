@@ -13,124 +13,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
     ///     Contains utility functions for doing math in two-dimensions that
     ///     don't fit elsewhere. Also contains any necessary constants.
     /// </summary>
-    public static class MathHelper
+    public static class CollisionHelper
     {
-        /// <summary>
-        ///     Default epsilon
-        /// </summary>
-        public const float DefaultEpsilon = 0.001f;
-
-        /// <summary>
-        ///     Determines if v1, v2, and v3 are collinear
-        /// </summary>
-        /// <remarks>
-        ///     Calculates if the area of the triangle of v1, v2, v3 is less than or equal to epsilon.
-        /// </remarks>
-        /// <param name="v1">Vector 1</param>
-        /// <param name="v2">Vector 2</param>
-        /// <param name="v3">Vector 3</param>
-        /// <param name="epsilon">How close is close enough</param>
-        /// <returns>If v1, v2, v3 is collinear</returns>
-        public static bool IsOnLine(Vector2 v1, Vector2 v2, Vector2 v3, float epsilon = DefaultEpsilon)
-        {
-            return AreaOfTriangle(v1, v2, v3) <= epsilon;
-        }
-
-        /// <summary>
-        ///     Calculates the square of the area of the triangle made up of the specified points.
-        /// </summary>
-        /// <param name="v1">First point</param>
-        /// <param name="v2">Second point</param>
-        /// <param name="v3">Third point</param>
-        /// <returns>Area of the triangle made up of the given 3 points</returns>
-        public static float AreaOfTriangle(Vector2 v1, Vector2 v2, Vector2 v3)
-        {
-            return 0.5f * ((v2.X - v1.X) * (v3.Y - v1.Y) - (v3.X - v1.X) * (v2.Y - v1.Y));
-        }
-
-        /// <summary>
-        ///     Finds a vector that is perpendicular to the specified vector.
-        /// </summary>
-        /// <returns>A vector perpendicular to v</returns>
-        /// <param name="v">Vector</param>
-        public static Vector2 Perpendicular(Vector2 v)
-        {
-            return new Vector2(-v.Y, v.X);
-        }
-
-        /// <summary>
-        ///     Finds the dot product of (x1, y1) and (x2, y2)
-        /// </summary>
-        /// <returns>The dot.</returns>
-        /// <param name="x1">The first x value.</param>
-        /// <param name="y1">The first y value.</param>
-        /// <param name="x2">The second x value.</param>
-        /// <param name="y2">The second y value.</param>
-        public static float Dot(float x1, float y1, float x2, float y2)
-        {
-            return x1 * x2 + y1 * y2;
-        }
-
-        /// <summary>
-        ///     Determines if f1 and f2 are approximately the same.
-        /// </summary>
-        /// <returns>The approximately.</returns>
-        /// <param name="f1">F1.</param>
-        /// <param name="f2">F2.</param>
-        /// <param name="epsilon">Epsilon.</param>
-        public static bool Approximately(float f1, float f2, float epsilon = DefaultEpsilon)
-        {
-            return Math.Abs(f1 - f2) <= epsilon;
-        }
-
-        /// <summary>
-        ///     Determines if vectors v1 and v2 are approximately equal, such that
-        ///     both coordinates are within epsilon.
-        /// </summary>
-        /// <returns>If v1 and v2 are approximately equal.</returns>
-        /// <param name="v1">V1.</param>
-        /// <param name="v2">V2.</param>
-        /// <param name="epsilon">Epsilon.</param>
-        public static bool Approximately(Vector2 v1, Vector2 v2, float epsilon = DefaultEpsilon)
-        {
-            return Approximately(v1.X, v2.X, epsilon) && Approximately(v1.Y, v2.Y, epsilon);
-        }
-
-        /// <summary>
-        ///     Rotates the specified vector about the specified vector a rotation of the
-        ///     specified amount.
-        /// </summary>
-        /// <param name="vec">The vector to rotate</param>
-        /// <param name="about">The point to rotate vec around</param>
-        /// <param name="rotation">The rotation</param>
-        /// <returns>The vector vec rotated about about rotation.Theta radians.</returns>
-        public static Vector2 Rotate(Vector2 vec, Vector2 about, Rotation rotation)
-        {
-            if (rotation.Theta == 0)
-                return vec;
-
-            var tmp = vec - about;
-            return new Vector2(tmp.X * rotation.CosTheta - tmp.Y * rotation.SinTheta + about.X,
-                tmp.X * rotation.SinTheta + tmp.Y * rotation.CosTheta + about.Y);
-        }
-
-        /// <summary>
-        ///     Returns either the vector or -vector such that MakeStandardNormal(vec) == MakeStandardNormal(-vec)
-        /// </summary>
-        /// <param name="vec">The vector</param>
-        /// <returns>Normal such that vec.X is positive (unless vec.X is 0, in which such that vec.Y is positive)</returns>
-        public static Vector2 MakeStandardNormal(Vector2 vec)
-        {
-            if (vec.X < 0)
-                return -vec;
-
-            if (vec.X == 0 && vec.Y < 0)
-                return -vec;
-
-            return vec;
-        }
-
-
         #region AxisAlignedLine
 
         /// <summary>
@@ -605,7 +489,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             var line1YInt = line1.Start.Y + pos1.Y - line1.Slope * (line1.Start.X + pos1.X);
             var line2YInt = line.Start.Y + pos2.Y - line.Slope * (line.Start.X + pos2.X);
 
-            if (Math.Abs(line1.Slope - line.Slope) <= DefaultEpsilon)
+            if (Math.Abs(line1.Slope - line.Slope) <= MathUtils.DefaultEpsilon)
             {
                 // parallel lines
                 if (line1YInt != line2YInt)
@@ -651,17 +535,17 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             float myArea = 0;
 
             var center = poly.Center + pos;
-            var last = Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
+            var last = MathUtils.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
             for (var i = 0; i < poly.Vertices.Length; i++)
             {
-                var curr = Rotate(poly.Vertices[i], poly.Center, rot) + pos;
+                var curr = MathUtils.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
 
-                myArea += AreaOfTriangle(center, last, curr);
+                myArea += MathUtils.AreaOfTriangle(center, last, curr);
 
                 last = curr;
             }
 
-            return Approximately(myArea, poly.Area, poly.Area / 1000);
+            return MathUtils.Approximately(myArea, poly.Area, poly.Area / 1000);
         }
 
         /// <summary>
@@ -680,7 +564,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         {
             foreach (var norm in poly1.Normals.Select(v => Tuple.Create(v, rot1)).Union(poly2.Normals.Select(v => Tuple.Create(v, rot2))))
             {
-                var axis = Rotate(norm.Item1, Vector2.Zero, norm.Item2);
+                var axis = MathUtils.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
                 if (!IntersectsAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, strict, axis))
                     return false;
             }
@@ -706,7 +590,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             foreach (var norm in poly1.Normals.Select(v => Tuple.Create(v, rot1)).Union(poly2.Normals.Select(v => Tuple.Create(v, rot2))))
             {
-                var axis = Rotate(norm.Item1, Vector2.Zero, norm.Item2);
+                var axis = MathUtils.Rotate(norm.Item1, Vector2.Zero, norm.Item2);
                 var mtv = IntersectMtvAlongAxis(poly1, poly2, pos1, pos2, rot1, rot2, axis);
                 if (!mtv.HasValue)
                     return Vector2.Zero;
@@ -811,10 +695,10 @@ namespace CollisionFloatTestNewMono.Engine.Math2
              * If this is not true for ANY of the lines, the polygon does not contain the point.
              */
 
-            var last = Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
+            var last = MathUtils.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
             for (var i = 0; i < poly.Vertices.Length; i++)
             {
-                var curr = Rotate(poly.Vertices[i], poly.Center, rot) + pos;
+                var curr = MathUtils.Rotate(poly.Vertices[i], poly.Center, rot) + pos;
                 var axis = curr - last;
 
                 var norm = poly.Clockwise ? new Vector2(-axis.Y, axis.X) : new Vector2(axis.Y, -axis.X);
@@ -868,7 +752,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                 {
                     var roughAxis = vert2 + pos2 - (vert + pos1);
                     roughAxis.Normalize();
-                    yield return MakeStandardNormal(roughAxis);
+                    yield return MathUtils.MakeStandardNormal(roughAxis);
                 }
             }
         }
@@ -930,7 +814,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             var rotatedVerts = new Vector2[original.Vertices.Length];
             for (var i = 0; i < original.Vertices.Length; i++)
-                rotatedVerts[i] = Rotate(original.Vertices[i], original.Center, rot);
+                rotatedVerts[i] = MathUtils.Rotate(original.Vertices[i], original.Center, rot);
 
             return new Polygon(rotatedVerts);
         }
@@ -1017,7 +901,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             bool checkedX = false, checkedY = false;
             for (var i = 0; i < poly.Normals.Count; i++)
             {
-                var norm = Rotate(poly.Normals[i], Vector2.Zero, rot1);
+                var norm = MathUtils.Rotate(poly.Normals[i], Vector2.Zero, rot1);
                 if (!IntersectsAlongAxis(poly, rect, pos1, pos2, rot1, strict, norm))
                     return false;
 
@@ -1056,7 +940,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             for (var i = 0; i < poly.Normals.Count; i++)
             {
-                var norm = Rotate(poly.Normals[i], Vector2.Zero, rot1);
+                var norm = MathUtils.Rotate(poly.Normals[i], Vector2.Zero, rot1);
                 var mtv = IntersectMtvAlongAxis(poly, rect, pos1, pos2, rot1, norm);
                 if (!mtv.HasValue)
                     return Vector2.Zero;
@@ -1277,7 +1161,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             Func<Vector2, bool> checkAxis = axis =>
             {
-                var standard = MakeStandardNormal(axis);
+                var standard = MathUtils.MakeStandardNormal(axis);
                 if (!checkedAxis.Contains(standard))
                 {
                     checkedAxis.Add(standard);
@@ -1299,17 +1183,17 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             };
 
             var circleCenter = new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius);
-            var lastVec = Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot1) + pos1;
+            var lastVec = MathUtils.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot1) + pos1;
             for (var curr = 0; curr < poly.Vertices.Length; curr++)
             {
-                var currVec = Rotate(poly.Vertices[curr], poly.Center, rot1) + pos1;
+                var currVec = MathUtils.Rotate(poly.Vertices[curr], poly.Center, rot1) + pos1;
 
                 // Test along circle center -> vector
                 if (!checkAxis(Vector2.Normalize(currVec - circleCenter)))
                     return Vector2.Zero;
 
                 // Test along line normal
-                if (!checkAxis(Vector2.Normalize(Perpendicular(currVec - lastVec))))
+                if (!checkAxis(Vector2.Normalize(MathUtils.Perpendicular(currVec - lastVec))))
                     return Vector2.Zero;
 
                 lastVec = currVec;
@@ -1404,7 +1288,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             Func<Vector2, bool> checkAxis = axis =>
             {
-                var standard = MakeStandardNormal(axis);
+                var standard = MathUtils.MakeStandardNormal(axis);
                 if (!checkedAxis.Contains(standard))
                 {
                     checkedAxis.Add(standard);
@@ -1451,7 +1335,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     return Vector2.Zero;
 
                 // Test along line normal
-                if (!checkAxis(Vector2.Normalize(Perpendicular(currVec - lastVec))))
+                if (!checkAxis(Vector2.Normalize(MathUtils.Perpendicular(currVec - lastVec))))
                     return Vector2.Zero;
 
                 lastVec = currVec;
@@ -1491,8 +1375,8 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             for (var i = 0; i < points.Length; i++)
             {
-                var polyPt = Rotate(points[i], center, rot);
-                var tmp = Dot(polyPt.X + pos.X, polyPt.Y + pos.Y, axis.X, axis.Y);
+                var polyPt = MathUtils.Rotate(points[i], center, rot);
+                var tmp = MathUtils.Dot(polyPt.X + pos.X, polyPt.Y + pos.Y, axis.X, axis.Y);
 
                 if (i == 0)
                 {
@@ -1523,7 +1407,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         private static bool CircleIntersectsLine(Circle circle, Line line, Vector2 pos1, Vector2 pos2, Rotation rot2, Vector2 about2, bool strict)
         {
             // Make more math friendly
-            var actualLine = new Line(Rotate(line.Start, about2, rot2) + pos2, Rotate(line.End, about2, rot2) + pos2);
+            var actualLine = new Line(MathUtils.Rotate(line.Start, about2, rot2) + pos2, MathUtils.Rotate(line.End, about2, rot2) + pos2);
             var circleCenter = new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius);
 
             // Check weird situations

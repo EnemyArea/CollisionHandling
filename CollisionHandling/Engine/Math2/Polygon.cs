@@ -78,12 +78,12 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             Vector2 tmp;
             for (var i = 1; i < vertices.Length; i++)
             {
-                tmp = MathHelper.MakeStandardNormal(Vector2.Normalize(MathHelper.Perpendicular(vertices[i] - vertices[i - 1])));
+                tmp = MathUtils.MakeStandardNormal(Vector2.Normalize(MathUtils.Perpendicular(vertices[i] - vertices[i - 1])));
                 if (!this.Normals.Contains(tmp))
                     this.Normals.Add(tmp);
             }
 
-            tmp = MathHelper.MakeStandardNormal(Vector2.Normalize(MathHelper.Perpendicular(vertices[0] - vertices[vertices.Length - 1])));
+            tmp = MathUtils.MakeStandardNormal(Vector2.Normalize(MathUtils.Perpendicular(vertices[0] - vertices[vertices.Length - 1])));
             if (!this.Normals.Contains(tmp))
                 this.Normals.Add(tmp);
 
@@ -126,7 +126,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             {
                 var next = this.Vertices[i];
                 this.Lines[i] = new Line(last, next);
-                area += MathHelper.AreaOfTriangle(last, next, this.Center);
+                area += MathUtils.AreaOfTriangle(last, next, this.Center);
                 last = next;
             }
 
@@ -151,7 +151,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
                     ccwCounter++;
 
                 this.Clockwise = clockwise;
-                if (Math.Abs(angLast - angCurr) > MathHelper.DefaultEpsilon)
+                if (Math.Abs(angLast - angCurr) > MathUtils.DefaultEpsilon)
                 {
                     foundDefinitiveResult = true;
                     break;

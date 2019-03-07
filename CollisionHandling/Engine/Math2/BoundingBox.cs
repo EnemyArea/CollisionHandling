@@ -60,11 +60,11 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <exception cref="ArgumentException">If min and max do not make a box</exception>
         public BoundingBox(Vector2 min, Vector2 max)
         {
-            if (MathHelper.Approximately(min, max))
+            if (MathUtils.Approximately(min, max))
                 throw new ArgumentException($"Min is approximately max: min={min}, max={max} - tha'ts a point, not a box");
-            if (Math.Abs(min.X - max.X) <= MathHelper.DefaultEpsilon)
+            if (Math.Abs(min.X - max.X) <= MathUtils.DefaultEpsilon)
                 throw new ArgumentException($"Min x is approximately max x: min={min}, max={max} - that's a line, not a box");
-            if (Math.Abs(min.Y - max.Y) <= MathHelper.DefaultEpsilon)
+            if (Math.Abs(min.Y - max.Y) <= MathUtils.DefaultEpsilon)
                 throw new ArgumentException($"Min y is approximately max y: min={min}, max={max} - that's a line, not a box");
 
             float tmpX1 = min.X, tmpX2 = max.X;

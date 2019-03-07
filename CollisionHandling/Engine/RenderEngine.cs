@@ -161,22 +161,22 @@ namespace CollisionFloatTestNewMono.Engine
 
             // Polygons
             var sizePolygon = new Vector2(150, 250);
-            var polygonVertices = GameHelper.GetConvexHull(new[]
+            var polygonVertices = MathUtils.GetConvexHull(new[]
             {
-                new Vector2(sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
-                new Vector2(-sizePolygon.X, sizePolygon.Y) * VectorHelper.AngleToVector(45),
+                new Vector2(sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
+                new Vector2(-sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
                 new Vector2(-15, 0),
                 new Vector2(15, 0)
             });
             var polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
             this.shapes.Add(polygon);
 
-            var a1 = ShapeUtils.CreateRectangle(150, 150).Vertices;
-            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), GameHelper.GetConvexHull(a1), 45);
+            var a1 = MathUtils.CreateRectangle(150, 150);
+            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), MathUtils.GetConvexHull(a1), 45);
             this.shapes.Add(polygon2);
 
-            var a2 = ShapeUtils.CreateRectangle(150, 150).Vertices;
-            var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), GameHelper.GetConvexHull(a2));
+            var a2 = MathUtils.CreateRectangle(150, 150);
+            var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), MathUtils.GetConvexHull(a2));
             this.shapes.Add(polygon3);
 
 
@@ -622,7 +622,7 @@ namespace CollisionFloatTestNewMono.Engine
                         break;
                     case PolygonShape polygonShape:
 
-                        this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Transform.Position, polygonShape.Transform.Rotation.GetAngle(), polygonShape.Color);
+                        this.primitiveBatch.DrawPolygon(polygonShape.Vertices, polygonShape.Position, polygonShape.Rotation, polygonShape.Color);
 
                         break;
                 }

@@ -39,7 +39,7 @@ namespace CollisionFloatTestNewMono.Engine
             : base(ShapeType.Polygon, name, position, 0)
         {
             this.Vertices = vertices.ToArray();
-            this.Normals = VectorHelper.CreateNormals(this.Vertices);
+            this.Normals = MathUtils.CreateNormals(this.Vertices);
 
             var vertexCount = this.Vertices.Length;
             for (var i = 0; i < vertexCount; ++i)

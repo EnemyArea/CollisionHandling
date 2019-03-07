@@ -2,12 +2,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
-using MathHelper = CollisionFloatTestNewMono.Engine.Math2.MathHelper;
 
 #endregion
 
@@ -57,8 +55,8 @@ namespace CollisionFloatTestNewMono.Engine
             var reversedMapData = new int[width, height];
 
             for (var y = 0; y < height; y++)
-                for (var x = 0; x < width; x++)
-                    reversedMapData[x, y] = mapCollisionData[y, x];
+            for (var x = 0; x < width; x++)
+                reversedMapData[x, y] = mapCollisionData[y, x];
 
             return reversedMapData;
         }
@@ -390,9 +388,9 @@ namespace CollisionFloatTestNewMono.Engine
         {
             var testPoly = new Polygon(polyA.Vertices);
             var testCircle = new Circle(circleB.Radius);
-            var rota = new Math2.Rotation(polyA.Rotation);
+            var rota = new Rotation(polyA.Rotation);
 
-            var intercectsMtv = Math2.MathHelper.IntersectMtv(testPoly, testCircle,
+            var intercectsMtv = CollisionHelper.IntersectMtv(testPoly, testCircle,
                 polyA.Position + polyA.Velocity,
                 circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
                 rota);
@@ -410,9 +408,9 @@ namespace CollisionFloatTestNewMono.Engine
         {
             var testPoly = new Polygon(polyA.Vertices);
             var testCircle = new Circle(circleB.Radius);
-            var rota = new Math2.Rotation(polyA.Rotation);
+            var rota = new Rotation(polyA.Rotation);
 
-            var intercectsMtv = Math2.MathHelper.IntersectMtv(testCircle, testPoly,
+            var intercectsMtv = CollisionHelper.IntersectMtv(testCircle, testPoly,
                 circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
                 polyA.Position + polyA.Velocity,
                 rota);
@@ -428,23 +426,10 @@ namespace CollisionFloatTestNewMono.Engine
         /// <returns></returns>
         public Vector2 CollidesCircles(CircleShape circleA, CircleShape circleB)
         {
-            //var direction = (circleShape.Position + circleShape.Velocity) - (circleShapeObs.Position + circleShapeObs.Velocity);
-            //var distance = (float)Math.Round(direction.Length());
-            //var sumOfRadii = circleShape.Radius + circleShapeObs.Radius;
-
-            //if (!(sumOfRadii - distance <= 0))
-            //{
-            //    var depth = sumOfRadii - distance;
-            //    direction.Normalize();
-            //    return direction * depth;
-            //}
-
-            //return Vector2.Zero;
-
             var testCircle1 = new Circle(circleA.Radius);
             var testCircle2 = new Circle(circleB.Radius);
 
-            var intercectsMtv = MathHelper.IntersectMtv(testCircle1, testCircle2,
+            var intercectsMtv = CollisionHelper.IntersectMtv(testCircle1, testCircle2,
                 circleA.Position - new Vector2(circleA.Radius) + circleA.Velocity,
                 circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity);
 
@@ -453,7 +438,7 @@ namespace CollisionFloatTestNewMono.Engine
 
 
         /// <summary>
-        ///  Compute the collision manifold between two polygons.
+        ///     Compute the collision manifold between two polygons.
         /// </summary>
         /// <param name="polyA"></param>
         /// <param name="polyB"></param>
@@ -463,11 +448,11 @@ namespace CollisionFloatTestNewMono.Engine
             var testPoly1 = new Polygon(polyA.Vertices);
             var testPoly2 = new Polygon(polyB.Vertices);
 
-            var intercectsMtv = MathHelper.IntersectMtv(testPoly1, testPoly2,
+            var intercectsMtv = CollisionHelper.IntersectMtv(testPoly1, testPoly2,
                 polyA.Position + polyA.Velocity,
                 polyB.Position + polyB.Velocity,
-                new Math2.Rotation(polyA.Rotation),
-                new Math2.Rotation(polyB.Rotation));
+                new Rotation(polyA.Rotation),
+                new Rotation(polyB.Rotation));
 
             return intercectsMtv;
         }

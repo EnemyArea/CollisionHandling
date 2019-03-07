@@ -95,7 +95,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
         /// <param name="end">End</param>
         public Line(Vector2 start, Vector2 end)
         {
-            if (MathHelper.Approximately(start, end))
+            if (MathUtils.Approximately(start, end))
                 throw new ArgumentException($"start is approximately end - that's a point, not a line. start={start}, end={end}");
 
             this.Start = start;
@@ -103,7 +103,7 @@ namespace CollisionFloatTestNewMono.Engine.Math2
 
             this.Delta = this.End - this.Start;
             this.Axis = Vector2.Normalize(this.Delta);
-            this.Normal = Vector2.Normalize(MathHelper.Perpendicular(this.Delta));
+            this.Normal = Vector2.Normalize(MathUtils.Perpendicular(this.Delta));
             this.MagnitudeSquared = this.Delta.LengthSquared();
             this.Magnitude = (float)Math.Sqrt(this.MagnitudeSquared);
 
