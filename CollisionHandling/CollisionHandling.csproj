@@ -45,7 +45,6 @@
     <Compile Include="Engine\Camera2D.cs" />
     <Compile Include="Engine\CircleShape.cs" />
     <Compile Include="Engine\CollisionManager.cs" />
-    <Compile Include="Engine\ContactFeatureType.cs" />
     <Compile Include="Engine\GameHelper.cs" />
     <Compile Include="Engine\Math2\AxisAlignedLine.cs" />
     <Compile Include="Engine\Math2\Circle.cs" />
