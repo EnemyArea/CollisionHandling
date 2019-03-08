@@ -32,7 +32,7 @@ using Microsoft.Xna.Framework;
 
 #endregion
 
-namespace CollisionFloatTestNewMono.Engine
+namespace CollisionFloatTestNewMono.Engine.Collision
 {
     /// <summary>
     /// https://github.com/UnterrainerInformatik/collisiongrid

@@ -3,11 +3,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
+using BoundingBox = CollisionFloatTestNewMono.Engine.Math2.BoundingBox;
 
 #endregion
 
-namespace CollisionFloatTestNewMono.Engine.Math2
+namespace CollisionFloatTestNewMono.Engine.Collision
 {
     /// <summary>
     ///     Contains utility functions for doing math in two-dimensions that

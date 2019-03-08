@@ -1,11 +1,10 @@
 ﻿#region
 
-using System.Linq;
 using Microsoft.Xna.Framework;
 
 #endregion
 
-namespace CollisionFloatTestNewMono.Engine
+namespace CollisionFloatTestNewMono.Engine.Shapes
 {
     public class RectangleShape : PolygonShape
     {

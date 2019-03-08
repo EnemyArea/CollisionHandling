@@ -3,7 +3,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CollisionFloatTestNewMono.Engine.Collision;
 using CollisionFloatTestNewMono.Engine.Math2;
+using CollisionFloatTestNewMono.Engine.Shapes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -107,6 +109,9 @@ namespace CollisionFloatTestNewMono.Engine
             }
         };
 
+        private int rotation;
+        private PolygonShape polygon;
+
 
         /// <summary>
         /// </summary>
@@ -168,7 +173,7 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(-15, 0),
                 new Vector2(15, 0)
             });
-            var polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
+            this.polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
             this.shapes.Add(polygon);
 
             var a1 = MathUtils.CreateRectangle(150, 150);
@@ -434,9 +439,9 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.oldState = newState;
 
-            //// Bewegen....
-            //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
-            //this.rotation = (int)MathHelper.Lerp(0, 360, time);
+            // Bewegen....
+            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
+            this.polygon.SetRotation(MathHelper.ToRadians((int)MathHelper.Lerp(0, 360, time)));
 
             this.playerShape.Color = Color.Fuchsia;
             this.playerShape.ResetVelocity();
@@ -449,6 +454,8 @@ namespace CollisionFloatTestNewMono.Engine
 
             foreach (var shape in this.shapes)
                 shape.Color = Color.Fuchsia;
+
+
 
             // Umliegende Shapes
             var currentWorldPosition = this.playerShape.Position;
@@ -468,7 +475,7 @@ namespace CollisionFloatTestNewMono.Engine
 
                     foreach (var shapeB in allShapesAround)
                     {
-                        if (shapeA == shapeB || (this.playerShape == shapeB))
+                        if (shapeA == shapeB)// || (this.playerShape == shapeB))
                             continue;
 
                         var type1 = shapeA.ShapeType;
@@ -572,6 +579,8 @@ namespace CollisionFloatTestNewMono.Engine
                                 var result = polygonShape.Velocity;
                                 polygonShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
                                 //this.grid.Move(shape, polygonShape.TilePosition);
+
+
                             }
                             break;
                     }

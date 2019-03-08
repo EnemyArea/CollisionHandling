@@ -1,4 +1,4 @@
-﻿namespace CollisionFloatTestNewMono.Engine
+﻿namespace CollisionFloatTestNewMono.Engine.Shapes
 {
     /// <summary>
     /// </summary>

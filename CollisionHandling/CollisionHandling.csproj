@@ -49,7 +49,7 @@
     <Compile Include="Engine\Math2\AxisAlignedLine.cs" />
     <Compile Include="Engine\Math2\Circle.cs" />
     <Compile Include="Engine\Math2\Line.cs" />
-    <Compile Include="Engine\Math2\CollisionHelper.cs" />
+    <Compile Include="Engine\Collision\CollisionHelper.cs" />
     <Compile Include="Engine\Math2\Polygon.cs" />
     <Compile Include="Engine\Math2\BoundingBox.cs" />
     <Compile Include="Engine\Math2\RelativeBoundingBox.cs" />

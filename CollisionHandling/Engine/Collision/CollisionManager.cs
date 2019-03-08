@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using CollisionFloatTestNewMono.Engine.Math2;
+using CollisionFloatTestNewMono.Engine.Shapes;
 using Microsoft.Xna.Framework;
 
 #endregion
 
-namespace CollisionFloatTestNewMono.Engine
+namespace CollisionFloatTestNewMono.Engine.Collision
 {
     /// <summary>
     /// </summary>
