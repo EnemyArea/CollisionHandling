@@ -183,7 +183,7 @@ namespace CollisionFloatTestNewMono.Engine
                               Matrix.CreateTranslation(targetOriginVector) *
                               this.scaleMatrix *
                               Matrix.CreateTranslation(new Vector3(this.Origin, 0f));
-            
+
             // Invertieren
             Matrix.Invert(ref this.viewMatrix, out this.invertedViewMatrix);
 

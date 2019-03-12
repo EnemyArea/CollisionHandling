@@ -31,10 +31,9 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         public Vector2 Position { get; private set; }
 
         /// <summary>
-        /// In radians
+        ///     In radians
         /// </summary>
         public float Rotation { get; private set; }
-        
 
 
         /// <summary>
@@ -51,7 +50,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
             this.Position = position;
             this.Rotation = rotation;
         }
-        
+
 
         /// <summary>
         /// </summary>

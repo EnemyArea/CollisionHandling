@@ -163,6 +163,5 @@ namespace CollisionFloatTestNewMono.Engine.Math2
             if (!foundDefinitiveResult)
                 this.Clockwise = cwCounter > ccwCounter;
         }
-
     }
 }

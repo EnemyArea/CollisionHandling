@@ -61,7 +61,7 @@ namespace CollisionFloatTestNewMono.Engine
         ///     Default epsilon
         /// </summary>
         public const float DefaultEpsilon = 0.001f;
-        
+
 
         /// <summary>
         ///     Determines if v1, v2, and v3 are collinear

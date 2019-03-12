@@ -35,7 +35,7 @@ using Microsoft.Xna.Framework;
 namespace CollisionFloatTestNewMono.Engine.Collision
 {
     /// <summary>
-    /// https://github.com/UnterrainerInformatik/collisiongrid
+    ///     https://github.com/UnterrainerInformatik/collisiongrid
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class CollisionGrid<T>
