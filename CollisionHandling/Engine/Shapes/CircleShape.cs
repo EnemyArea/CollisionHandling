@@ -1,5 +1,6 @@
 ﻿#region
 
+using System;
 using Microsoft.Xna.Framework;
 
 #endregion
@@ -8,7 +9,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
 {
     /// <summary>
     /// </summary>
-    public class CircleShape : Shape
+    public sealed class CircleShape : Shape
     {
         /// <summary>
         /// </summary>
@@ -28,17 +29,20 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
             : base(ShapeType.Circle, name, position, 0)
         {
             this.Radius = radius;
-            this.TilePosition = GameHelper.ConvertPositionToTilePosition(position);
+            this.UpdateBoundingBox();
         }
 
 
         /// <summary>
         /// </summary>
-        /// <param name="position"></param>
-        public override void SetPosition(Vector2 position)
+        protected override void UpdateBoundingBox()
         {
-            base.SetPosition(position);
-            this.TilePosition = GameHelper.ConvertPositionToTilePosition(position);
+            this.TilePosition = GameHelper.ConvertPositionToTilePosition(this.Position);
+            this.BoundingBox = new Rectangle(
+                this.TilePosition.X + (this.Radius / GameHelper.TileSize),
+                this.TilePosition.Y + (this.Radius / GameHelper.TileSize),
+                Math.Max(1, this.Radius / GameHelper.TileSize),
+                Math.Max(1, this.Radius / GameHelper.TileSize));
         }
 
 

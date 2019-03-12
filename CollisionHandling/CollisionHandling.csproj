@@ -41,7 +41,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Engine\Collision\CollisionGrid.cs" />
     <Compile Include="Engine\Camera2D.cs" />
     <Compile Include="Engine\Shapes\CircleShape.cs" />
     <Compile Include="Engine\Collision\CollisionManager.cs" />
@@ -60,6 +59,7 @@
     <Compile Include="Engine\Shapes\RectangleShape.cs" />
     <Compile Include="Engine\Collision\ShapeContactType.cs" />
     <Compile Include="Engine\Shapes\ShapeType.cs" />
+    <Compile Include="Engine\Collision\SpatialGrid.cs" />
     <Compile Include="GameClass.cs" />
     <Compile Include="Engine\Shapes\LineShape.cs" />
     <Compile Include="Program.cs" />

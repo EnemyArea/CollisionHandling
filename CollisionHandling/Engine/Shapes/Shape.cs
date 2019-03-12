@@ -35,6 +35,10 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// </summary>
         public float Rotation { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        public Rectangle BoundingBox { get; protected set; }
+
 
         /// <summary>
         /// </summary>
@@ -57,7 +61,8 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="position"></param>
         public virtual void SetPosition(Vector2 position)
         {
-            this.Position = position;
+            this.Position = position;      
+            this.UpdateBoundingBox();   
         }
 
 
@@ -67,6 +72,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         public virtual void MoveByVelocity(Vector2 velocity)
         {
             this.Position += velocity;
+            this.UpdateBoundingBox();
         }
 
 
@@ -76,6 +82,13 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         public virtual void SetRotation(float radians)
         {
             this.Rotation = radians;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        protected virtual void UpdateBoundingBox()
+        {
         }
 
 

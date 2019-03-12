@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using CollisionFloatTestNewMono.Engine.Collision;
 using CollisionFloatTestNewMono.Engine.Shapes;
 using Microsoft.Xna.Framework;
@@ -40,15 +41,11 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        private readonly int mapWith = 95;
+        private readonly int mapWidth = 95;
 
         /// <summary>
         /// </summary>
         private readonly int mapHeight = 86;
-
-        /// <summary>
-        /// </summary>
-        private CollisionGrid<Shape> grid;
 
         /// <summary>
         /// </summary>
@@ -78,6 +75,9 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         private Matrix view;
 
+        /// <summary>
+        /// </summary>
+        private SpatialGrid spatialGrid;
 
         /// <summary>
         /// </summary>
@@ -107,9 +107,6 @@ namespace CollisionFloatTestNewMono.Engine
             }
         };
 
-        private int rotation;
-        private PolygonShape polygon;
-
 
         /// <summary>
         /// </summary>
@@ -127,7 +124,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.camera = new Camera2D();
             this.camera.UpdateViewport(graphicsDevice.Viewport);
-            this.camera.ChangeMapSize(this.mapWith, this.mapHeight);
+            this.camera.ChangeMapSize(this.mapWidth, this.mapHeight);
             this.camera.SetZoomLevel(1);
             this.camera.SetFocusPosition(Vector2.Zero);
 
@@ -350,47 +347,38 @@ namespace CollisionFloatTestNewMono.Engine
                 { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
             };
 
-            var lines = this.collisionManager.CreateHullForBody(this.mapWith, this.mapHeight, mapData, true);
+            var lines = this.collisionManager.CreateHullForBody(this.mapWidth, this.mapHeight, mapData, true);
+            this.shapes.AddRange(lines);
 
-
-            //this.shapes.AddRange(lines);
-
-            //this.grid = new CollisionGrid<Shape>(this.mapWith, this.mapHeight, this.mapWith * GameHelper.TileSize, this.mapHeight * GameHelper.TileSize);
-
-            //foreach (var shape in this.shapes)
-            //{
-            //    switch (shape)
-            //    {
-            //        case RectangleShape rectangleShape:
-
-            //            this.grid.Add(rectangleShape, rectangleShape.TileRectangle);
-
-            //            break;
-            //        case CircleShape circleShape:
-
-            //            this.grid.Add(circleShape, circleShape.TilePosition);
-
-            //            break;
-            //        case LineShape lineShape:
-
-            //            if (lineShape.StartTilePosition.X == lineShape.EndTilePosition.X)
-            //            {
-            //                var rect = new Rectangle(lineShape.StartTilePosition.X, lineShape.StartTilePosition.Y, 1, Math.Abs(lineShape.EndTilePosition.Y - lineShape.StartTilePosition.Y));
-            //                this.grid.Add(lineShape, rect);
-            //            }
-            //            else
-            //            {
-            //                if (lineShape.StartTilePosition.Y == lineShape.EndTilePosition.Y)
-            //                {
-            //                    var rect = new Rectangle(lineShape.StartTilePosition.X, lineShape.StartTilePosition.Y, Math.Abs(lineShape.EndTilePosition.X - lineShape.StartTilePosition.X), 1);
-            //                    this.grid.Add(lineShape, rect);
-            //                }
-            //            }
-
-            //            break;
-            //    }
-            //}
+            // SpatialGrid fill
+            this.spatialGrid = new SpatialGrid(this.shapes);
         }
+
+
+        ///// <summary>
+        ///// </summary>
+        ///// <param name="shape"></param>
+        ///// <returns></returns>
+        //private Rectangle CreateSpatialGridCell(Shape shape)
+        //{
+        //    var boundingBox = shape.BoundingBox;
+        //    var x = (int)(boundingBox.X / this.leafSize);
+        //    var y = (int)(boundingBox.Y / this.leafSize);
+        //    var spatialGridCell = new Rectangle(x, y, 10, 10);
+        //    return spatialGridCell;
+        //}
+
+
+        ///// <summary>
+        ///// </summary>
+        ///// <param name="shape"></param>
+        ///// <param name="oldSpatialGridCell"></param>
+        ///// <param name="newSpatialGridCell"></param>
+        //private void MoveSpatialGrid(Shape shape, Rectangle oldSpatialGridCell, Rectangle newSpatialGridCell)
+        //{
+        //    this.spatialGrid[oldSpatialGridCell].Remove(shape);
+        //    this.spatialGrid[newSpatialGridCell].Add(shape);
+        //}
 
 
         /// <summary>
@@ -407,7 +395,11 @@ namespace CollisionFloatTestNewMono.Engine
                 this.showTexture = !this.showTexture;
 
             if (newState.IsKeyDown(Keys.F4) && !this.oldState.IsKeyDown(Keys.F4))
+            {
+                var oldPosition = ((CircleShape)this.playerShape).TilePosition;
                 this.playerShape.SetPosition(Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(this.camera.ViewMatrixWithOffset)));
+                this.spatialGrid.Move(oldPosition, ((CircleShape)this.playerShape).TilePosition, this.playerShape);
+            }
 
             var velocityDirection = Vector2.Zero;
             if (newState.IsKeyDown(Keys.LeftShift) || newState.IsKeyDown(Keys.RightShift))
@@ -458,7 +450,10 @@ namespace CollisionFloatTestNewMono.Engine
             // Umliegende Shapes
             var currentWorldPosition = this.playerShape.Position;
             var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
-            var allShapesAround = this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
+            var allShapesAround = this.spatialGrid.GetFromArea(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)).ToArray(); // new List<Shape>() { this.playerShape }; // this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
+
+            //var spatialGridCell = this.CreateSpatialGridCell(this.playerShape);
+            //var allShapesAround = this.spatialGrid[spatialGridCell];
 
             foreach (var shape in allShapesAround)
                 shape.Color = Color.Yellow;
@@ -567,8 +562,16 @@ namespace CollisionFloatTestNewMono.Engine
                     {
                         case CircleShape circleShape:
                             {
+                                //var oldSpatialGridCell = this.CreateSpatialGridCell(circleShape);
+
+                                var oldPosition = circleShape.TilePosition;
                                 var result = circleShape.Velocity;
                                 circleShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
+                                this.spatialGrid.Move(oldPosition, circleShape.TilePosition, circleShape);
+
+                                //var newSpatialGridCell = this.CreateSpatialGridCell(circleShape);
+                                //this.MoveSpatialGrid(circleShape, oldSpatialGridCell, newSpatialGridCell);
+
                                 //this.grid.Move(shape, circleShape.TilePosition);
                             }
                             break;
@@ -610,6 +613,13 @@ namespace CollisionFloatTestNewMono.Engine
 
 
             this.primitiveBatch.Begin(ref this.projection, ref this.view);
+
+            //foreach (var spatialGridKey in this.spatialGrid.Keys)
+            //{
+            //    var vertices = MathUtils.CreateRectangle(spatialGridKey.Width * this.leafSize, spatialGridKey.Height * this.leafSize).ToArray();
+            //    this.primitiveBatch.DrawPolygon(vertices, new Vector2(spatialGridKey.X, spatialGridKey.Y) * this.leafSize, 0, Color.Blue);
+            //}
+
 
             foreach (var shape in this.shapes)
             {
