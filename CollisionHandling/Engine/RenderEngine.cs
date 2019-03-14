@@ -41,11 +41,11 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        private readonly int mapWidth = 95;
+        private int mapWidth;
 
         /// <summary>
         /// </summary>
-        private readonly int mapHeight = 86;
+        private int mapHeight;
 
         /// <summary>
         /// </summary>
@@ -121,13 +121,6 @@ namespace CollisionFloatTestNewMono.Engine
             this.texture = content.Load<Texture2D>("floor");
             this.primitiveBatch = new PrimitiveBatch(graphicsDevice, 1000);
             this.collisionManager = new CollisionManager();
-
-            this.camera = new Camera2D();
-            this.camera.UpdateViewport(graphicsDevice.Viewport);
-            this.camera.ChangeMapSize(this.mapWidth, this.mapHeight);
-            this.camera.SetZoomLevel(1);
-            this.camera.SetFocusPosition(Vector2.Zero);
-
 
             //// Polygon-Player
             //var size = new Vector2(20, 30);
@@ -347,11 +340,29 @@ namespace CollisionFloatTestNewMono.Engine
                 { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
             };
 
+            ///// <summary>
+            ///// </summary>
+            //private readonly int mapWidth = 95;
+
+            ///// <summary>
+            ///// </summary>
+            //private readonly int mapHeight = 86;
+
+            this.mapWidth = mapData.GetLength(1);
+            this.mapHeight = mapData.GetLength(0);
+
             var lines = this.collisionManager.CreateHullForBody(this.mapWidth, this.mapHeight, mapData, true);
             this.shapes.AddRange(lines);
 
             // SpatialGrid fill
             this.spatialGrid = new SpatialGrid(this.shapes);
+
+            // Camera
+            this.camera = new Camera2D();
+            this.camera.UpdateViewport(graphicsDevice.Viewport);
+            this.camera.ChangeMapSize(this.mapWidth, this.mapHeight);
+            this.camera.SetZoomLevel(1);
+            this.camera.SetFocusPosition(Vector2.Zero);
         }
 
 
@@ -450,10 +461,7 @@ namespace CollisionFloatTestNewMono.Engine
             // Umliegende Shapes
             var currentWorldPosition = this.playerShape.Position;
             var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
-            var allShapesAround = this.spatialGrid.GetFromArea(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)).ToArray(); // new List<Shape>() { this.playerShape }; // this.shapes; // new List<Shape>(this.grid.Get(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)));
-
-            //var spatialGridCell = this.CreateSpatialGridCell(this.playerShape);
-            //var allShapesAround = this.spatialGrid[spatialGridCell];
+            var allShapesAround = this.spatialGrid.GetFromArea(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10)).ToArray();
 
             foreach (var shape in allShapesAround)
                 shape.Color = Color.Yellow;

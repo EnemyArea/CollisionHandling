@@ -17,6 +17,8 @@ namespace CollisionFloatTestNewMono
         private readonly GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private RenderEngine renderEngine;
+        private FrameRateCounter frameRateCounter;
+
 
         /// <summary>
         /// </summary>
@@ -39,6 +41,8 @@ namespace CollisionFloatTestNewMono
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             this.spriteBatch = new SpriteBatch(this.GraphicsDevice);
+            this.frameRateCounter = new FrameRateCounter(this, this.graphics);
+            this.frameRateCounter.LoadContent();
 
             this.renderEngine = new RenderEngine();
             this.renderEngine.LoadMap(this.GraphicsDevice, this.Content);
@@ -52,6 +56,8 @@ namespace CollisionFloatTestNewMono
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            this.frameRateCounter.StartUpdateTimer(gameTime);
+
             // Allows the game to exit
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
@@ -60,6 +66,8 @@ namespace CollisionFloatTestNewMono
 
             // Update ausführen
             base.Update(gameTime);
+
+            this.frameRateCounter.EndUpdateTimer(gameTime);
         }
 
 
@@ -69,6 +77,8 @@ namespace CollisionFloatTestNewMono
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Draw(GameTime gameTime)
         {
+            this.frameRateCounter.StartDrawTimer();
+
             // Alles clearen
             this.GraphicsDevice.Clear(Color.Black);
 
@@ -77,6 +87,8 @@ namespace CollisionFloatTestNewMono
 
             // Draw ausführen
             base.Draw(gameTime);
+
+            this.frameRateCounter.EndDrawTimer(gameTime);
         }
     }
 }
