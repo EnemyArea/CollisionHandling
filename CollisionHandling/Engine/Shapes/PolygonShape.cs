@@ -1,8 +1,10 @@
 ﻿#region
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using BoundingBox = CollisionFloatTestNewMono.Engine.Math2.BoundingBox;
 
 #endregion
 
@@ -35,8 +37,9 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="position"></param>
         /// <param name="vertices"></param>
         /// <param name="degrees"></param>
-        public PolygonShape(string name, Vector2 position, IEnumerable<Vector2> vertices, float degrees = 0)
-            : base(ShapeType.Polygon, name, position, 0)
+        /// <param name="isStatic"></param>
+        public PolygonShape(string name, Vector2 position, IEnumerable<Vector2> vertices, float degrees = 0, bool isStatic = true)
+            : base(ShapeType.Polygon, name, position, 0, isStatic)
         {
             this.Vertices = vertices.ToArray();
             this.Normals = MathUtils.CreateNormals(this.Vertices);
@@ -48,6 +51,23 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
             this.Center *= 1.0f / this.Vertices.Length;
 
             this.SetRotation(MathHelper.ToRadians(degrees));
+            this.UpdateBoundingBox();
+        }
+
+
+        /// <summary>
+        /// </summary>
+        protected override void UpdateBoundingBox()
+        {
+            var aabb = AabbHelper.ComputePolygonAabb(this.Position, this.Vertices, this.Center, this.Rotation);
+
+            this.BoundingBox = new Rectangle(
+                (int)aabb.LowerBound.X,
+                (int)aabb.LowerBound.Y,
+                (int)aabb.Width,
+                (int)aabb.Height);
+            
+            this.BoundingBoxTileMap = GameHelper.ConvertPositionToTilePosition(this.BoundingBox);
         }
 
 

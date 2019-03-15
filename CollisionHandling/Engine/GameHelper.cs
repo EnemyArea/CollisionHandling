@@ -1,5 +1,6 @@
 ﻿#region
 
+using System;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 
@@ -91,16 +92,15 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="rectangle"></param>
         /// <returns></returns>
-        public static IEnumerable<Vector2> CreateVerticesFromRectangle(Rectangle rectangle)
+        public static IList<Vector2> CreateVerticesFromRectangle(Rectangle rectangle)
         {
-            yield return new Vector2(0, 0);
-            yield return new Vector2(rectangle.Width, 0);
-            yield return new Vector2(0, 0);
-            yield return new Vector2(0, rectangle.Height);
-            yield return new Vector2(0, rectangle.Height);
-            yield return new Vector2(rectangle.Width, rectangle.Height);
-            yield return new Vector2(rectangle.Width, 0);
-            yield return new Vector2(rectangle.Width, rectangle.Height);
+            return new[]
+            {
+                new Vector2(rectangle.X, rectangle.Y),
+                new Vector2(rectangle.X + rectangle.Width, rectangle.Y),
+                new Vector2(rectangle.X + rectangle.Width, rectangle.Y + rectangle.Height),
+                new Vector2(rectangle.X, rectangle.Y + rectangle.Height)
+            };
         }
     }
 }

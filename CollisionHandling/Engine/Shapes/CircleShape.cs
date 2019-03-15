@@ -25,8 +25,9 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="name"></param>
         /// <param name="position"></param>
         /// <param name="radius"></param>
-        public CircleShape(string name, Vector2 position, int radius)
-            : base(ShapeType.Circle, name, position, 0)
+        /// <param name="isStatic"></param>
+        public CircleShape(string name, Vector2 position, int radius, bool isStatic = true)
+            : base(ShapeType.Circle, name, position, 0, isStatic)
         {
             this.Radius = radius;
             this.UpdateBoundingBox();
@@ -38,11 +39,15 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         protected override void UpdateBoundingBox()
         {
             this.TilePosition = GameHelper.ConvertPositionToTilePosition(this.Position);
+
+            var aabb = AabbHelper.ComputeCircleAabb(this.Position, this.Radius);
             this.BoundingBox = new Rectangle(
-                this.TilePosition.X + (this.Radius / GameHelper.TileSize),
-                this.TilePosition.Y + (this.Radius / GameHelper.TileSize),
-                Math.Max(1, this.Radius / GameHelper.TileSize),
-                Math.Max(1, this.Radius / GameHelper.TileSize));
+                (int)aabb.LowerBound.X,
+                (int)aabb.LowerBound.Y,
+                (int)aabb.Width,
+                (int)aabb.Height);
+            
+            this.BoundingBoxTileMap = GameHelper.ConvertPositionToTilePosition(this.BoundingBox);
         }
 
 

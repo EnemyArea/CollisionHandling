@@ -38,6 +38,14 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <summary>
         /// </summary>
         public Rectangle BoundingBox { get; protected set; }
+        
+        /// <summary>
+        /// </summary>
+        public Rectangle BoundingBoxTileMap { get; protected set; }
+
+        /// <summary>
+        /// </summary>
+        public bool IsStatic { get; private set; }
 
 
         /// <summary>
@@ -46,13 +54,15 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="name"></param>
         /// <param name="position"></param>
         /// <param name="rotation"></param>
-        protected Shape(ShapeType shapeType, string name, Vector2 position, int rotation)
+        /// <param name="isStatic"></param>
+        protected Shape(ShapeType shapeType, string name, Vector2 position, int rotation, bool isStatic)
         {
             this.ShapeType = shapeType;
             this.Name = name;
             this.Color = Color.Gray;
             this.Position = position;
             this.Rotation = rotation;
+            this.IsStatic = isStatic;
         }
 
 
@@ -82,6 +92,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         public virtual void SetRotation(float radians)
         {
             this.Rotation = radians;
+            this.UpdateBoundingBox();
         }
 
 

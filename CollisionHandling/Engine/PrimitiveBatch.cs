@@ -1,6 +1,7 @@
 ﻿#region
 
 using System;
+using System.Collections.Generic;
 using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -162,16 +163,16 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="position"></param>
         /// <param name="angle"></param>
         /// <param name="color"></param>
-        public void DrawPolygon(Vector2[] vertices, Vector2 position, float angle, Color color)
+        public void DrawPolygon(IList<Vector2> vertices, Vector2 position, float angle, Color color)
         {
             var roation = new Rotation(angle);
 
-            var vertexCount = vertices.Length;
+            var vertexCount = vertices.Count;
             var origin = Vector2.Zero;
             for (var i = 0; i < vertexCount; ++i)
                 origin += vertices[i];
 
-            origin *= 1.0f / vertices.Length;
+            origin *= 1.0f / vertices.Count;
 
             var tempVertices = new Vector2[vertexCount];
             for (var i = 0; i < vertexCount; ++i)
