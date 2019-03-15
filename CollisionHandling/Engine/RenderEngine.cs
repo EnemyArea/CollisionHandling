@@ -180,7 +180,7 @@ namespace CollisionFloatTestNewMono.Engine
 
 
             // Circles
-            this.shapes.Add(new CircleShape("C1", new Vector2(5 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize), GameHelper.TileSize * 2));
+            this.shapes.Add(new CircleShape("C1", new Vector2(5 * GameHelper.TileSize, 5 * GameHelper.TileSize), GameHelper.TileSize * 2));
             this.shapes.Add(new CircleShape("C2", new Vector2(10 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize + 20), GameHelper.TileSize * 2));
 
 
@@ -616,8 +616,8 @@ namespace CollisionFloatTestNewMono.Engine
                 }
 
                 // AABB rendern
-                //var boundingBoxVertices = GameHelper.CreateVerticesFromRectangle(shape.BoundingBox);
-                //this.primitiveBatch.DrawPolygon(boundingBoxVertices, Vector2.Zero, 0, Color.DarkOrange);
+                var boundingBoxVertices = GameHelper.CreateVerticesFromRectangle(shape.BoundingBox);
+                this.primitiveBatch.DrawPolygon(boundingBoxVertices, Vector2.Zero, 0, Color.DarkOrange);
 
                 var boundingBoxTileMapVertices = GameHelper.CreateVerticesFromRectangle(new Rectangle(shape.BoundingBoxTileMap.X * GameHelper.TileSize, shape.BoundingBoxTileMap.Y * GameHelper.TileSize, shape.BoundingBoxTileMap.Width * GameHelper.TileSize, shape.BoundingBoxTileMap.Height * GameHelper.TileSize));
                 this.primitiveBatch.DrawPolygon(boundingBoxTileMapVertices, Vector2.Zero, 0, Color.BlueViolet);
