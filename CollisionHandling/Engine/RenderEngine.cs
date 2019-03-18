@@ -144,7 +144,9 @@ namespace CollisionFloatTestNewMono.Engine
             // Circle-Player
             //this.playerShape = new CircleShape("P", new Vector2(336, 179), 15);
             //this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
-            this.playerShape = new CircleShape("P", new Vector2(232, 194), 15, false);
+            //this.playerShape = new CircleShape("P", new Vector2(232, 194), 15, false);
+
+            this.playerShape = new CircleShape("P", new Vector2(GameHelper.TileSize * 3, GameHelper.TileSize * 3) - new Vector2(GameHelper.TileSize) / 2, GameHelper.TileSize/2, false);
             this.shapes.Add(this.playerShape);
 
             //this.shapes.Add(new CircleShape("P1", new Vector2(232, 194), 15));
@@ -155,7 +157,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             //
             // Test geometries
-            //
+            // 
 
 
             // Polygons
@@ -168,7 +170,7 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(15, 0)
             });
             this.polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
-            this.shapes.Add(polygon);
+            this.shapes.Add(this.polygon);
 
             var a1 = MathUtils.CreateRectangle(150, 150);
             var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), MathUtils.GetConvexHull(a1), 45);
@@ -185,19 +187,25 @@ namespace CollisionFloatTestNewMono.Engine
 
 
             // Lines
-            var offset = new Vector2(120, 140);
+            var offset = new Vector2(800, 100);
             this.shapes.Add(new LineShape(
                 new Vector2(100 + offset.X, 100 + offset.Y),
                 new Vector2(200 + offset.X, 100 + offset.Y)
             ));
+
+            offset += new Vector2(0, 80);
             this.shapes.Add(new LineShape(
                 new Vector2(200 + offset.X, 100 + offset.Y),
                 new Vector2(200 + offset.X, 200 + offset.Y)
             ));
+
+            offset += new Vector2(0, 80);
             this.shapes.Add(new LineShape(
                 new Vector2(200 + offset.X, 200 + offset.Y),
                 new Vector2(100 + offset.X, 200 + offset.Y)
             ));
+            
+            offset += new Vector2(0, -50);
             this.shapes.Add(new LineShape(
                 new Vector2(100 + offset.X, 200 + offset.Y),
                 new Vector2(100 + offset.X, 100 + offset.Y)
@@ -361,8 +369,8 @@ namespace CollisionFloatTestNewMono.Engine
             //this.shapes.AddRange(lines);
 
             // SpatialGrid fill
-            //this.spatialGrid = new SpatialGrid(this.mapWidth, this.mapHeight, this.shapes);
-            this.spatialGrid = new SpatialGrid(this.mapWidth, this.mapHeight, new List<Shape>());
+            this.spatialGrid = new SpatialGrid(this.mapWidth, this.mapHeight, this.shapes);
+            //this.spatialGrid = new SpatialGrid(this.mapWidth, this.mapHeight, new List<Shape>());
 
             // Camera
             this.camera = new Camera2D();
@@ -423,9 +431,9 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.oldState = newState;
 
-            // Bewegen....
-            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
-            this.polygon.SetRotation(MathHelper.ToRadians((int)MathHelper.Lerp(0, 360, time)));
+            //// Bewegen....
+            //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
+            //this.polygon.SetRotation(MathHelper.ToRadians((int)MathHelper.Lerp(0, 360, time)));
 
             this.playerShape.Color = Color.Fuchsia;
             this.playerShape.ResetVelocity();

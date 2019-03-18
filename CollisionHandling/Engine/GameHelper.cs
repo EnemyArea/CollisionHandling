@@ -39,16 +39,6 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        /// <param name="coordinate"></param>
-        /// <returns></returns>
-        public static int ConvertPositionToTilePosition(double coordinate)
-        {
-            return (int)(coordinate / TileSize);
-        }
-
-
-        /// <summary>
-        /// </summary>
         /// <param name="position"></param>
         /// <returns></returns>
         public static Point ConvertPositionToTilePosition(Vector2 position)
@@ -59,15 +49,55 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public static Point ConvertPositionToTilePositionCeiling(Vector2 position)
+        {
+            return new Point((int)Math.Ceiling(position.X / TileSize), (int)Math.Ceiling(position.Y / TileSize));
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <returns></returns>
+        public static int ConvertPositionToTilePosition(double coordinate)
+        {
+            return (int)(coordinate / TileSize);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <returns></returns>
+        public static int ConvertPositionToTilePositionFloor(double coordinate)
+        {
+            return (int)Math.Floor(coordinate / TileSize);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <returns></returns>
+        public static int ConvertPositionToTilePositionCeiling(double coordinate)
+        {
+            return (int)Math.Ceiling(coordinate / TileSize);
+        }
+
+
+        /// <summary>
+        /// </summary>
         /// <param name="rectangle"></param>
         /// <returns></returns>
         public static Rectangle ConvertPositionToTilePosition(Rectangle rectangle)
         {
             return new Rectangle(
-                ConvertPositionToTilePosition(rectangle.X),
-                ConvertPositionToTilePosition(rectangle.Y),
-                ConvertPositionToTilePosition(rectangle.Width),
-                ConvertPositionToTilePosition(rectangle.Height));
+                ConvertPositionToTilePositionFloor(rectangle.X),
+                ConvertPositionToTilePositionFloor(rectangle.Y),
+                ConvertPositionToTilePositionCeiling(rectangle.Width),
+                ConvertPositionToTilePositionCeiling(rectangle.Height));
         }
 
 

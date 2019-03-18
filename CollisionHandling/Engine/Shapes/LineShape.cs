@@ -50,27 +50,18 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         {
             this.StartTilePosition = GameHelper.ConvertPositionToTilePosition(this.Start);
             this.EndTilePosition = GameHelper.ConvertPositionToTilePosition(this.End);
-
-            //if (this.StartTilePosition.X == this.EndTilePosition.X)
-            //{
-            //    this.BoundingBox = new Rectangle(this.StartTilePosition.X, this.StartTilePosition.Y, 1, Math.Abs(this.EndTilePosition.Y - this.StartTilePosition.Y));
-            //}
-            //else
-            //{
-            //    if (this.StartTilePosition.Y == this.EndTilePosition.Y)
-            //    {
-            //        this.BoundingBox = new Rectangle(this.StartTilePosition.X, this.StartTilePosition.Y, Math.Abs(this.EndTilePosition.X - this.StartTilePosition.X), 1);
-            //    }
-            //}
-
+            
             var aabb = AabbHelper.ComputeLineAabb(this.Start, this.End, Vector2.Zero, 0);
+            
+            var start = GameHelper.ConvertPositionToTilePosition(aabb.LowerBound);
+            var end = GameHelper.ConvertPositionToTilePositionCeiling(aabb.UpperBound);
+            
+            var boundingBoxTileMap = new Rectangle(Math.Min(start.X, end.X),
+                Math.Min(start.Y, end.Y),
+                Math.Abs(start.X - end.X),
+                Math.Abs(start.Y - end.Y));
 
-            this.BoundingBox = new Rectangle(
-                (int)aabb.LowerBound.X,
-                (int)aabb.LowerBound.Y,
-                (int)aabb.Width,
-                (int)aabb.Height);
-            this.BoundingBoxTileMap = GameHelper.ConvertPositionToTilePosition(this.BoundingBox);
+            this.BoundingBoxTileMap = boundingBoxTileMap;
         }
     }
 }

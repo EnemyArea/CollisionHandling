@@ -46,8 +46,16 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
                 (int)aabb.LowerBound.Y,
                 (int)aabb.Width,
                 (int)aabb.Height);
+
+            var start = GameHelper.ConvertPositionToTilePosition(aabb.LowerBound);
+            var end = GameHelper.ConvertPositionToTilePositionCeiling(aabb.UpperBound);
             
-            this.BoundingBoxTileMap = GameHelper.ConvertPositionToTilePosition(this.BoundingBox);
+            var boundingBoxTileMap = new Rectangle(Math.Min(start.X, end.X),
+                Math.Min(start.Y, end.Y),
+                Math.Abs(start.X - end.X),
+                Math.Abs(start.Y - end.Y));
+
+            this.BoundingBoxTileMap = boundingBoxTileMap;
         }
 
 

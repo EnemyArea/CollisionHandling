@@ -13,6 +13,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
     /// </summary>
     public sealed class SpatialGrid
     {
+        private readonly int gridWidthInTiles;
+        private readonly int gridHeightInTiles;
+
         /// <summary>
         /// </summary>
         private readonly Dictionary<Point, List<Shape>> storage = new Dictionary<Point, List<Shape>>();
@@ -31,6 +34,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         {
             var sw = new Stopwatch();
             sw.Start();
+            
+            this.gridWidthInTiles = gridWidthInTiles;
+            this.gridHeightInTiles = gridHeightInTiles;
 
             for (var y = 0; y < gridHeightInTiles + 1; y++)
             {
@@ -43,10 +49,10 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
             foreach (var shape in shapes)
             {
-                var shapeX = shape.BoundingBox.X;
-                var shapeY = shape.BoundingBox.Y;
-                var width = shape.BoundingBox.Width;
-                var height = shape.BoundingBox.Height;
+                var shapeX = shape.BoundingBoxTileMap.X;
+                var shapeY = shape.BoundingBoxTileMap.Y;
+                var width = shape.BoundingBoxTileMap.Width;
+                var height = shape.BoundingBoxTileMap.Height;
 
                 for (var y = 0; y < height; y++)
                 {

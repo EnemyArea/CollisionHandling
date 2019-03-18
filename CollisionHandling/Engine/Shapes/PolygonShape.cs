@@ -16,15 +16,11 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
     {
         /// <summary>
         /// </summary>
-        public Vector2[] Normals { get; }
-
-        /// <summary>
-        /// </summary>
         public Vector2[] Vertices { get; }
-
+        
         /// <summary>
         /// </summary>
-        public Point[] PointVertices { get; private set; }
+        public Vector2[] Normals { get; }
 
         /// <summary>
         /// </summary>
@@ -67,26 +63,24 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
                 (int)aabb.Width,
                 (int)aabb.Height);
             
-            this.BoundingBoxTileMap = GameHelper.ConvertPositionToTilePosition(this.BoundingBox);
+            var start = GameHelper.ConvertPositionToTilePosition(aabb.LowerBound);
+            var end = GameHelper.ConvertPositionToTilePositionCeiling(aabb.UpperBound);
+            
+            var boundingBoxTileMap = new Rectangle(Math.Min(start.X, end.X),
+                Math.Min(start.Y, end.Y),
+                Math.Abs(start.X - end.X),
+                Math.Abs(start.Y - end.Y));
+
+            this.BoundingBoxTileMap = boundingBoxTileMap;
         }
-
-
-        /// <summary>
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<Point> GeneratePoints()
-        {
-            foreach (var vertex in this.Vertices)
-                yield return GameHelper.ConvertPositionToTilePosition(vertex);
-        }
-
+        
 
         /// <summary>
         /// </summary>
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{this.Name} / {this.Position}/ {this.Vertices} / {this.Normals} / {this.PointVertices}";
+            return $"{this.Name} / {this.Position}/ {this.Vertices} / {this.Normals}";
         }
     }
 }
