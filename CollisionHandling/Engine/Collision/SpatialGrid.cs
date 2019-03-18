@@ -14,12 +14,10 @@ namespace CollisionFloatTestNewMono.Engine.Collision
     public sealed class SpatialGrid
     {
         /// <summary>
-        /// 
         /// </summary>
         private readonly int gridWidthInTiles;
 
         /// <summary>
-        /// 
         /// </summary>
         private readonly int gridHeightInTiles;
 
@@ -29,15 +27,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
         /// <summary>
         /// </summary>
-        private readonly List<Shape> allShapesAround = new List<Shape>();
+        private readonly HashSet<Shape> allShapesAround = new HashSet<Shape>();
 
 
         /// <summary>
         /// </summary>
         /// <param name="gridWidthInTiles"></param>
         /// <param name="gridHeightInTiles"></param>
-        /// <param name="shapes"></param>
-        public SpatialGrid(int gridWidthInTiles, int gridHeightInTiles, IEnumerable<Shape> shapes)
+        public SpatialGrid(int gridWidthInTiles, int gridHeightInTiles)
         {
             var sw = new Stopwatch();
             sw.Start();
@@ -54,25 +51,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 }
             }
 
-            foreach (var shape in shapes)
-            {
-                var shapeX = shape.BoundingBoxTileMap.X;
-                var shapeY = shape.BoundingBoxTileMap.Y;
-                var width = shape.BoundingBoxTileMap.Width;
-                var height = shape.BoundingBoxTileMap.Height;
-
-                for (var y = 0; y < height; y++)
-                {
-                    for (var x = 0; x < width; x++)
-                    {
-                        this.Insert(new Point(shapeX + x, shapeY + y), shape);
-                    }
-                }
-            }
-
             sw.Stop();
             Debug.WriteLine($"SpatialGrid: {sw.Elapsed}");
-            // SpatialGrid: 00:00:00.0030600
         }
 
 
@@ -80,7 +60,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// </summary>
         /// <param name="point"></param>
         /// <param name="shape"></param>
-        public void Insert(Point point, Shape shape)
+        private void Insert(Point point, Shape shape)
         {
             if (point.X < 0 || point.Y < 0 || point.X >= this.gridWidthInTiles || point.Y >= this.gridHeightInTiles)
                 return;
@@ -91,17 +71,40 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
         /// <summary>
         /// </summary>
-        /// <param name="rectangle"></param>
+        /// <param name="shape"></param>
+        public void Insert(Shape shape)
+        {
+            var shapeX = shape.BoundingBoxTileMap.X;
+            var shapeY = shape.BoundingBoxTileMap.Y;
+            var width = shape.BoundingBoxTileMap.Width;
+            var height = shape.BoundingBoxTileMap.Height;
+
+            for (var y = 0; y < height; y++)
+            {
+                for (var x = 0; x < width; x++)
+                {
+                    this.Insert(new Point(shapeX + x, shapeY + y), shape);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="areaX"></param>
+        /// <param name="areaY"></param>
+        /// <param name="areaWidth"></param>
+        /// <param name="areaHeight"></param>
         /// <returns></returns>
-        public IList<Shape> GetFromArea(Rectangle rectangle)
+        public ICollection<Shape> GetFromArea(int areaX, int areaY, int areaWidth, int areaHeight)
         {
             this.allShapesAround.Clear();
 
-            for (var y = 0; y < rectangle.Size.Y; y++)
+            for (var y = 0; y < areaHeight; y++)
             {
-                for (var x = 0; x < rectangle.Size.X; x++)
+                for (var x = 0; x < areaWidth; x++)
                 {
-                    var point = new Point(rectangle.X + x, rectangle.Y + y);
+                    var point = new Point(areaX + x, areaY + y);
                     if (!this.storage.TryGetValue(point, out var shapes))
                         continue;
 

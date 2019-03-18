@@ -14,6 +14,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 {
     /// <summary>
     /// </summary>
+    /// <param name="collisionManager"></param>
+    /// <param name="shapeCollision"></param>
+    /// <returns></returns>
+    public delegate bool CollisionHandler(CollisionManager collisionManager, ShapeCollision shapeCollision);
+
+
+    /// <summary>
+    /// </summary>
     public sealed class CollisionManager
     {
         /// <summary>
@@ -42,6 +50,100 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             public bool IsSearchedTop;
             public bool IsSearchedRight;
             public bool IsSearchedBottom;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        public event CollisionHandler OnCollision;
+
+
+        /// <summary>
+        /// </summary>
+        private readonly SpatialGrid spatialGrid;
+
+        /// <summary>
+        /// </summary>
+        private readonly List<Shape> shapes = new List<Shape>();
+
+        /// <summary>
+        /// </summary>
+        private readonly Rectangle searchArea = new Rectangle(-5, -5, 10, 10);
+
+        /// <summary>
+        ///     Circle = 0,
+        ///     Line = 1,
+        ///     Polygon = 2,
+        /// </summary>
+        private static readonly ShapeContactType[,] registers =
+        {
+            {
+                ShapeContactType.Circle, // 0,0 = Circle->Circle
+                ShapeContactType.LineAndCircle, // 0,1 = Circle->Line
+                ShapeContactType.PolygonAndCircle, // 0,2 = Circle->Polygon
+            },
+            {
+                ShapeContactType.LineAndCircle, // 1,0 = Line->Circle
+                ShapeContactType.NotSupported, // 1,1 = Line->Line
+                ShapeContactType.LineAndPolygon // 1,2 = Line->Polygon
+            },
+            {
+                ShapeContactType.PolygonAndCircle, // 2,0 = Polygon->Circle
+                ShapeContactType.LineAndPolygon, // 2,1 = Polygon->Line
+                ShapeContactType.Polygon // 2,2 = Polygon->Polygon
+            }
+        };
+
+
+        /// <summary>
+        /// </summary>
+        public IEnumerable<Shape> Shapes => this.shapes.AsReadOnly();
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="gridWidthInTiles"></param>
+        /// <param name="gridHeightInTiles"></param>
+        public CollisionManager(int gridWidthInTiles, int gridHeightInTiles)
+        {
+            this.spatialGrid = new SpatialGrid(gridWidthInTiles, gridHeightInTiles);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="shape"></param>
+        public void AddShape(Shape shape)
+        {
+            this.shapes.Add(shape);
+            this.spatialGrid.Insert(shape);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="shapes"></param>
+        public void AddShapes(ICollection<Shape> shapes)
+        {
+            this.shapes.AddRange(shapes);
+            foreach (var shape in shapes)
+                this.spatialGrid.Insert(shape);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="shape"></param>
+        /// <returns></returns>
+        public ICollection<Shape> AllShapesAround(Shape shape)
+        {
+            // Umliegende Shapes
+            var currentWorldPosition = shape.Position;
+            var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
+            return this.spatialGrid.GetFromArea(
+                currentTilePosition.X + this.searchArea.X,
+                currentTilePosition.Y + this.searchArea.Y,
+                this.searchArea.Width, this.searchArea.Height);
         }
 
 
@@ -340,7 +442,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="lineA"></param>
         /// <param name="circleB"></param>
         /// <returns></returns>
-        public Vector2 CollidesLineAndCircle(LineShape lineA, CircleShape circleB)
+        private static Vector2 CollidesLineAndCircle(LineShape lineA, CircleShape circleB)
         {
             var center = circleB.Position + circleB.Velocity;
             var radius = circleB.Radius;
@@ -385,7 +487,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// </summary>
         /// <param name="polyA"></param>
         /// <param name="circleB"></param>
-        public Vector2 CollidesPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
+        private static Vector2 CollidesPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
         {
             var testPoly = new Polygon(polyA.Vertices);
             var testCircle = new Circle(circleB.Radius);
@@ -405,7 +507,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// </summary>
         /// <param name="polyA"></param>
         /// <param name="circleB"></param>
-        public Vector2 CollidesPolygonAndCircle(CircleShape circleB, PolygonShape polyA)
+        private static Vector2 CollidesPolygonAndCircle(CircleShape circleB, PolygonShape polyA)
         {
             var testPoly = new Polygon(polyA.Vertices);
             var testCircle = new Circle(circleB.Radius);
@@ -425,7 +527,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="circleA"></param>
         /// <param name="circleB"></param>
         /// <returns></returns>
-        public Vector2 CollidesCircles(CircleShape circleA, CircleShape circleB)
+        private static Vector2 CollidesCircles(CircleShape circleA, CircleShape circleB)
         {
             var testCircle1 = new Circle(circleA.Radius);
             var testCircle2 = new Circle(circleB.Radius);
@@ -444,7 +546,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="polyA"></param>
         /// <param name="polyB"></param>
         /// <returns></returns>
-        public Vector2 CollidePolygons(PolygonShape polyA, PolygonShape polyB)
+        private static Vector2 CollidePolygons(PolygonShape polyA, PolygonShape polyB)
         {
             var testPoly1 = new Polygon(polyA.Vertices);
             var testPoly2 = new Polygon(polyB.Vertices);
@@ -464,9 +566,164 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="lineA"></param>
         /// <param name="polyB"></param>
         /// <returns></returns>
-        public Vector2 CollidesLineAndPolygon(LineShape lineA, PolygonShape polyB)
+        private static Vector2 CollidesLineAndPolygon(LineShape lineA, PolygonShape polyB)
         {
             return Vector2.Zero;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="shape"></param>
+        /// <param name="position"></param>
+        public void SetShapePosition(Shape shape, Vector2 position)
+        {
+            var oldPosition = GameHelper.ConvertPositionToTilePosition(shape.Position);
+            shape.SetPosition(position);
+
+            var newPosition = GameHelper.ConvertPositionToTilePosition(shape.Position);
+            this.spatialGrid.Move(oldPosition, newPosition, shape);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="shapeA"></param>
+        /// <param name="allShapesAround"></param>
+        /// <returns></returns>
+        private void SolveCollisions(Shape shapeA, ICollection<Shape> allShapesAround)
+        {
+            var iterations = 0;
+            bool hasCollison;
+            do
+            {
+                hasCollison = false;
+
+                foreach (var shapeB in allShapesAround)
+                {
+                    if (shapeA.IsStatic || shapeA == shapeB || shapeA.IsStatic == shapeB.IsStatic)
+                        continue;
+
+                    var type1 = shapeA.ShapeType;
+                    var type2 = shapeB.ShapeType;
+                    Shape sortedShapeA;
+                    Shape sortedShapeB;
+
+                    if ((type1 >= type2 || type1 == ShapeType.Line && type2 == ShapeType.Polygon) && !(type2 == ShapeType.Line && type1 == ShapeType.Polygon))
+                    {
+                        sortedShapeA = shapeA;
+                        sortedShapeB = shapeB;
+                    }
+                    else
+                    {
+                        sortedShapeA = shapeB;
+                        sortedShapeB = shapeA;
+                    }
+
+                    var newVelocity = Vector2.Zero;
+                    var shapeContactType = registers[(int)shapeA.ShapeType, (int)shapeB.ShapeType];
+                    switch (shapeContactType)
+                    {
+                        case ShapeContactType.Circle:
+
+                            // Circle->Circle
+                            newVelocity += CollidesCircles((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
+
+                            break;
+                        case ShapeContactType.PolygonAndCircle:
+
+                            if (shapeA is PolygonShape && shapeB is CircleShape)
+                            {
+                                // Polygon->Circle
+                                newVelocity += CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                            }
+                            else
+                            {
+                                // Polygon->Circle
+                                newVelocity += CollidesPolygonAndCircle((CircleShape)sortedShapeB, (PolygonShape)sortedShapeA);
+                            }
+
+                            break;
+                        case ShapeContactType.LineAndCircle:
+
+                            // Line->Circle
+                            newVelocity += CollidesLineAndCircle((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
+
+                            break;
+                        case ShapeContactType.Polygon:
+
+                            // Polygon->Polygon
+                            newVelocity += CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
+
+                            break;
+                        case ShapeContactType.LineAndPolygon:
+
+                            // Polygon->Circle
+                            newVelocity += CollidesLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
+
+                            break;
+                    }
+
+                    if (newVelocity != Vector2.Zero)
+                    {
+                        // Collision
+                        hasCollison = this.OnCollision?.Invoke(this, new ShapeCollision(shapeContactType, shapeA, shapeB, newVelocity)) ?? true;
+
+                        // Apply velocity
+                        if (hasCollison)
+                            shapeA.ApplyVelocity(newVelocity);
+                    }
+                }
+
+                iterations++;
+            }
+            while (hasCollison && iterations <= 10);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public void Update(GameTime gameTime)
+        {
+            foreach (var shape in this.shapes)
+            {
+                // Ignore
+                if (shape.IsStatic)
+                    continue;
+
+                // Umliegende Shapes
+                var shapesAround = this.AllShapesAround(shape);
+
+                // Solve collisions
+                this.SolveCollisions(shape, shapesAround);
+
+                // Ignore if no velocity
+                if (shape.Velocity == Vector2.Zero)
+                    continue;
+
+                // Move by velocity
+                switch (shape)
+                {
+                    case CircleShape circleShape:
+                        {
+                            var oldPosition = circleShape.TilePosition;
+                            circleShape.MoveByVelocity(new Vector2((int)Math.Round(circleShape.Velocity.X), (int)Math.Round(circleShape.Velocity.Y)));
+                            this.spatialGrid.Move(oldPosition, circleShape.TilePosition, circleShape);
+                        }
+                        break;
+                    case PolygonShape polygonShape:
+                        {
+                            //var oldPosition = polygonShape.TilePosition;
+                            //polygonShape.MoveByVelocity(new Vector2((int)Math.Round(polygonShape.Velocity.X), (int)Math.Round(polygonShape.Velocity.Y)));
+                            //this.spatialGrid.Move(oldPosition, polygonShape.TilePosition, polygonShape);
+                        }
+                        break;
+                }
+
+                // Reset
+                shape.ResetVelocity();
+            }
         }
     }
 }

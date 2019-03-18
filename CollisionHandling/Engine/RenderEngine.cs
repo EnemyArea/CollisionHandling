@@ -1,9 +1,8 @@
 ﻿#region
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using CollisionFloatTestNewMono.Engine.Collision;
+using CollisionFloatTestNewMono.Engine.Math2;
 using CollisionFloatTestNewMono.Engine.Shapes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -32,11 +31,6 @@ namespace CollisionFloatTestNewMono.Engine
         private KeyboardState oldState;
 
         /// <summary>
-        /// </summary>
-        private readonly List<Shape> shapes = new List<Shape>();
-
-        /// <summary>
-        /// 
         /// </summary>
         private PolygonShape polygon;
 
@@ -82,36 +76,7 @@ namespace CollisionFloatTestNewMono.Engine
 
         /// <summary>
         /// </summary>
-        private SpatialGrid spatialGrid;
-
-        /// <summary>
-        /// </summary>
         private CollisionManager collisionManager;
-
-
-        /// <summary>
-        ///     Circle = 0,
-        ///     Line = 1,
-        ///     Polygon = 2,
-        /// </summary>
-        private static readonly ShapeContactType[,] registers =
-        {
-            {
-                ShapeContactType.Circle, // 0,0 = Circle->Circle
-                ShapeContactType.LineAndCircle, // 0,1 = Circle->Line
-                ShapeContactType.PolygonAndCircle, // 0,2 = Circle->Polygon
-            },
-            {
-                ShapeContactType.LineAndCircle, // 1,0 = Line->Circle
-                ShapeContactType.NotSupported, // 1,1 = Line->Line
-                ShapeContactType.LineAndPolygon // 1,2 = Line->Polygon
-            },
-            {
-                ShapeContactType.PolygonAndCircle, // 2,0 = Polygon->Circle
-                ShapeContactType.LineAndPolygon, // 2,1 = Polygon->Line
-                ShapeContactType.Polygon // 2,2 = Polygon->Polygon
-            }
-        };
 
 
         /// <summary>
@@ -126,142 +91,6 @@ namespace CollisionFloatTestNewMono.Engine
             this.font = content.Load<SpriteFont>("Fonts/interfaceFontSmall");
             this.texture = content.Load<Texture2D>("floor");
             this.primitiveBatch = new PrimitiveBatch(graphicsDevice, 1000);
-            this.collisionManager = new CollisionManager();
-
-            //// Polygon-Player
-            //var size = new Vector2(20, 30);
-            //var playerVertices = GameHelper.GetConvexHull(new[]
-            //{
-            //    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
-            //    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
-            //    new Vector2(-20, 0),
-            //    new Vector2(20, 0)
-            //});
-            //this.playerShape = new PolygonShape("P", new Vector2(400, 200), playerVertices);
-            //this.shapes.Add(this.playerShape);
-
-
-            // Circle-Player
-            //this.playerShape = new CircleShape("P", new Vector2(336, 179), 15);
-            //this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
-            //this.playerShape = new CircleShape("P", new Vector2(232, 194), 15, false);
-
-            this.playerShape = new CircleShape("P", new Vector2(GameHelper.TileSize * 3, GameHelper.TileSize * 3) - new Vector2(GameHelper.TileSize) / 2, GameHelper.TileSize/2, false);
-            this.shapes.Add(this.playerShape);
-
-            //this.shapes.Add(new CircleShape("P1", new Vector2(232, 194), 15));
-            //this.shapes.Add(new CircleShape("P2", new Vector2(192, 260), 15));
-            //this.shapes.Add(new CircleShape("P3", new Vector2(280, 350), 15));
-            //this.shapes.Add(new CircleShape("P4", new Vector2(352, 260), 15));
-
-
-            //
-            // Test geometries
-            // 
-
-
-            // Polygons
-            var sizePolygon = new Vector2(150, 250);
-            var polygonVertices = MathUtils.GetConvexHull(new[]
-            {
-                new Vector2(sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
-                new Vector2(-sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
-                new Vector2(-15, 0),
-                new Vector2(15, 0)
-            });
-            this.polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
-            this.shapes.Add(this.polygon);
-
-            var a1 = MathUtils.CreateRectangle(150, 150);
-            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), MathUtils.GetConvexHull(a1), 45);
-            this.shapes.Add(polygon2);
-
-            var a2 = MathUtils.CreateRectangle(150, 150);
-            var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), MathUtils.GetConvexHull(a2));
-            this.shapes.Add(polygon3);
-
-
-            // Circles
-            this.shapes.Add(new CircleShape("C1", new Vector2(5 * GameHelper.TileSize, 5 * GameHelper.TileSize), GameHelper.TileSize * 2));
-            this.shapes.Add(new CircleShape("C2", new Vector2(10 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize + 20), GameHelper.TileSize * 2));
-
-
-            // Lines
-            var offset = new Vector2(800, 100);
-            this.shapes.Add(new LineShape(
-                new Vector2(100 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 100 + offset.Y)
-            ));
-
-            offset += new Vector2(0, 80);
-            this.shapes.Add(new LineShape(
-                new Vector2(200 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 200 + offset.Y)
-            ));
-
-            offset += new Vector2(0, 80);
-            this.shapes.Add(new LineShape(
-                new Vector2(200 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 200 + offset.Y)
-            ));
-            
-            offset += new Vector2(0, -50);
-            this.shapes.Add(new LineShape(
-                new Vector2(100 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 100 + offset.Y)
-            ));
-
-
-            //this.shapes.Add(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
-            //this.shapes.Add(new RectangleShape("EventGate", new Rectangle(1376, 96, 192, 32)));
-            //this.shapes.Add(new RectangleShape("EventPater", new Rectangle(640, 2336, 224, 160)));
-            //this.shapes.Add(new RectangleShape("EventPaterChildrenCrash", new Rectangle(1440, 384, 160, 192)));
-
-            //this.shapes.Add(new CircleShape("JungeFrau", new Vector2(314 + 15, 1271 + 15), 15));
-            //this.shapes.Add(new CircleShape("Mara", new Vector2(1737 + 15, 1400 + 15), 15));
-            //this.shapes.Add(new CircleShape("Anja", new Vector2(1737 + 15, 1565 + 15), 15));
-            //this.shapes.Add(new CircleShape("Tomy", new Vector2(1344 + 15, 1384 + 15), 15));
-            //this.shapes.Add(new CircleShape("Mimi", new Vector2(1372 + 15, 1420 + 15), 15));
-            //this.shapes.Add(new CircleShape("Lilly", new Vector2(1313 + 15, 1409 + 15), 15));
-            //this.shapes.Add(new CircleShape("Händler", new Vector2(1566 + 15, 476 + 15), 15));
-            //this.shapes.Add(new CircleShape("Will", new Vector2(1376 + 15, 192 + 15), 15));
-            //this.shapes.Add(new CircleShape("Wache2", new Vector2(2275 + 15, 1528 + 15), 15));
-            //this.shapes.Add(new CircleShape("Wache3", new Vector2(1313 + 15, 2383 + 15), 15));
-            //this.shapes.Add(new CircleShape("AlteFrau", new Vector2(289 + 15, 863 + 15), 15));
-            //this.shapes.Add(new CircleShape("Neko", new Vector2(320 + 15, 864 + 15), 15));
-            //this.shapes.Add(new CircleShape("Lilly2", new Vector2(1498 + 15, 57 + 15), 15));
-            //this.shapes.Add(new CircleShape("Mimi2", new Vector2(1499 + 15, -9.536743E-07f + 15), 15));
-            //this.shapes.Add(new CircleShape("Tomy2", new Vector2(1498 + 15, 28 + 15), 15));
-            //this.shapes.Add(new CircleShape("Ben", new Vector2(416 + 15, 480 + 15), 15));
-            //this.shapes.Add(new CircleShape("Frau2", new Vector2(2560 + 15, 2208 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel2", new Vector2(674 + 15, 607 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel3", new Vector2(1044 + 15, 1126 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel4", new Vector2(1415 + 15, 961 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel5", new Vector2(618 + 15, 1719 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel6", new Vector2(1312 + 15, 1897 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel7", new Vector2(576 + 15, 2457 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel8", new Vector2(1683 + 15, 2315 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel9", new Vector2(2348 + 15, 1983 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel10", new Vector2(2287 + 15, 1422 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel11", new Vector2(1505 + 15, 1614 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel12", new Vector2(1876 + 15, 810 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel13", new Vector2(1174 + 15, 677 + 15), 15));
-            //this.shapes.Add(new CircleShape("Vogel1", new Vector2(2368 + 15, 512 + 15), 15));
-            //this.shapes.Add(new CircleShape("AlterMann", new Vector2(572 + 15, 1926 + 15), 15));
-            //this.shapes.Add(new CircleShape("Pater", new Vector2(736 + 15, 2368 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling2", new Vector2(961.9999f + 15, 2114 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling5", new Vector2(1338 + 15, 595.9999f + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling1", new Vector2(460 + 15, 1054 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling4", new Vector2(1782 + 15, 1712 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling6", new Vector2(668 + 15, 446 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling9", new Vector2(2576 + 15, 1596 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling10", new Vector2(1356 + 15, 2412 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling11", new Vector2(2134 + 15, 452 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling12", new Vector2(2274 + 15, 877.9999f + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling13", new Vector2(1450 + 15, 2334 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling7", new Vector2(592 + 15, 1606 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling3", new Vector2(1758 + 15, 1086 + 15), 15));
-            //this.shapes.Add(new CircleShape("Schmetterling8", new Vector2(2056 + 15, 2080 + 15), 15));
 
             // assign the new map
             var mapData = new[,]
@@ -354,23 +183,150 @@ namespace CollisionFloatTestNewMono.Engine
                 { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }
             };
 
-            ///// <summary>
-            ///// </summary>
-            //private readonly int mapWidth = 95;
-
-            ///// <summary>
-            ///// </summary>
-            //private readonly int mapHeight = 86;
-
             this.mapWidth = mapData.GetLength(1);
             this.mapHeight = mapData.GetLength(0);
 
-            //var lines = this.collisionManager.CreateHullForBody(this.mapWidth, this.mapHeight, mapData, true);
-            //this.shapes.AddRange(lines);
+            // Fill the collisionManager
+            this.collisionManager = new CollisionManager(this.mapWidth, this.mapHeight);
+            this.collisionManager.OnCollision += this.CollisionManagerOnOnCollision;
+            //this.collisionManager.AddShapes(this.collisionManager.CreateHullForBody(this.mapWidth, this.mapHeight, mapData, true).ToArray());
 
-            // SpatialGrid fill
-            this.spatialGrid = new SpatialGrid(this.mapWidth, this.mapHeight, this.shapes);
-            //this.spatialGrid = new SpatialGrid(this.mapWidth, this.mapHeight, new List<Shape>());
+
+            //// Polygon-Player
+            //var size = new Vector2(20, 30);
+            //var playerVertices = GameHelper.GetConvexHull(new[]
+            //{
+            //    new Vector2(size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-size.X, size.Y) * VectorHelper.AngleToVector(45),
+            //    new Vector2(-20, 0),
+            //    new Vector2(20, 0)
+            //});
+            //this.playerShape = new PolygonShape("P", new Vector2(400, 200), playerVertices);
+            //this.collisionManager.AddShape(this.playerShape);
+
+
+            // Circle - Player
+            //this.playerShape = new CircleShape("P", new Vector2(336, 179), 15);
+            //this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
+            //this.playerShape = new CircleShape("P", new Vector2(232, 194), 15, false);
+
+            this.playerShape = new CircleShape("P", new Vector2(GameHelper.TileSize * 3, GameHelper.TileSize * 3) - new Vector2(GameHelper.TileSize) / 2, GameHelper.TileSize / 2, false);
+            this.collisionManager.AddShape(this.playerShape);
+
+            //this.collisionManager.AddShape(new CircleShape("P1", new Vector2(232, 194), 15));
+            //this.collisionManager.AddShape(new CircleShape("P2", new Vector2(192, 260), 15));
+            //this.collisionManager.AddShape(new CircleShape("P3", new Vector2(280, 350), 15));
+            //this.collisionManager.AddShape(new CircleShape("P4", new Vector2(352, 260), 15));
+
+
+            //
+            // Test geometries
+            // 
+
+
+            // Polygons
+            var sizePolygon = new Vector2(150, 250);
+            var polygonVertices = MathUtils.GetConvexHull(new[]
+            {
+                new Vector2(sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
+                new Vector2(-sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
+                new Vector2(-15, 0),
+                new Vector2(15, 0)
+            });
+            this.polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
+            this.collisionManager.AddShape(this.polygon);
+
+            var a1 = MathUtils.CreateRectangle(150, 150);
+            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), MathUtils.GetConvexHull(a1), 45);
+            this.collisionManager.AddShape(polygon2);
+
+            var a2 = MathUtils.CreateRectangle(150, 150);
+            var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), MathUtils.GetConvexHull(a2));
+            this.collisionManager.AddShape(polygon3);
+
+
+            // Circles
+            this.collisionManager.AddShape(new CircleShape("C1", new Vector2(5 * GameHelper.TileSize, 5 * GameHelper.TileSize), GameHelper.TileSize * 2));
+            this.collisionManager.AddShape(new CircleShape("C2", new Vector2(10 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize + 20), GameHelper.TileSize * 2));
+
+
+            // Lines
+            var offset = new Vector2(800, 100);
+            this.collisionManager.AddShape(new LineShape(
+                new Vector2(100 + offset.X, 100 + offset.Y),
+                new Vector2(200 + offset.X, 100 + offset.Y)
+            ));
+
+            offset += new Vector2(0, 80);
+            this.collisionManager.AddShape(new LineShape(
+                new Vector2(200 + offset.X, 100 + offset.Y),
+                new Vector2(200 + offset.X, 200 + offset.Y)
+            ));
+
+            offset += new Vector2(0, 80);
+            this.collisionManager.AddShape(new LineShape(
+                new Vector2(200 + offset.X, 200 + offset.Y),
+                new Vector2(100 + offset.X, 200 + offset.Y)
+            ));
+
+            offset += new Vector2(0, -50);
+            this.collisionManager.AddShape(new LineShape(
+                new Vector2(100 + offset.X, 200 + offset.Y),
+                new Vector2(100 + offset.X, 100 + offset.Y)
+            ));
+
+
+            //this.collisionManager.AddShape(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
+            //this.collisionManager.AddShape(new RectangleShape("EventGate", new Rectangle(1376, 96, 192, 32)));
+            //this.collisionManager.AddShape(new RectangleShape("EventPater", new Rectangle(640, 2336, 224, 160)));
+            //this.collisionManager.AddShape(new RectangleShape("EventPaterChildrenCrash", new Rectangle(1440, 384, 160, 192)));
+
+            //this.collisionManager.AddShape(new CircleShape("JungeFrau", new Vector2(314 + 15, 1271 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Mara", new Vector2(1737 + 15, 1400 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Anja", new Vector2(1737 + 15, 1565 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Tomy", new Vector2(1344 + 15, 1384 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Mimi", new Vector2(1372 + 15, 1420 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Lilly", new Vector2(1313 + 15, 1409 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Händler", new Vector2(1566 + 15, 476 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Will", new Vector2(1376 + 15, 192 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Wache2", new Vector2(2275 + 15, 1528 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Wache3", new Vector2(1313 + 15, 2383 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("AlteFrau", new Vector2(289 + 15, 863 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Neko", new Vector2(320 + 15, 864 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Lilly2", new Vector2(1498 + 15, 57 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Mimi2", new Vector2(1499 + 15, -9.536743E-07f + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Tomy2", new Vector2(1498 + 15, 28 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Ben", new Vector2(416 + 15, 480 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Frau2", new Vector2(2560 + 15, 2208 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel2", new Vector2(674 + 15, 607 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel3", new Vector2(1044 + 15, 1126 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel4", new Vector2(1415 + 15, 961 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel5", new Vector2(618 + 15, 1719 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel6", new Vector2(1312 + 15, 1897 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel7", new Vector2(576 + 15, 2457 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel8", new Vector2(1683 + 15, 2315 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel9", new Vector2(2348 + 15, 1983 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel10", new Vector2(2287 + 15, 1422 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel11", new Vector2(1505 + 15, 1614 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel12", new Vector2(1876 + 15, 810 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel13", new Vector2(1174 + 15, 677 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Vogel1", new Vector2(2368 + 15, 512 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("AlterMann", new Vector2(572 + 15, 1926 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Pater", new Vector2(736 + 15, 2368 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling2", new Vector2(961.9999f + 15, 2114 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling5", new Vector2(1338 + 15, 595.9999f + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling1", new Vector2(460 + 15, 1054 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling4", new Vector2(1782 + 15, 1712 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling6", new Vector2(668 + 15, 446 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling9", new Vector2(2576 + 15, 1596 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling10", new Vector2(1356 + 15, 2412 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling11", new Vector2(2134 + 15, 452 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling12", new Vector2(2274 + 15, 877.9999f + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling13", new Vector2(1450 + 15, 2334 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling7", new Vector2(592 + 15, 1606 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling3", new Vector2(1758 + 15, 1086 + 15), 15));
+            //this.collisionManager.AddShape(new CircleShape("Schmetterling8", new Vector2(2056 + 15, 2080 + 15), 15));
+
 
             // Camera
             this.camera = new Camera2D();
@@ -378,6 +334,18 @@ namespace CollisionFloatTestNewMono.Engine
             this.camera.ChangeMapSize(this.mapWidth, this.mapHeight);
             this.camera.SetZoomLevel(1);
             this.camera.SetFocusPosition(Vector2.Zero);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="collisionManager"></param>
+        /// <param name="shapeCollision"></param>
+        private bool CollisionManagerOnOnCollision(CollisionManager collisionManager, ShapeCollision shapeCollision)
+        {
+            shapeCollision.ShapeA.Color = Color.Red;
+            shapeCollision.ShapeB.Color = Color.Red;
+            return true;
         }
 
 
@@ -396,9 +364,8 @@ namespace CollisionFloatTestNewMono.Engine
 
             if (newState.IsKeyDown(Keys.F4) && !this.oldState.IsKeyDown(Keys.F4))
             {
-                var oldPosition = ((CircleShape)this.playerShape).TilePosition;
-                this.playerShape.SetPosition(Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(this.camera.ViewMatrixWithOffset)));
-                this.spatialGrid.Move(oldPosition, ((CircleShape)this.playerShape).TilePosition, this.playerShape);
+                // Position updaten
+                this.collisionManager.SetShapePosition(this.playerShape, Vector2.Transform(new Vector2(Mouse.GetState().X, Mouse.GetState().Y), Matrix.Invert(this.camera.ViewMatrixWithOffset)));
             }
 
             var velocityDirection = Vector2.Zero;
@@ -431,9 +398,9 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.oldState = newState;
 
-            //// Bewegen....
-            //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
-            //this.polygon.SetRotation(MathHelper.ToRadians((int)MathHelper.Lerp(0, 360, time)));
+            // Bewegen....
+            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
+            this.polygon.SetRotation(MathHelper.ToRadians((int)MathHelper.Lerp(0, 360, time)));
 
             this.playerShape.Color = Color.Fuchsia;
             this.playerShape.ResetVelocity();
@@ -444,136 +411,14 @@ namespace CollisionFloatTestNewMono.Engine
                 this.playerShape.ApplyVelocity(velocityDirection * this.playerSpeed * elapsed);
             }
 
-            for (var index = 0; index < this.shapes.Count; index++)
-            {
-                var shape = this.shapes[index];
+            foreach (var shape in this.collisionManager.Shapes)
                 shape.Color = Color.Fuchsia;
-            }
 
-            // Umliegende Shapes
-            var currentWorldPosition = this.playerShape.Position;
-            var currentTilePosition = GameHelper.ConvertPositionToTilePosition(currentWorldPosition);
-
-            var allShapesAround = this.spatialGrid.GetFromArea(new Rectangle(currentTilePosition.X - 5, currentTilePosition.Y - 5, 10, 10));
-
-            foreach (var shape in allShapesAround)
+            foreach (var shape in this.collisionManager.AllShapesAround(this.playerShape))
                 shape.Color = Color.Yellow;
 
-            var shapeCount = allShapesAround.Count;
-            for (var indexOuter = 0; indexOuter < shapeCount; indexOuter++)
-            {
-                var iterations = 0;
-                bool hasCollison;
-                do
-                {
-                    var shapeA = allShapesAround[indexOuter];
-                    hasCollison = false;
-
-                    for (var indexInner = 0; indexInner < shapeCount; indexInner++)
-                    {
-                        var shapeB = allShapesAround[indexInner];
-                        if (shapeA.IsStatic || shapeA == shapeB || shapeA.IsStatic == shapeB.IsStatic)
-                            continue;
-
-                        var type1 = shapeA.ShapeType;
-                        var type2 = shapeB.ShapeType;
-                        Shape sortedShapeA;
-                        Shape sortedShapeB;
-
-                        if ((type1 >= type2 || type1 == ShapeType.Line && type2 == ShapeType.Polygon) && !(type2 == ShapeType.Line && type1 == ShapeType.Polygon))
-                        {
-                            sortedShapeA = shapeA;
-                            sortedShapeB = shapeB;
-                        }
-                        else
-                        {
-                            sortedShapeA = shapeB;
-                            sortedShapeB = shapeA;
-                        }
-
-                        var newVelocity = Vector2.Zero;
-                        var shapeContactType = registers[(int)shapeA.ShapeType, (int)shapeB.ShapeType];
-                        switch (shapeContactType)
-                        {
-                            case ShapeContactType.Circle:
-
-                                // Circle->Circle
-                                newVelocity += this.collisionManager.CollidesCircles((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
-
-                                break;
-                            case ShapeContactType.PolygonAndCircle:
-
-                                if (shapeA is PolygonShape && shapeB is CircleShape)
-                                {
-                                    // Polygon->Circle
-                                    newVelocity += this.collisionManager.CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
-                                }
-                                else
-                                {
-                                    // Polygon->Circle
-                                    newVelocity += this.collisionManager.CollidesPolygonAndCircle((CircleShape)sortedShapeB, (PolygonShape)sortedShapeA);
-                                }
-
-                                break;
-                            case ShapeContactType.LineAndCircle:
-
-                                // Line->Circle
-                                newVelocity += this.collisionManager.CollidesLineAndCircle((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
-
-                                break;
-                            case ShapeContactType.Polygon:
-
-                                // Polygon->Polygon
-                                newVelocity += this.collisionManager.CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
-
-                                break;
-                            case ShapeContactType.LineAndPolygon:
-
-                                // Polygon->Circle
-                                newVelocity += this.collisionManager.CollidesLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
-
-                                break;
-                        }
-
-                        if (newVelocity != Vector2.Zero)
-                        {
-                            shapeA.ApplyVelocity(newVelocity);
-                            shapeB.Color = Color.Red;
-                            hasCollison = true;
-                        }
-                    }
-
-                    iterations++;
-                }
-                while (hasCollison && iterations <= 10);
-            }
-
-            // Bewegen
-            foreach (var shape in allShapesAround)
-            {
-                if (shape.Velocity != Vector2.Zero)
-                {
-                    switch (shape)
-                    {
-                        case CircleShape circleShape:
-                            {
-                                var oldPosition = circleShape.TilePosition;
-                                circleShape.MoveByVelocity(new Vector2((int)Math.Round(circleShape.Velocity.X), (int)Math.Round(circleShape.Velocity.Y)));
-                                this.spatialGrid.Move(oldPosition, circleShape.TilePosition, circleShape);
-                            }
-                            break;
-                        case PolygonShape polygonShape:
-                            {
-                                //var oldPosition = polygonShape.TilePosition;
-                                //polygonShape.MoveByVelocity(new Vector2((int)Math.Round(polygonShape.Velocity.X), (int)Math.Round(polygonShape.Velocity.Y)));
-                                //this.spatialGrid.Move(oldPosition, polygonShape.TilePosition, polygonShape);
-                            }
-                            break;
-                    }
-                }
-
-                shape.ResetVelocity();
-            }
+            // Update
+            this.collisionManager.Update(gameTime);
 
             // Camera
             this.camera.SetFocusPosition(this.playerShape.Position);
@@ -601,9 +446,8 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.primitiveBatch.Begin(ref this.projection, ref this.view);
 
-            for (var index = 0; index < this.shapes.Count; index++)
+            foreach (var shape in this.collisionManager.Shapes)
             {
-                var shape = this.shapes[index];
                 switch (shape)
                 {
                     case CircleShape circleShape:
@@ -622,13 +466,6 @@ namespace CollisionFloatTestNewMono.Engine
 
                         break;
                 }
-
-                // AABB rendern
-                var boundingBoxVertices = GameHelper.CreateVerticesFromRectangle(shape.BoundingBox);
-                this.primitiveBatch.DrawPolygon(boundingBoxVertices, Vector2.Zero, 0, Color.DarkOrange);
-
-                var boundingBoxTileMapVertices = GameHelper.CreateVerticesFromRectangle(new Rectangle(shape.BoundingBoxTileMap.X * GameHelper.TileSize, shape.BoundingBoxTileMap.Y * GameHelper.TileSize, shape.BoundingBoxTileMap.Width * GameHelper.TileSize, shape.BoundingBoxTileMap.Height * GameHelper.TileSize));
-                this.primitiveBatch.DrawPolygon(boundingBoxTileMapVertices, Vector2.Zero, 0, Color.BlueViolet);
             }
 
             this.primitiveBatch.End();
