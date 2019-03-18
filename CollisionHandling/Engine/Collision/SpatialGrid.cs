@@ -13,7 +13,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
     /// </summary>
     public sealed class SpatialGrid
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly int gridWidthInTiles;
+
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly int gridHeightInTiles;
 
         /// <summary>
@@ -34,7 +41,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         {
             var sw = new Stopwatch();
             sw.Start();
-            
+
             this.gridWidthInTiles = gridWidthInTiles;
             this.gridHeightInTiles = gridHeightInTiles;
 
@@ -75,6 +82,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="shape"></param>
         public void Insert(Point point, Shape shape)
         {
+            if (point.X < 0 || point.Y < 0 || point.X >= this.gridWidthInTiles || point.Y >= this.gridHeightInTiles)
+                return;
+
             this.storage[point].Add(shape);
         }
 
