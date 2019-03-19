@@ -33,8 +33,9 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="start"></param>
         /// <param name="end"></param>
         /// <param name="isStatic"></param>
-        public LineShape(Vector2 start, Vector2 end, bool isStatic = true)
-            : base(ShapeType.Line, "Line", Vector2.Zero, 0, isStatic)
+        /// <param name="name"></param>
+        public LineShape(Vector2 start, Vector2 end, bool isStatic = true, string name = null)
+            : base(ShapeType.Line, name ?? "Line", Vector2.Zero, 0, isStatic)
         {
             this.Start = start;
             this.End = end;

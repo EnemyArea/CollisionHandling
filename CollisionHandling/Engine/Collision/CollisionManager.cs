@@ -14,14 +14,6 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 {
     /// <summary>
     /// </summary>
-    /// <param name="collisionManager"></param>
-    /// <param name="shapeCollision"></param>
-    /// <returns></returns>
-    public delegate bool CollisionHandler(CollisionManager collisionManager, ShapeCollision shapeCollision);
-
-
-    /// <summary>
-    /// </summary>
     public sealed class CollisionManager
     {
         /// <summary>
@@ -52,6 +44,10 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             public bool IsSearchedBottom;
         }
 
+
+        /// <summary>
+        /// </summary>
+        public event SeperationHandler OnSeparation;
 
         /// <summary>
         /// </summary>
@@ -94,6 +90,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             }
         };
 
+        /// <summary>
+        /// </summary>
+        private readonly HashSet<ShapeCollision> collisions = new HashSet<ShapeCollision>();
 
         /// <summary>
         /// </summary>
@@ -158,8 +157,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             var reversedMapData = new int[width, height];
 
             for (var y = 0; y < height; y++)
-            for (var x = 0; x < width; x++)
-                reversedMapData[x, y] = mapCollisionData[y, x];
+                for (var x = 0; x < width; x++)
+                    reversedMapData[x, y] = mapCollisionData[y, x];
 
             return reversedMapData;
         }
@@ -568,7 +567,111 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <returns></returns>
         private static Vector2 CollidesLineAndPolygon(LineShape lineA, PolygonShape polyB)
         {
+            // TODO: implementieren!
             return Vector2.Zero;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="lineA"></param>
+        /// <param name="circleB"></param>
+        /// <returns></returns>
+        private static bool OverlapLineAndCircle(LineShape lineA, CircleShape circleB)
+        {
+            // TODO: make that better!
+            return CollidesLineAndCircle(lineA, circleB) != Vector2.Zero;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="circleA"></param>
+        /// <param name="circleB"></param>
+        /// <returns></returns>
+        private static bool OverlapCircles(CircleShape circleA, CircleShape circleB)
+        {
+            var testCircle1 = new Circle(circleA.Radius);
+            var testCircle2 = new Circle(circleB.Radius);
+
+            var intercects = CollisionHelper.Intersects(testCircle1, testCircle2,
+                circleA.Position - new Vector2(circleA.Radius) + circleA.Velocity,
+                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity, true);
+
+            return intercects;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="polyA"></param>
+        /// <param name="polyB"></param>
+        /// <returns></returns>
+        private static bool OverlapPolygons(PolygonShape polyA, PolygonShape polyB)
+        {
+            var testPoly1 = new Polygon(polyA.Vertices);
+            var testPoly2 = new Polygon(polyB.Vertices);
+
+            var intercects = CollisionHelper.Intersects(testPoly1, testPoly2,
+                polyA.Position + polyA.Velocity,
+                polyB.Position + polyB.Velocity,
+                new Rotation(polyA.Rotation),
+                new Rotation(polyB.Rotation), true);
+
+            return intercects;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="polyA"></param>
+        /// <param name="circleB"></param>
+        /// <returns></returns>
+        private static bool OverlapPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
+        {
+            var testPoly = new Polygon(polyA.Vertices);
+            var testCircle = new Circle(circleB.Radius);
+            var rota = new Rotation(polyA.Rotation);
+
+            var intercects = CollisionHelper.Intersects(testPoly, testCircle,
+                polyA.Position + polyA.Velocity,
+                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                rota, true);
+
+            return intercects;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="circleB"></param>
+        /// <param name="polyA"></param>
+        /// <returns></returns>
+        private static bool OverlapPolygonAndCircle(CircleShape circleB, PolygonShape polyA)
+        {
+            var testPoly = new Polygon(polyA.Vertices);
+            var testCircle = new Circle(circleB.Radius);
+            var rota = new Rotation(polyA.Rotation);
+
+            var intercects = CollisionHelper.Intersects(testCircle, testPoly,
+                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                polyA.Position + polyA.Velocity,
+                rota, true);
+
+            return intercects;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="lineA"></param>
+        /// <param name="polyB"></param>
+        /// <returns></returns>
+        private static bool OverlapLineAndPolygon(LineShape lineA, PolygonShape polyB)
+        {
+            return false;
         }
 
 
@@ -593,6 +696,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <returns></returns>
         private void SolveCollisions(Shape shapeA, ICollection<Shape> allShapesAround)
         {
+            this.collisions.Clear();
             var iterations = 0;
             bool hasCollison;
             do
@@ -601,7 +705,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
                 foreach (var shapeB in allShapesAround)
                 {
-                    if (shapeA.IsStatic || shapeA == shapeB || shapeA.IsStatic == shapeB.IsStatic)
+                    if (shapeA.IsStatic || shapeA == shapeB || shapeA.IsStatic == shapeB.IsStatic || !shapeA.IsEnabled || !shapeB.IsEnabled)
                         continue;
 
                     var type1 = shapeA.ShapeType;
@@ -621,57 +725,127 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                     }
 
                     var newVelocity = Vector2.Zero;
+                    var isSensor = shapeA.IsSensor || shapeB.IsSensor;
+                    var isOverlapping = false;
                     var shapeContactType = registers[(int)shapeA.ShapeType, (int)shapeB.ShapeType];
                     switch (shapeContactType)
                     {
                         case ShapeContactType.Circle:
 
-                            // Circle->Circle
-                            newVelocity += CollidesCircles((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
+                            if (isSensor)
+                            {
+                                // Circle->Circle
+                                isOverlapping = OverlapCircles((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
+                            }
+                            else
+                            {
+                                // Circle->Circle
+                                newVelocity += CollidesCircles((CircleShape)sortedShapeA, (CircleShape)sortedShapeB);
+                            }
 
                             break;
                         case ShapeContactType.PolygonAndCircle:
 
                             if (shapeA is PolygonShape && shapeB is CircleShape)
                             {
-                                // Polygon->Circle
-                                newVelocity += CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                if (isSensor)
+                                {
+                                    // Circle->Circle
+                                    isOverlapping = OverlapPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                }
+                                else
+                                {
+                                    // Polygon->Circle
+                                    newVelocity += CollidesPolygonAndCircle((PolygonShape)sortedShapeA, (CircleShape)sortedShapeB);
+                                }
                             }
                             else
                             {
-                                // Polygon->Circle
-                                newVelocity += CollidesPolygonAndCircle((CircleShape)sortedShapeB, (PolygonShape)sortedShapeA);
+                                if (isSensor)
+                                {
+                                    // Circle->Circle
+                                    isOverlapping = OverlapPolygonAndCircle((CircleShape)sortedShapeB, (PolygonShape)sortedShapeA);
+                                }
+                                else
+                                {
+                                    // Polygon->Circle
+                                    newVelocity += CollidesPolygonAndCircle((CircleShape)sortedShapeB, (PolygonShape)sortedShapeA);
+                                }
                             }
 
                             break;
                         case ShapeContactType.LineAndCircle:
 
-                            // Line->Circle
-                            newVelocity += CollidesLineAndCircle((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
+                            if (isSensor)
+                            {
+                                // Circle->Circle
+                                isOverlapping = OverlapLineAndCircle((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
+                            }
+                            else
+                            {
+                                // Line->Circle
+                                newVelocity += CollidesLineAndCircle((LineShape)sortedShapeA, (CircleShape)sortedShapeB);
+                            }
 
                             break;
                         case ShapeContactType.Polygon:
 
-                            // Polygon->Polygon
-                            newVelocity += CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
+                            if (isSensor)
+                            {
+                                // Circle->Circle
+                                isOverlapping = OverlapPolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
+                            }
+                            else
+                            {
+                                // Polygon->Polygon
+                                newVelocity += CollidePolygons((PolygonShape)sortedShapeA, (PolygonShape)sortedShapeB);
+                            }
 
                             break;
                         case ShapeContactType.LineAndPolygon:
 
-                            // Polygon->Circle
-                            newVelocity += CollidesLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
+                            if (isSensor)
+                            {
+                                // Circle->Circle
+                                isOverlapping = OverlapLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
+                            }
+                            else
+                            {
+                                // Polygon->Circle
+                                newVelocity += CollidesLineAndPolygon((LineShape)sortedShapeA, (PolygonShape)sortedShapeB);
+                            }
 
                             break;
                     }
 
-                    if (newVelocity != Vector2.Zero)
+                    if (isOverlapping)
                     {
-                        // Collision
-                        hasCollison = this.OnCollision?.Invoke(this, new ShapeCollision(shapeContactType, shapeA, shapeB, newVelocity)) ?? true;
+                        // Contact
+                        var shapeCollision = new ShapeCollision(shapeContactType, shapeA, shapeB);
 
-                        // Apply velocity
-                        if (hasCollison)
-                            shapeA.ApplyVelocity(newVelocity);
+                        // Add collison contact
+                        this.collisions.Add(shapeCollision);
+                    }
+                    else
+                    {
+                        if (newVelocity != Vector2.Zero)
+                        {
+                            // Contact
+                            var shapeCollision = new ShapeCollision(shapeContactType, shapeA, shapeB);
+
+                            // Collision
+                            hasCollison = this.OnSeparation?.Invoke(this, new ShapeCollision(shapeContactType, shapeA, shapeB)) ?? true;
+
+                            // Apply velocity
+                            if (hasCollison)
+                            {
+                                // Apply velocity
+                                shapeA.ApplyVelocity(newVelocity);
+
+                                // Add collison contact
+                                this.collisions.Add(shapeCollision);
+                            }
+                        }
                     }
                 }
 
@@ -689,7 +863,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             foreach (var shape in this.shapes)
             {
                 // Ignore
-                if (shape.IsStatic)
+                if (shape.IsStatic || !shape.IsEnabled)
                     continue;
 
                 // Umliegende Shapes
@@ -697,6 +871,15 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
                 // Solve collisions
                 this.SolveCollisions(shape, shapesAround);
+
+                // Collisions
+                if (this.OnCollision != null && this.collisions.Count > 0)
+                {
+                    foreach (var shapeCollision in this.collisions)
+                    {
+                        this.OnCollision.Invoke(this, shapeCollision);
+                    }
+                }
 
                 // Ignore if no velocity
                 if (shape.Velocity == Vector2.Zero)
@@ -708,7 +891,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                     case CircleShape circleShape:
                         {
                             var oldPosition = circleShape.TilePosition;
-                            circleShape.MoveByVelocity(new Vector2((int)Math.Round(circleShape.Velocity.X), (int)Math.Round(circleShape.Velocity.Y)));
+                            circleShape.MoveByVelocity(circleShape.Velocity);
                             this.spatialGrid.Move(oldPosition, circleShape.TilePosition, circleShape);
                         }
                         break;

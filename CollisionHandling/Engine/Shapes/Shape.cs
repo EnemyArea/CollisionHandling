@@ -47,6 +47,14 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// </summary>
         public bool IsStatic { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        public bool IsSensor { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public bool IsEnabled { get; set; }
+
 
         /// <summary>
         /// </summary>
@@ -63,6 +71,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
             this.Position = position;
             this.Rotation = rotation;
             this.IsStatic = isStatic;
+            this.IsEnabled = true;
         }
 
 

@@ -22,24 +22,27 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <summary>
         /// </summary>
         public Shape ShapeB { get; }
-
-        /// <summary>
-        /// </summary>
-        public Vector2 Velocity { get; }
-
+        
 
         /// <summary>
         /// </summary>
         /// <param name="shapeContactType"></param>
         /// <param name="shapeA"></param>
         /// <param name="shapeB"></param>
-        /// <param name="velocity"></param>
-        public ShapeCollision(ShapeContactType shapeContactType, Shape shapeA, Shape shapeB, Vector2 velocity)
+        public ShapeCollision(ShapeContactType shapeContactType, Shape shapeA, Shape shapeB)
         {
             this.ShapeContactType = shapeContactType;
             this.ShapeA = shapeA;
             this.ShapeB = shapeB;
-            this.Velocity = velocity;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $"{this.ShapeContactType} => {this.ShapeA.Name} & {this.ShapeB.Name}";
         }
     }
 }

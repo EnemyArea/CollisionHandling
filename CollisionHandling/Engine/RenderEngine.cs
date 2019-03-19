@@ -1,5 +1,6 @@
 ﻿#region
 
+using System.Diagnostics;
 using System.Linq;
 using CollisionFloatTestNewMono.Engine.Collision;
 using CollisionFloatTestNewMono.Engine.Math2;
@@ -188,7 +189,8 @@ namespace CollisionFloatTestNewMono.Engine
 
             // Fill the collisionManager
             this.collisionManager = new CollisionManager(this.mapWidth, this.mapHeight);
-            this.collisionManager.OnCollision += this.CollisionManagerOnOnCollision;
+            this.collisionManager.OnSeparation += this.OnSeparation;
+            this.collisionManager.OnCollision += this.OnCollision;
             //this.collisionManager.AddShapes(this.collisionManager.CreateHullForBody(this.mapWidth, this.mapHeight, mapData, true).ToArray());
 
 
@@ -239,6 +241,7 @@ namespace CollisionFloatTestNewMono.Engine
             var a1 = MathUtils.CreateRectangle(150, 150);
             var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), MathUtils.GetConvexHull(a1), 45);
             this.collisionManager.AddShape(polygon2);
+            polygon2.IsSensor = true;
 
             var a2 = MathUtils.CreateRectangle(150, 150);
             var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), MathUtils.GetConvexHull(a2));
@@ -254,25 +257,25 @@ namespace CollisionFloatTestNewMono.Engine
             var offset = new Vector2(800, 100);
             this.collisionManager.AddShape(new LineShape(
                 new Vector2(100 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 100 + offset.Y)
+                new Vector2(200 + offset.X, 100 + offset.Y), name: "Line1"
             ));
 
-            offset += new Vector2(0, 80);
+            //offset += new Vector2(0, 80);
             this.collisionManager.AddShape(new LineShape(
                 new Vector2(200 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 200 + offset.Y)
+                new Vector2(200 + offset.X, 200 + offset.Y), name: "Line2"
             ));
 
-            offset += new Vector2(0, 80);
+            //offset += new Vector2(0, 80);
             this.collisionManager.AddShape(new LineShape(
                 new Vector2(200 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 200 + offset.Y)
+                new Vector2(100 + offset.X, 200 + offset.Y), name: "Line3"
             ));
 
-            offset += new Vector2(0, -50);
+            //offset += new Vector2(0, -50);
             this.collisionManager.AddShape(new LineShape(
                 new Vector2(100 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 100 + offset.Y)
+                new Vector2(100 + offset.X, 100 + offset.Y), name: "Line4"
             ));
 
 
@@ -341,11 +344,27 @@ namespace CollisionFloatTestNewMono.Engine
         /// </summary>
         /// <param name="collisionManager"></param>
         /// <param name="shapeCollision"></param>
-        private bool CollisionManagerOnOnCollision(CollisionManager collisionManager, ShapeCollision shapeCollision)
+        private bool OnSeparation(CollisionManager collisionManager, ShapeCollision shapeCollision)
+        {
+            //shapeCollision.ShapeA.Color = Color.Red;
+            //shapeCollision.ShapeB.Color = Color.Red;
+
+            //Debug.WriteLine(shapeCollision);
+
+            return true;
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="collisionManager"></param>
+        /// <param name="shapeCollision"></param>
+        private void OnCollision(CollisionManager collisionManager, ShapeCollision shapeCollision)
         {
             shapeCollision.ShapeA.Color = Color.Red;
             shapeCollision.ShapeB.Color = Color.Red;
-            return true;
+
+            Debug.WriteLine(shapeCollision);
         }
 
 
