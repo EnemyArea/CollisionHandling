@@ -1,5 +1,7 @@
 ﻿#region
 
+using System.Collections.Generic;
+using CollisionFloatTestNewMono.Engine.Collision;
 using Microsoft.Xna.Framework;
 
 #endregion
@@ -38,7 +40,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <summary>
         /// </summary>
         public Rectangle BoundingBox { get; protected set; }
-        
+
         /// <summary>
         /// </summary>
         public Rectangle BoundingBoxTileMap { get; protected set; }
@@ -54,6 +56,18 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <summary>
         /// </summary>
         public bool IsEnabled { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public IList<Shape> IgnoredCollisions { get; private set; }
+
+        /// <summary>
+        /// </summary>
+        public CollisionCategory CollisionCategory { get; set; }
+
+        /// <summary>
+        /// </summary>
+        public CollisionCategory CollidesOnyWithCategories { get; set; }
 
 
         /// <summary>
@@ -72,6 +86,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
             this.Rotation = rotation;
             this.IsStatic = isStatic;
             this.IsEnabled = true;
+            this.IgnoredCollisions = new List<Shape>();
         }
 
 
@@ -80,8 +95,8 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="position"></param>
         public virtual void SetPosition(Vector2 position)
         {
-            this.Position = position;      
-            this.UpdateBoundingBox();   
+            this.Position = position;
+            this.UpdateBoundingBox();
         }
 
 

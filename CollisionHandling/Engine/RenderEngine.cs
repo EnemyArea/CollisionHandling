@@ -213,6 +213,8 @@ namespace CollisionFloatTestNewMono.Engine
             //this.playerShape = new CircleShape("P", new Vector2(232, 194), 15, false);
 
             this.playerShape = new CircleShape("P", new Vector2(GameHelper.TileSize * 3, GameHelper.TileSize * 3) - new Vector2(GameHelper.TileSize) / 2, GameHelper.TileSize / 2, false);
+            this.playerShape.CollisionCategory = CollisionCategory.Cat1;
+            this.playerShape.CollidesOnyWithCategories = CollisionCategory.Cat1 | CollisionCategory.Cat3;
             this.collisionManager.AddShape(this.playerShape);
 
             //this.collisionManager.AddShape(new CircleShape("P1", new Vector2(232, 194), 15));
@@ -236,6 +238,7 @@ namespace CollisionFloatTestNewMono.Engine
                 new Vector2(15, 0)
             });
             this.polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
+            this.polygon.CollisionCategory = CollisionCategory.Cat4;
             this.collisionManager.AddShape(this.polygon);
 
             var a1 = MathUtils.CreateRectangle(150, 150);
@@ -247,10 +250,17 @@ namespace CollisionFloatTestNewMono.Engine
             var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), MathUtils.GetConvexHull(a2));
             this.collisionManager.AddShape(polygon3);
 
+            this.collisionManager.IgnoreCollisionsOf(this.playerShape, polygon3);
+
 
             // Circles
-            this.collisionManager.AddShape(new CircleShape("C1", new Vector2(5 * GameHelper.TileSize, 5 * GameHelper.TileSize), GameHelper.TileSize * 2));
-            this.collisionManager.AddShape(new CircleShape("C2", new Vector2(10 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize + 20), GameHelper.TileSize * 2));
+            var circle1 = new CircleShape("C1", new Vector2(5 * GameHelper.TileSize, 5 * GameHelper.TileSize), GameHelper.TileSize * 2);
+            circle1.CollisionCategory = CollisionCategory.Cat1;
+            this.collisionManager.AddShape(circle1);
+
+            var circle2 = new CircleShape("C2", new Vector2(10 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize + 20), GameHelper.TileSize * 2);
+            circle2.CollisionCategory = CollisionCategory.Cat2;
+            this.collisionManager.AddShape(circle2);
 
 
             // Lines

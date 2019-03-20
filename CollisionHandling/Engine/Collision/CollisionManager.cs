@@ -89,7 +89,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 ShapeContactType.Polygon // 2,2 = Polygon->Polygon
             }
         };
-
+        
         /// <summary>
         /// </summary>
         private readonly HashSet<ShapeCollision> collisions = new HashSet<ShapeCollision>();
@@ -157,8 +157,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             var reversedMapData = new int[width, height];
 
             for (var y = 0; y < height; y++)
-                for (var x = 0; x < width; x++)
-                    reversedMapData[x, y] = mapCollisionData[y, x];
+            for (var x = 0; x < width; x++)
+                reversedMapData[x, y] = mapCollisionData[y, x];
 
             return reversedMapData;
         }
@@ -573,7 +573,6 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="lineA"></param>
         /// <param name="circleB"></param>
@@ -624,7 +623,6 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="polyA"></param>
         /// <param name="circleB"></param>
@@ -671,6 +669,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <returns></returns>
         private static bool OverlapLineAndPolygon(LineShape lineA, PolygonShape polyB)
         {
+            // TODO: implementieren!
             return false;
         }
 
@@ -692,6 +691,28 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <summary>
         /// </summary>
         /// <param name="shapeA"></param>
+        /// <param name="shapeB"></param>
+        public void IgnoreCollisionsOf(Shape shapeA, Shape shapeB)
+        {
+            shapeA.IgnoredCollisions.Add(shapeB);
+            shapeB.IgnoredCollisions.Add(shapeA);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="shapeA"></param>
+        /// <param name="shapeB"></param>
+        public void EnableCollisionWith(Shape shapeA, Shape shapeB)
+        {
+            shapeA.IgnoredCollisions.Remove(shapeB);
+            shapeB.IgnoredCollisions.Remove(shapeA);
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="shapeA"></param>
         /// <param name="allShapesAround"></param>
         /// <returns></returns>
         private void SolveCollisions(Shape shapeA, ICollection<Shape> allShapesAround)
@@ -705,7 +726,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
                 foreach (var shapeB in allShapesAround)
                 {
-                    if (shapeA.IsStatic || shapeA == shapeB || shapeA.IsStatic == shapeB.IsStatic || !shapeA.IsEnabled || !shapeB.IsEnabled)
+                    if (shapeA.IsStatic ||
+                        shapeA == shapeB ||
+                        shapeA.IsStatic == shapeB.IsStatic ||
+                        !shapeA.IsEnabled ||
+                        !shapeB.IsEnabled ||
+                        shapeA.IgnoredCollisions.Contains(shapeB) ||
+                        shapeB.IgnoredCollisions.Contains(shapeA) || 
+                        !shapeA.CollidesOnyWithCategories.HasFlag(shapeB.CollisionCategory))
                         continue;
 
                     var type1 = shapeA.ShapeType;

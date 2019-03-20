@@ -44,7 +44,9 @@
     <Compile Include="Engine\Aabb.cs" />
     <Compile Include="Engine\AabbHelper.cs" />
     <Compile Include="Engine\Camera2D.cs" />
+    <Compile Include="Engine\Collision\CollisionCategory.cs" />
     <Compile Include="Engine\Collision\CollisionHandler.cs" />
+    <Compile Include="Engine\Collision\SeperationHandler.cs" />
     <Compile Include="Engine\Collision\ShapeCollision.cs" />
     <Compile Include="Engine\FrameRateCounter.cs" />
     <Compile Include="Engine\Shapes\CircleShape.cs" />
