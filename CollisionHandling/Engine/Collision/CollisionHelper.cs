@@ -296,35 +296,21 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <summary>
         ///     Determines if the circle at the specified position contains the point
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="pos">The top-left of the circles bounding box</param>
         /// <param name="point">The point to check if is in the circle at pos</param>
         /// <param name="strict">If the edges do not count</param>
         /// <returns>If the circle at pos contains point</returns>
-        public static bool Contains(Circle circle, Vector2 pos, Vector2 point, bool strict)
+        public static bool Contains(float radius, Vector2 pos, Vector2 point, bool strict)
         {
-            var distSq = (point - new Vector2(pos.X + circle.Radius, pos.Y + circle.Radius)).LengthSquared();
+            var distSq = (point - new Vector2(pos.X + radius, pos.Y + radius)).LengthSquared();
 
             if (strict)
-                return distSq < circle.Radius * circle.Radius;
+                return distSq < radius * radius;
 
-            return distSq <= circle.Radius * circle.Radius;
+            return distSq <= radius * radius;
         }
 
-        /// <summary>
-        ///     Determines if the first circle at the specified position intersects the second circle
-        ///     at the specified position.
-        /// </summary>
-        /// <param name="circle1">First circle</param>
-        /// <param name="circle">Second circle</param>
-        /// <param name="pos1">Top-left of the bounding box of the first circle</param>
-        /// <param name="pos2">Top-left of the bounding box of the second circle</param>
-        /// <param name="strict">If overlap is required for intersection</param>
-        /// <returns>If circle1 at pos1 intersects circle2 at pos2</returns>
-        public static bool Intersects(Circle circle1, Circle circle, Vector2 pos1, Vector2 pos2, bool strict)
-        {
-            return Intersects(circle1.Radius, circle.Radius, pos1, pos2, strict);
-        }
 
         /// <summary>
         ///     Determines if the first circle of specified radius and (bounding box top left) intersects
@@ -349,19 +335,6 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             return distSq <= (radius1 + radius2) * (radius1 + radius2);
         }
 
-        /// <summary>
-        ///     Determines the shortest axis and overlap for which the first circle at the specified position
-        ///     overlaps the second circle at the specified position. If the circles do not overlap, returns null.
-        /// </summary>
-        /// <param name="circle1">First circle</param>
-        /// <param name="circle">Second circle</param>
-        /// <param name="pos1">Top-left of the first circles bounding box</param>
-        /// <param name="pos2">Top-left of the second circles bounding box</param>
-        /// <returns></returns>
-        public static Vector2 IntersectMtv(Circle circle1, Circle circle, Vector2 pos1, Vector2 pos2)
-        {
-            return IntersectMtv(circle1.Radius, circle.Radius, pos1, pos2);
-        }
 
         /// <summary>
         ///     Determines the shortest axis and overlap for which the first circle, specified by its radius and its bounding
@@ -391,18 +364,6 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             return Vector2.Zero;
         }
 
-        /// <summary>
-        ///     Projects the specified circle with the upper-left at the specified position onto
-        ///     the specified axis.
-        /// </summary>
-        /// <param name="circle">The circle</param>
-        /// <param name="pos">The position of the circle</param>
-        /// <param name="axis">the axis to project along</param>
-        /// <returns>Projects circle at pos along axis</returns>
-        public static AxisAlignedLine ProjectAlongAxis(Circle circle, Vector2 pos, Vector2 axis)
-        {
-            return ProjectAlongAxis(circle.Radius, pos, axis);
-        }
 
         /// <summary>
         ///     Projects a circle defined by its radius and the top-left of its bounding box along
@@ -1099,13 +1060,13 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     intersects the specified circle at it's respective position.
         /// </summary>
         /// <param name="poly">The polygon</param>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="pos1">The origin for the polygon</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <param name="rot1">The rotation of the polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If poly at pos1 with rotation rot1 intersects the circle at pos2</returns>
-        public static bool Intersects(Polygon poly, Circle circle, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict)
+        public static bool Intersects(Polygon poly, float radius, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict)
         {
             // look at pictures of https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection if you don't
             // believe this is true
@@ -1113,13 +1074,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             for (var i = 0; i < poly.Lines.Length; i++)
             {
                 var line = poly.Lines[i];
-                intersectsLine = CircleIntersectsLine(circle, line, pos2, pos1, rot1, poly.Center, strict);
+                intersectsLine = CircleIntersectsLine(radius, line, pos2, pos1, rot1, poly.Center, strict);
                 if (intersectsLine)
                     break;
             }
 
-            return intersectsLine || Contains(poly, pos1, rot1, new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius), strict);
+            return intersectsLine || Contains(poly, pos1, rot1, new Vector2(pos2.X + radius, pos2.Y + radius), strict);
         }
+
 
         /// <summary>
         ///     Determines the minimum translation that must be applied the specified polygon (at the given position
@@ -1128,12 +1090,12 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     Returns a tuple of the axis to move the polygon in (unit vector) and the distance to move the polygon.
         /// </summary>
         /// <param name="poly">The polygon</param>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="pos1">The origin of the polygon</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <param name="rot1">The rotation of the polygon</param>
         /// <returns></returns>
-        public static Vector2 IntersectMtv(Polygon poly, Circle circle, Vector2 pos1, Vector2 pos2, Rotation rot1)
+        public static Vector2 IntersectMtv(Polygon poly, float radius, Vector2 pos1, Vector2 pos2, Rotation rot1)
         {
             // We have two situations, either the circle is not strictly intersecting the polygon, or
             // there exists at least one shortest line that you could push the polygon to prevent 
@@ -1168,7 +1130,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 {
                     checkedAxis.Add(standard);
                     var polyProj = ProjectAlongAxis(poly, pos1, rot1, axis);
-                    var circleProj = ProjectAlongAxis(circle, pos2, axis);
+                    var circleProj = ProjectAlongAxis(radius, pos2, axis);
 
                     var mtv = IntersectMtv(polyProj, circleProj);
                     if (!mtv.HasValue)
@@ -1184,7 +1146,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 return true;
             };
 
-            var circleCenter = new Vector2(pos2.X + circle.Radius, pos2.Y + circle.Radius);
+            var circleCenter = new Vector2(pos2.X + radius, pos2.Y + radius);
             var lastVec = MathUtils.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot1) + pos1;
             for (var curr = 0; curr < poly.Vertices.Length; curr++)
             {
@@ -1208,16 +1170,16 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     Determines if the specified circle, at the given position, intersects the specified polygon,
         ///     at the given position and rotation.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="poly">The polygon</param>
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <param name="rot2">The rotation of the polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If circle at pos1 intersects poly at pos2 with rotation rot2</returns>
-        public static bool Intersects(Circle circle, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict)
+        public static bool Intersects(float radius, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict)
         {
-            return Intersects(poly, circle, pos2, pos1, rot2, strict);
+            return Intersects(poly, radius, pos2, pos1, rot2, strict);
         }
 
         /// <summary>
@@ -1226,61 +1188,61 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     not overlap, returns null. Otherwise, returns a tuple of the unit axis to move the circle in, and the
         ///     distance to move the circle.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="poly">The polygon</param>
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <param name="rot2">The rotation of the polygon</param>
         /// <returns>The mtv to move the circle at pos1 to prevent overlap with the poly at pos2 with rotation rot2</returns>
-        public static Vector2 IntersectMtv(Circle circle, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2)
+        public static Vector2 IntersectMtv(float radius, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2)
         {
-            var res = IntersectMtv(poly, circle, pos2, pos1, rot2);
+            var res = IntersectMtv(poly, radius, pos2, pos1, rot2);
             return -res;
         }
 
         /// <summary>
         ///     Determines if the specified circle an rectangle intersect at their given positions.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="rect">The rectangle</param>
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the rectangle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If circle at pos1 intersects rect at pos2</returns>
-        public static bool Intersects(Circle circle, BoundingBox rect, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(float radius, BoundingBox rect, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            var circleCenter = new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius);
-            return CircleIntersectsHorizontalLine(circle, new Line(rect.Min + pos2, rect.UpperRight + pos2), circleCenter, strict)
-                   || CircleIntersectsHorizontalLine(circle, new Line(rect.LowerLeft + pos2, rect.Max + pos2), circleCenter, strict)
-                   || CircleIntersectsVerticalLine(circle, new Line(rect.Min + pos2, rect.LowerLeft + pos2), circleCenter, strict)
-                   || CircleIntersectsVerticalLine(circle, new Line(rect.UpperRight + pos2, rect.Max + pos2), circleCenter, strict)
-                   || Contains(rect, pos2, new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius), strict);
+            var circleCenter = new Vector2(pos1.X + radius, pos1.Y + radius);
+            return CircleIntersectsHorizontalLine(radius, new Line(rect.Min + pos2, rect.UpperRight + pos2), circleCenter, strict)
+                   || CircleIntersectsHorizontalLine(radius, new Line(rect.LowerLeft + pos2, rect.Max + pos2), circleCenter, strict)
+                   || CircleIntersectsVerticalLine(radius, new Line(rect.Min + pos2, rect.LowerLeft + pos2), circleCenter, strict)
+                   || CircleIntersectsVerticalLine(radius, new Line(rect.UpperRight + pos2, rect.Max + pos2), circleCenter, strict)
+                   || Contains(rect, pos2, new Vector2(pos1.X + radius, pos1.Y + radius), strict);
         }
 
         /// <summary>
         ///     Determines if the specified rectangle and circle intersect at their given positions.
         /// </summary>
         /// <param name="rect">The rectangle</param>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="pos1">The origin of the rectangle</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns></returns>
-        public static bool Intersects(BoundingBox rect, Circle circle, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(BoundingBox rect, float radius, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            return Intersects(circle, rect, pos2, pos1, strict);
+            return Intersects(radius, rect, pos2, pos1, strict);
         }
 
         /// <summary>
         ///     Determines the minimum translation vector to be applied to the circle to
         ///     prevent overlap with the rectangle, when they are at their given positions.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="rect">The rectangle</param>
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The rectangles origin</param>
         /// <returns>MTV for circle at pos1 to prevent overlap with rect at pos2</returns>
-        public static Vector2 IntersectMtv(Circle circle, BoundingBox rect, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(float radius, BoundingBox rect, Vector2 pos1, Vector2 pos2)
         {
             // Same as polygon rect, just converted to rects points
             var checkedAxis = new HashSet<Vector2>();
@@ -1294,7 +1256,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 if (!checkedAxis.Contains(standard))
                 {
                     checkedAxis.Add(standard);
-                    var circleProj = ProjectAlongAxis(circle, pos1, axis);
+                    var circleProj = ProjectAlongAxis(radius, pos1, axis);
                     var rectProj = ProjectAlongAxis(rect, pos2, axis);
 
                     var mtv = IntersectMtv(circleProj, rectProj);
@@ -1311,7 +1273,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 return true;
             };
 
-            var circleCenter = new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius);
+            var circleCenter = new Vector2(pos1.X + radius, pos1.Y + radius);
             var lastVec = rect.UpperRight + pos2;
             for (var curr = 0; curr < 4; curr++)
             {
@@ -1351,13 +1313,13 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     prevent overlap with the circle, when they are at their given positions.
         /// </summary>
         /// <param name="rect">The rectangle</param>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="pos1">The origin of the rectangle</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <returns>MTV for rect at pos1 to prevent overlap with circle at pos2</returns>
-        public static Vector2 IntersectMtv(BoundingBox rect, Circle circle, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(BoundingBox rect, float radius, Vector2 pos1, Vector2 pos2)
         {
-            var res = IntersectMtv(circle, rect, pos2, pos1);
+            var res = IntersectMtv(radius, rect, pos2, pos1);
             return -res;
         }
 
@@ -1398,7 +1360,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     Determines if the circle whose bounding boxs top left is at the first postion intersects the line
         ///     at the second position who is rotated the specified amount about the specified point.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="line">The line</param>
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the line</param>
@@ -1406,17 +1368,17 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="about2">What the line is rotated about</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle at pos1 intersects the line at pos2 rotated rot2 about about2</returns>
-        private static bool CircleIntersectsLine(Circle circle, Line line, Vector2 pos1, Vector2 pos2, Rotation rot2, Vector2 about2, bool strict)
+        private static bool CircleIntersectsLine(float radius, Line line, Vector2 pos1, Vector2 pos2, Rotation rot2, Vector2 about2, bool strict)
         {
             // Make more math friendly
             var actualLine = new Line(MathUtils.Rotate(line.Start, about2, rot2) + pos2, MathUtils.Rotate(line.End, about2, rot2) + pos2);
-            var circleCenter = new Vector2(pos1.X + circle.Radius, pos1.Y + circle.Radius);
+            var circleCenter = new Vector2(pos1.X + radius, pos1.Y + radius);
 
             // Check weird situations
             if (actualLine.Horizontal)
-                return CircleIntersectsHorizontalLine(circle, actualLine, circleCenter, strict);
+                return CircleIntersectsHorizontalLine(radius, actualLine, circleCenter, strict);
             if (actualLine.Vertical)
-                return CircleIntersectsVerticalLine(circle, actualLine, circleCenter, strict);
+                return CircleIntersectsVerticalLine(radius, actualLine, circleCenter, strict);
 
             // Goal:
             // 1. Find closest distance, closestDistance, on the line to the circle (assuming the line was infinite)
@@ -1448,12 +1410,12 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             // Step 1a
             if (strict)
             {
-                if (closestDistance >= circle.Radius)
+                if (closestDistance >= radius)
                     return false;
             }
             else
             {
-                if (closestDistance > circle.Radius)
+                if (closestDistance > radius)
                     return false;
             }
 
@@ -1503,8 +1465,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
             var distToCircleFromClosestEdgeSq = (circleCenter - closestEdge).LengthSquared();
             if (strict)
-                return distToCircleFromClosestEdgeSq < circle.Radius * circle.Radius;
-            return distToCircleFromClosestEdgeSq <= circle.Radius * circle.Radius;
+                return distToCircleFromClosestEdgeSq < radius * radius;
+            return distToCircleFromClosestEdgeSq <= radius * radius;
 
             // If you had trouble following, see the horizontal and vertical cases which are the same process but the projections
             // are simpler
@@ -1514,12 +1476,12 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     Determines if the circle at the specified position intersects the line,
         ///     which is at its true position and rotation, when the line is assumed to be horizontal.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="line">The line</param>
         /// <param name="circleCenter">The center of the circle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle with center circleCenter intersects the horizontal line</returns>
-        private static bool CircleIntersectsHorizontalLine(Circle circle, Line line, Vector2 circleCenter, bool strict)
+        private static bool CircleIntersectsHorizontalLine(float radius, Line line, Vector2 circleCenter, bool strict)
         {
             // This is exactly the same process as CircleIntersectsLine, except the projetions are easier
             var lineY = line.Start.Y;
@@ -1531,12 +1493,12 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             // Step 1a
             if (strict)
             {
-                if (closestDistance >= circle.Radius)
+                if (closestDistance >= radius)
                     return false;
             }
             else
             {
-                if (closestDistance > circle.Radius)
+                if (closestDistance > radius)
                     return false;
             }
 
@@ -1558,21 +1520,21 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             var distClosestEdgeToCircleSq = new Vector2(circleCenter.X - edgeClosestX, circleCenter.Y - lineY).LengthSquared();
 
             if (strict)
-                return distClosestEdgeToCircleSq < circle.Radius * circle.Radius;
+                return distClosestEdgeToCircleSq < radius * radius;
 
-            return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
+            return distClosestEdgeToCircleSq <= radius * radius;
         }
 
         /// <summary>
         ///     Determines if the circle at the specified position intersects the line, which
         ///     is at its true position and rotation, when the line is assumed to be vertical
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="line">The line</param>
         /// <param name="circleCenter">The center of the circle</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If the circle with center circleCenter intersects the line</returns>
-        private static bool CircleIntersectsVerticalLine(Circle circle, Line line, Vector2 circleCenter, bool strict)
+        private static bool CircleIntersectsVerticalLine(float radius, Line line, Vector2 circleCenter, bool strict)
         {
             // Same process as horizontal, but axis flipped
             var lineX = line.Start.X;
@@ -1583,12 +1545,12 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             // Step 1a
             if (strict)
             {
-                if (closestDistance >= circle.Radius)
+                if (closestDistance >= radius)
                     return false;
             }
             else
             {
-                if (closestDistance > circle.Radius)
+                if (closestDistance > radius)
                     return false;
             }
 
@@ -1610,9 +1572,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             var distClosestEdgeToCircleSq = new Vector2(circleCenter.X - lineX, circleCenter.Y - edgeClosestY).LengthSquared();
 
             if (strict)
-                return distClosestEdgeToCircleSq < circle.Radius * circle.Radius;
+                return distClosestEdgeToCircleSq < radius * radius;
 
-            return distClosestEdgeToCircleSq <= circle.Radius * circle.Radius;
+            return distClosestEdgeToCircleSq <= radius * radius;
         }
 
         #region NoRotation
@@ -1677,28 +1639,28 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     Determines if the polygon and circle intersect when at the given positions.
         /// </summary>
         /// <param name="poly">The polygon</param>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="pos1">The origin of the polygon</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If poly at pos1 intersects circle at pos2</returns>
-        public static bool Intersects(Polygon poly, Circle circle, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(Polygon poly, float radius, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            return Intersects(poly, circle, pos1, pos2, Rotation.Zero, strict);
+            return Intersects(poly, radius, pos1, pos2, Rotation.Zero, strict);
         }
 
         /// <summary>
         ///     Determines if the circle and polygon intersect when at the given positions.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="poly">The polygon</param>
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If circle at pos1 intersects poly at pos2</returns>
-        public static bool Intersects(Circle circle, Polygon poly, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(float radius, Polygon poly, Vector2 pos1, Vector2 pos2, bool strict)
         {
-            return Intersects(circle, poly, pos1, pos2, Rotation.Zero, strict);
+            return Intersects(radius, poly, pos1, pos2, Rotation.Zero, strict);
         }
 
         /// <summary>
@@ -1706,27 +1668,27 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         ///     intersection with the specified circle, when they are at the given positions.
         /// </summary>
         /// <param name="poly">The polygon</param>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="pos1">The position of the polygon</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <returns>MTV to move poly at pos1 to prevent overlap with circle at pos2</returns>
-        public static Vector2 IntersectMtv(Polygon poly, Circle circle, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(Polygon poly, float radius, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMtv(poly, circle, pos1, pos2, Rotation.Zero);
+            return IntersectMtv(poly, radius, pos1, pos2, Rotation.Zero);
         }
 
         /// <summary>
         ///     Determines the minimum translation vector to be applied to the circle to prevent
         ///     intersection with the specified polyogn, when they are at the given positions.
         /// </summary>
-        /// <param name="circle">The circle</param>
+        /// <param name="radius">The circle</param>
         /// <param name="poly">The polygon</param>
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <returns></returns>
-        public static Vector2 IntersectMtv(Circle circle, Polygon poly, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(float radius, Polygon poly, Vector2 pos1, Vector2 pos2)
         {
-            return IntersectMtv(circle, poly, pos1, pos2, Rotation.Zero);
+            return IntersectMtv(radius, poly, pos1, pos2, Rotation.Zero);
         }
 
         #endregion

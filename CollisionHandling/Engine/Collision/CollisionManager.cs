@@ -488,11 +488,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="circleB"></param>
         private static Vector2 CollidesPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
         {
-            var testCircle = new Circle(circleB.Radius);
-
-            var intercectsMtv = CollisionHelper.IntersectMtv(polyA.Polygon, testCircle,
+            var intercectsMtv = CollisionHelper.IntersectMtv(polyA.Polygon, circleB.Radius,
                 polyA.Position + polyA.Velocity,
-                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity,
                 polyA.Rotation);
 
             return intercectsMtv;
@@ -506,10 +504,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="circleB"></param>
         private static Vector2 CollidesPolygonAndCircle(CircleShape circleB, PolygonShape polyA)
         {
-            var testCircle = new Circle(circleB.Radius);
-
-            var intercectsMtv = CollisionHelper.IntersectMtv(testCircle, polyA.Polygon,
-                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+            var intercectsMtv = CollisionHelper.IntersectMtv(circleB.Radius, polyA.Polygon,
+                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity,
                 polyA.Position + polyA.Velocity,
                 polyA.Rotation);
 
@@ -613,11 +609,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <returns></returns>
         private static bool OverlapPolygonAndCircle(PolygonShape polyA, CircleShape circleB)
         {
-            var testCircle = new Circle(circleB.Radius);
-
-            var intercects = CollisionHelper.Intersects(polyA.Polygon, testCircle,
+            var intercects = CollisionHelper.Intersects(polyA.Polygon, circleB.Radius,
                 polyA.Position + polyA.Velocity,
-                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity,
                 polyA.Rotation, true);
 
             return intercects;
@@ -631,10 +625,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <returns></returns>
         private static bool OverlapPolygonAndCircle(CircleShape circleB, PolygonShape polyA)
         {
-            var testCircle = new Circle(circleB.Radius);
-
-            var intercects = CollisionHelper.Intersects(testCircle, polyA.Polygon,
-                circleB.Position - new Vector2(testCircle.Radius) + circleB.Velocity,
+            var intercects = CollisionHelper.Intersects(circleB.Radius, polyA.Polygon,
+                circleB.Position - new Vector2(circleB.Radius) + circleB.Velocity,
                 polyA.Position + polyA.Velocity,
                 polyA.Rotation, true);
 

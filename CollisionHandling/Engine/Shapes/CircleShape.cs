@@ -13,7 +13,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
     {
         /// <summary>
         /// </summary>
-        public int Radius { get; }
+        public float Radius { get; }
 
         /// <summary>
         /// </summary>
@@ -26,7 +26,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="position"></param>
         /// <param name="radius"></param>
         /// <param name="isStatic"></param>
-        public CircleShape(string name, Vector2 position, int radius, bool isStatic = true)
+        public CircleShape(string name, Vector2 position, float radius, bool isStatic = true)
             : base(ShapeType.Circle, name, position, 0, isStatic)
         {
             this.Radius = radius;

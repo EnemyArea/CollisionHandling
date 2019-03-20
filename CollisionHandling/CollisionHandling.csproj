@@ -53,7 +53,6 @@
     <Compile Include="Engine\Collision\CollisionManager.cs" />
     <Compile Include="Engine\GameHelper.cs" />
     <Compile Include="Engine\Math2\AxisAlignedLine.cs" />
-    <Compile Include="Engine\Math2\Circle.cs" />
     <Compile Include="Engine\Math2\Line.cs" />
     <Compile Include="Engine\Collision\CollisionHelper.cs" />
     <Compile Include="Engine\Math2\Polygon.cs" />
