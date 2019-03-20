@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using CollisionFloatTestNewMono.Engine.Collision;
+using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 
 #endregion
@@ -35,7 +36,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <summary>
         ///     In radians
         /// </summary>
-        public float Rotation { get; private set; }
+        public Rotation Rotation { get; private set; }
 
         /// <summary>
         /// </summary>
@@ -75,15 +76,15 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// <param name="shapeType"></param>
         /// <param name="name"></param>
         /// <param name="position"></param>
-        /// <param name="rotation"></param>
+        /// <param name="angle"></param>
         /// <param name="isStatic"></param>
-        protected Shape(ShapeType shapeType, string name, Vector2 position, int rotation, bool isStatic)
+        protected Shape(ShapeType shapeType, string name, Vector2 position, float angle, bool isStatic)
         {
             this.ShapeType = shapeType;
             this.Name = name;
             this.Color = Color.Gray;
             this.Position = position;
-            this.Rotation = rotation;
+            this.Rotation = new Rotation(angle);
             this.IsStatic = isStatic;
             this.IsEnabled = true;
             this.IgnoredCollisions = new List<Shape>();
@@ -112,10 +113,10 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
 
         /// <summary>
         /// </summary>
-        /// <param name="radians"></param>
-        public virtual void SetRotation(float radians)
+        /// <param name="angle"></param>
+        public virtual void SetRotation(float angle)
         {
-            this.Rotation = radians;
+            this.Rotation = new Rotation(angle);
             this.UpdateBoundingBox();
         }
 

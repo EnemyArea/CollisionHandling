@@ -175,7 +175,7 @@ namespace CollisionFloatTestNewMono.Engine
         {
             // Den Zielursprung berechnen. Dieser liegt normalerweise in der Mitte des Bildschirms
             // außer, wenn wir ein Ziel Focusieren.
-            var targetOrigin = (this.GetFocusPosition() ?? this.Origin);
+            var targetOrigin = this.GetFocusPosition() ?? this.Origin;
             var targetOriginVector = -new Vector3((int)Math.Round(targetOrigin.X), (int)Math.Round(targetOrigin.Y), 0f);
 
             // Matrix neuberechnen

@@ -248,7 +248,7 @@ namespace CollisionFloatTestNewMono.Engine
             for (var i = 1; i < vertices.Count; ++i)
             {
                 var x = vertices[i].X;
-                if (x > x0 || (x == x0 && vertices[i].Y < vertices[i0].Y))
+                if (x > x0 || x == x0 && vertices[i].Y < vertices[i0].Y)
                 {
                     i0 = i;
                     x0 = x;

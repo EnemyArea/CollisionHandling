@@ -124,7 +124,7 @@ namespace CollisionFloatTestNewMono.Engine
             if (intVal < 0)
             {
                 stringBuilder.Append('-');
-                var uintVal = uint.MaxValue - ((uint)intVal) + 1; //< This is to deal with Int32.MinValue
+                var uintVal = uint.MaxValue - (uint)intVal + 1; //< This is to deal with Int32.MinValue
                 stringBuilder.Concat(uintVal, padAmount, padChar, baseVal);
             }
             else
@@ -222,7 +222,7 @@ namespace CollisionFloatTestNewMono.Engine
                 remainder *= 10;
                 decimalPlaces--;
 
-                while (decimalPlaces > 0 && ((uint)remainder % 10) == 0)
+                while (decimalPlaces > 0 && (uint)remainder % 10 == 0)
                 {
                     remainder *= 10;
                     decimalPlaces--;

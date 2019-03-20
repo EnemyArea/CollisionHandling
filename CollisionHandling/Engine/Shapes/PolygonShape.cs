@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 using BoundingBox = CollisionFloatTestNewMono.Engine.Math2.BoundingBox;
 
@@ -26,6 +27,10 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// </summary>
         public Vector2 Center { get; }
 
+        /// <summary>
+        /// </summary>
+        public Polygon Polygon { get; set; }
+
 
         /// <summary>
         /// </summary>
@@ -45,6 +50,7 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
                 this.Center += this.Vertices[i];
 
             this.Center *= 1.0f / this.Vertices.Length;
+            this.Polygon = new Polygon(this.Vertices);
 
             this.SetRotation(MathHelper.ToRadians(degrees));
             this.UpdateBoundingBox();

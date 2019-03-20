@@ -24,7 +24,7 @@ namespace CollisionFloatTestNewMono.Engine
         ///     this smaller means polygons will have an insufficient buffer for continuous collision.
         ///     Making it larger may create artifacts for vertex collision.
         /// </summary>
-        private const float PolygonRadius = (2.0f * LinearSlop);
+        private const float PolygonRadius = 2.0f * LinearSlop;
 
 
         /// <summary>
@@ -71,18 +71,16 @@ namespace CollisionFloatTestNewMono.Engine
         /// <param name="position"></param>
         /// <param name="vertices"></param>
         /// <param name="origin"></param>
-        /// <param name="angle"></param>
+        /// <param name="rotation"></param>
         /// <returns></returns>
-        public static Aabb ComputePolygonAabb(Vector2 position, IList<Vector2> vertices, Vector2 origin, float angle)
+        public static Aabb ComputePolygonAabb(Vector2 position, IList<Vector2> vertices, Vector2 origin, Rotation rotation)
         {
-            var roation = new Rotation(angle);
-
-            var lower = position + MathUtils.Rotate(vertices[0], origin, roation);
+            var lower = position + MathUtils.Rotate(vertices[0], origin, rotation);
             var upper = lower;
 
             for (var i = 1; i < vertices.Count; ++i)
             {
-                var v = position + MathUtils.Rotate(vertices[i], origin, roation);
+                var v = position + MathUtils.Rotate(vertices[i], origin, rotation);
                 lower = Vector2.Min(lower, v);
                 upper = Vector2.Max(upper, v);
             }
