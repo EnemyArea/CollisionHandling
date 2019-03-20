@@ -1123,7 +1123,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             var bestAxis = Vector2.Zero;
             var shortestOverlap = float.MaxValue;
 
-            Func<Vector2, bool> checkAxis = axis =>
+            bool CheckAxis(Vector2 axis)
             {
                 var standard = MathUtils.MakeStandardNormal(axis);
                 if (!checkedAxis.Contains(standard))
@@ -1144,7 +1144,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 }
 
                 return true;
-            };
+            }
 
             var circleCenter = new Vector2(pos2.X + radius, pos2.Y + radius);
             var lastVec = MathUtils.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot1) + pos1;
@@ -1153,11 +1153,11 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 var currVec = MathUtils.Rotate(poly.Vertices[curr], poly.Center, rot1) + pos1;
 
                 // Test along circle center -> vector
-                if (!checkAxis(Vector2.Normalize(currVec - circleCenter)))
+                if (!CheckAxis(Vector2.Normalize(currVec - circleCenter)))
                     return Vector2.Zero;
 
                 // Test along line normal
-                if (!checkAxis(Vector2.Normalize(MathUtils.Perpendicular(currVec - lastVec))))
+                if (!CheckAxis(Vector2.Normalize(MathUtils.Perpendicular(currVec - lastVec))))
                     return Vector2.Zero;
 
                 lastVec = currVec;
@@ -1250,7 +1250,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
             var bestAxis = Vector2.Zero;
             var shortestOverlap = float.MaxValue;
 
-            Func<Vector2, bool> checkAxis = axis =>
+            bool CheckAxis(Vector2 axis)
             {
                 var standard = MathUtils.MakeStandardNormal(axis);
                 if (!checkedAxis.Contains(standard))
@@ -1271,7 +1271,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 }
 
                 return true;
-            };
+            }
 
             var circleCenter = new Vector2(pos1.X + radius, pos1.Y + radius);
             var lastVec = rect.UpperRight + pos2;
@@ -1295,11 +1295,11 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 }
 
                 // Test along circle center -> vector
-                if (!checkAxis(Vector2.Normalize(currVec - circleCenter)))
+                if (!CheckAxis(Vector2.Normalize(currVec - circleCenter)))
                     return Vector2.Zero;
 
                 // Test along line normal
-                if (!checkAxis(Vector2.Normalize(MathUtils.Perpendicular(currVec - lastVec))))
+                if (!CheckAxis(Vector2.Normalize(MathUtils.Perpendicular(currVec - lastVec))))
                     return Vector2.Zero;
 
                 lastVec = currVec;

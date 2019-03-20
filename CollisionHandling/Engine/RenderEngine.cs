@@ -212,7 +212,7 @@ namespace CollisionFloatTestNewMono.Engine
             //this.playerShape = new CircleShape("P", new Vector2(186, 234), 15);
             //this.playerShape = new CircleShape("P", new Vector2(232, 194), 15, false);
 
-            this.playerShape = new CircleShape("P", new Vector2(GameHelper.TileSize * 3, GameHelper.TileSize * 3) - new Vector2(GameHelper.TileSize) / 2, GameHelper.TileSize / 2, false);
+            this.playerShape = new CircleShape("P", new Vector2(GameHelper.TileSize * 3, GameHelper.TileSize * 3) - new Vector2(GameHelper.TileSize) / 2, GameHelper.TileSize / 2f, false);
             this.collisionManager.AddShape(this.playerShape);
 
             //this.collisionManager.AddShape(new CircleShape("P1", new Vector2(232, 194), 15));

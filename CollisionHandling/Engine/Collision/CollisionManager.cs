@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using CollisionFloatTestNewMono.Engine.Math2;
 using CollisionFloatTestNewMono.Engine.Shapes;
 using Microsoft.Xna.Framework;
 
@@ -89,7 +88,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 ShapeContactType.Polygon // 2,2 = Polygon->Polygon
             }
         };
-        
+
         /// <summary>
         /// </summary>
         private readonly HashSet<ShapeCollision> collisions = new HashSet<ShapeCollision>();
@@ -704,7 +703,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                         !shapeA.IsEnabled ||
                         !shapeB.IsEnabled ||
                         shapeA.IgnoredCollisions.Contains(shapeB) ||
-                        shapeB.IgnoredCollisions.Contains(shapeA) || 
+                        shapeB.IgnoredCollisions.Contains(shapeA) ||
                         !shapeA.CollidesOnyWithCategories.HasFlag(shapeB.CollisionCategory))
                         continue;
 
