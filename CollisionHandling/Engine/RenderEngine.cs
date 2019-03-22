@@ -3,7 +3,6 @@
 using System.Diagnostics;
 using System.Linq;
 using CollisionFloatTestNewMono.Engine.Collision;
-using CollisionFloatTestNewMono.Engine.Math2;
 using CollisionFloatTestNewMono.Engine.Shapes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -485,6 +484,13 @@ namespace CollisionFloatTestNewMono.Engine
 
                         break;
                 }
+
+                //// AABB rendern
+                //var boundingBoxVertices = GameHelper.CreateVerticesFromRectangle(shape.BoundingBox);
+                //this.primitiveBatch.DrawPolygon(boundingBoxVertices, Vector2.Zero, Rotation.Zero, Color.DarkOrange);
+
+                //var boundingBoxTileMapVertices = GameHelper.CreateVerticesFromRectangle(new Rectangle(shape.BoundingBoxTileMap.X * GameHelper.TileSize, shape.BoundingBoxTileMap.Y * GameHelper.TileSize, shape.BoundingBoxTileMap.Width * GameHelper.TileSize, shape.BoundingBoxTileMap.Height * GameHelper.TileSize));
+                //this.primitiveBatch.DrawPolygon(boundingBoxTileMapVertices, Vector2.Zero, Rotation.Zero, Color.BlueViolet);
             }
 
             this.primitiveBatch.End();

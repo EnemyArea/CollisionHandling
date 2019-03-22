@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 

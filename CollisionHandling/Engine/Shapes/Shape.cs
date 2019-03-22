@@ -2,7 +2,6 @@
 
 using System.Collections.Generic;
 using CollisionFloatTestNewMono.Engine.Collision;
-using CollisionFloatTestNewMono.Engine.Math2;
 using Microsoft.Xna.Framework;
 
 #endregion

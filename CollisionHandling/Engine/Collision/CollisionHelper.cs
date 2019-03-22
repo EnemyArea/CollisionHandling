@@ -3,9 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using CollisionFloatTestNewMono.Engine.Math2;
+using CollisionFloatTestNewMono.Engine.Shapes;
 using Microsoft.Xna.Framework;
-using BoundingBox = CollisionFloatTestNewMono.Engine.Math2.BoundingBox;
 
 #endregion
 
@@ -256,7 +255,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">Origin of box 2</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If box1 intersects box2 when box1 is at pos1 and box2 is at pos2</returns>
-        public static bool Intersects(BoundingBox box1, BoundingBox box2, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(AABB box1, AABB box2, Vector2 pos1, Vector2 pos2, bool strict)
         {
             return Intersects(box1.Min.X + pos1.X, box1.Max.X + pos1.X, box2.Min.X + pos2.X, box2.Max.X + pos2.X, strict, false)
                    && Intersects(box1.Min.Y + pos1.Y, box1.Max.Y + pos1.Y, box2.Min.Y + pos2.Y, box2.Max.Y + pos2.Y, strict, false);
@@ -270,7 +269,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="point">Point to check</param>
         /// <param name="strict">true if the edges do not count</param>
         /// <returns>If the box at pos contains point</returns>
-        public static bool Contains(BoundingBox box, Vector2 pos, Vector2 point, bool strict)
+        public static bool Contains(AABB box, Vector2 pos, Vector2 point, bool strict)
         {
             return Contains(box.Min.X + pos.X, box.Max.X + pos.X, point.X, strict, false)
                    && Contains(box.Min.Y + pos.Y, box.Max.Y + pos.Y, point.Y, strict, false);
@@ -283,7 +282,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos">The origin of the rectangle</param>
         /// <param name="axis">The axis to project on</param>
         /// <returns>The projection of rect at pos along axis</returns>
-        public static AxisAlignedLine ProjectAlongAxis(BoundingBox rect, Vector2 pos, Vector2 axis)
+        public static AxisAlignedLine ProjectAlongAxis(AABB rect, Vector2 pos, Vector2 axis)
         {
             return ProjectAlongAxis(axis, pos, Rotation.Zero, rect.Center, rect.Min, rect.UpperRight, rect.LowerLeft, rect.Max);
         }
@@ -480,15 +479,15 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         #region Polygon
 
         /// <summary>
-        ///     Determines if the specified polygon at the specified position and rotation contains the specified point
+        ///     Determines if the specified PolygonShape at the specified position and rotation contains the specified point
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="pos">Origin of the polygon</param>
         /// <param name="rot">Rotation of the polygon</param>
         /// <param name="point">Point to check</param>
         /// <param name="strict">True if the edges do not count as inside</param>
-        /// <returns>If the polygon at pos with rotation rot about its center contains point</returns>
-        public static bool Contains(Polygon poly, Vector2 pos, Rotation rot, Vector2 point, bool strict)
+        /// <returns>If the PolygonShape at pos with rotation rot about its center contains point</returns>
+        public static bool Contains(PolygonShape poly, Vector2 pos, Rotation rot, Vector2 point, bool strict)
         {
             if (!Contains(poly.Aabb, pos, point, strict))
                 return false;
@@ -512,7 +511,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         }
 
         /// <summary>
-        ///     Determines if the first polygon intersects the second polygon when they are at
+        ///     Determines if the first PolygonShape intersects the second PolygonShape when they are at
         ///     the respective positions and rotations.
         /// </summary>
         /// <param name="poly1">First polygon</param>
@@ -523,7 +522,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="rot2">Rotation fo the second polyogn</param>
         /// <param name="strict">If overlapping is required for intersection</param>
         /// <returns>If poly1 at pos1 with rotation rot1 intersects poly2 at pos2with rotation rot2</returns>
-        public static bool Intersects(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, bool strict)
+        public static bool Intersects(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, bool strict)
         {
             foreach (var norm in poly1.Normals.Select(v => Tuple.Create(v, rot1)).Union(poly2.Normals.Select(v => Tuple.Create(v, rot2))))
             {
@@ -546,7 +545,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="rot1">Rotation of the first polyogn</param>
         /// <param name="rot2">Rotation of the second polygon</param>
         /// <returns>MTV to move poly1 to prevent intersection with poly2</returns>
-        public static Vector2 IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
+        public static Vector2 IntersectMtv(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
         {
             var bestAxis = Vector2.Zero;
             var bestMagn = float.MaxValue;
@@ -569,18 +568,18 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         }
 
         /// <summary>
-        ///     Determines if polygon 1 and polygon 2 at position 1 and position 2, respectively, intersect along axis.
+        ///     Determines if PolygonShape 1 and PolygonShape 2 at position 1 and position 2, respectively, intersect along axis.
         /// </summary>
-        /// <param name="poly1">polygon 1</param>
-        /// <param name="poly2">polygon 2</param>
-        /// <param name="pos1">Origin of polygon 1</param>
-        /// <param name="pos2">Origin of polygon 2</param>
+        /// <param name="poly1">PolygonShape 1</param>
+        /// <param name="poly2">PolygonShape 2</param>
+        /// <param name="pos1">Origin of PolygonShape 1</param>
+        /// <param name="pos2">Origin of PolygonShape 2</param>
         /// <param name="rot1">Rotation of the first polygon</param>
         /// <param name="rot2">Rotation of the second polygon</param>
         /// <param name="strict">If overlapping is required for intersection</param>
         /// <param name="axis">The axis to check</param>
         /// <returns>If poly1 at pos1 intersects poly2 at pos2 along axis</returns>
-        public static bool IntersectsAlongAxis(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, bool strict, Vector2 axis)
+        public static bool IntersectsAlongAxis(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, bool strict, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(poly1, pos1, rot1, axis);
             var proj2 = ProjectAlongAxis(poly2, pos2, rot2, axis);
@@ -589,21 +588,21 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         }
 
         /// <summary>
-        ///     Determines the distance along axis, if any, that polygon 1 should be shifted by
-        ///     to prevent intersection with polygon 2. Null if no intersection along axis.
+        ///     Determines the distance along axis, if any, that PolygonShape 1 should be shifted by
+        ///     to prevent intersection with PolygonShape 2. Null if no intersection along axis.
         /// </summary>
-        /// <param name="poly1">polygon 1</param>
-        /// <param name="poly2">polygon 2</param>
-        /// <param name="pos1">polygon 1 origin</param>
-        /// <param name="pos2">polygon 2 origin</param>
-        /// <param name="rot1">polygon 1 rotation</param>
-        /// <param name="rot2">polygon 2 rotation</param>
+        /// <param name="poly1">PolygonShape 1</param>
+        /// <param name="poly2">PolygonShape 2</param>
+        /// <param name="pos1">PolygonShape 1 origin</param>
+        /// <param name="pos2">PolygonShape 2 origin</param>
+        /// <param name="rot1">PolygonShape 1 rotation</param>
+        /// <param name="rot2">PolygonShape 2 rotation</param>
         /// <param name="axis">Axis to check</param>
         /// <returns>
         ///     a number to shift pos1 along axis by to prevent poly1 at pos1 from intersecting poly2 at pos2, or null if no
         ///     int. along axis
         /// </returns>
-        public static float? IntersectMtvAlongAxis(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, Vector2 axis)
+        public static float? IntersectMtvAlongAxis(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(poly1, pos1, rot1, axis);
             var proj2 = ProjectAlongAxis(poly2, pos2, rot2, axis);
@@ -612,35 +611,35 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         }
 
         /// <summary>
-        ///     Projects the polygon at position onto the specified axis.
+        ///     Projects the PolygonShape at position onto the specified axis.
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="pos">The polygons origin</param>
         /// <param name="rot">the rotation of the polygon</param>
         /// <param name="axis">The axis to project onto</param>
         /// <returns>poly at pos projected along axis</returns>
-        public static AxisAlignedLine ProjectAlongAxis(Polygon poly, Vector2 pos, Rotation rot, Vector2 axis)
+        public static AxisAlignedLine ProjectAlongAxis(PolygonShape poly, Vector2 pos, Rotation rot, Vector2 axis)
         {
             return ProjectAlongAxis(axis, pos, rot, poly.Center, poly.Vertices);
         }
 
         /// <summary>
-        ///     Calculates the shortest distance from the specified polygon to the specified point,
-        ///     and the axis from polygon to pos.
-        ///     Returns null if pt is contained in the polygon (not strictly).
+        ///     Calculates the shortest distance from the specified PolygonShape to the specified point,
+        ///     and the axis from PolygonShape to pos.
+        ///     Returns null if pt is contained in the PolygonShape (not strictly).
         /// </summary>
         /// <returns>The distance form poly to pt.</returns>
         /// <param name="poly">The polygon</param>
         /// <param name="pos">Origin of the polygon</param>
         /// <param name="rot">Rotation of the polygon</param>
         /// <param name="pt">Point to check.</param>
-        public static Vector2 MinDistance(Polygon poly, Vector2 pos, Rotation rot, Vector2 pt)
+        public static Vector2 MinDistance(PolygonShape poly, Vector2 pos, Rotation rot, Vector2 pt)
         {
             /*
              * Definitions
              * 
              * For each line in the polygon, find the normal of the line in the direction of outside the polygon.
-             * Call the side of the original line that contains none of the polygon "above the line". The other side is "below the line".
+             * Call the side of the original line that contains none of the PolygonShape "above the line". The other side is "below the line".
              * 
              * If the point falls above the line:
              *   Imagine two additional lines that are normal to the line and fall on the start and end, respectively.
@@ -655,7 +654,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
              *   Otherwise
              *     The shortest vector is from the line to the point
              * 
-             * If this is not true for ANY of the lines, the polygon does not contain the point.
+             * If this is not true for ANY of the lines, the PolygonShape does not contain the point.
              */
 
             var last = MathUtils.Rotate(poly.Vertices[poly.Vertices.Length - 1], poly.Center, rot) + pos;
@@ -707,7 +706,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos1"></param>
         /// <param name="pos2"></param>
         /// <returns></returns>
-        private static IEnumerable<Vector2> GetExtraMinDistanceVecsPolyPoly(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
+        private static IEnumerable<Vector2> GetExtraMinDistanceVecsPolyPoly(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2)
         {
             foreach (var vert in poly1.Vertices)
             {
@@ -731,7 +730,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">Origin of second polygon</param>
         /// <param name="rot1">Rotation of first polygon</param>
         /// <param name="rot2">Rotation of second polygon</param>
-        public static Vector2 MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
+        public static Vector2 MinDistance(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2, Rotation rot1, Rotation rot2)
         {
             if (rot1.Theta != 0 || rot2.Theta != 0)
                 throw new NotSupportedException("Finding the minimum distance between polygons requires calculating the rotated polygons. This operation is expensive and should be cached. " +
@@ -761,27 +760,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
             return bestAxis.Value * bestDist;
         }
-
-        /// <summary>
-        ///     Returns a polygon that is created by rotated the original polygon
-        ///     about its center by the specified amount. Returns the original polygon if
-        ///     rot.Theta == 0.
-        /// </summary>
-        /// <returns>The rotated polygon.</returns>
-        /// <param name="original">Original.</param>
-        /// <param name="rot">Rot.</param>
-        public static Polygon GetRotated(Polygon original, Rotation rot)
-        {
-            if (rot.Theta == 0)
-                return original;
-
-            var rotatedVerts = new Vector2[original.Vertices.Length];
-            for (var i = 0; i < original.Vertices.Length; i++)
-                rotatedVerts[i] = MathUtils.Rotate(original.Vertices[i], original.Center, rot);
-
-            return new Polygon(rotatedVerts);
-        }
-
+        
 
         #region NoRotation
 
@@ -794,41 +773,41 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">Origin of second polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If poly1 at pos1 not rotated and poly2 at pos2 not rotated intersect</returns>
-        public static bool Intersects(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2, bool strict)
         {
             return Intersects(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero, strict);
         }
 
         /// <summary>
-        ///     Determines if the first polygon at position 1 intersects the second polygon at position 2, where
-        ///     neither polygon is rotated.
+        ///     Determines if the first PolygonShape at position 1 intersects the second PolygonShape at position 2, where
+        ///     neither PolygonShape is rotated.
         /// </summary>
         /// <param name="poly1">First polygon</param>
         /// <param name="poly2">Second polygon</param>
         /// <param name="pos1">Origin of first polygon</param>
         /// <param name="pos2">Origin of second polygon</param>
         /// <returns>If poly1 at pos1 not rotated intersects poly2 at pos2 not rotated</returns>
-        public static Vector2 IntersectMtv(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMtv(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero);
         }
 
         /// <summary>
-        ///     Determines the shortest way for the specified polygon at the specified position with
+        ///     Determines the shortest way for the specified PolygonShape at the specified position with
         ///     no rotation to get to the specified point, if point is not (non-strictly) intersected
-        ///     the polygon when it's at the specified position with no rotation.
+        ///     the PolygonShape when it's at the specified position with no rotation.
         /// </summary>
         /// <param name="poly">Polygon</param>
         /// <param name="pos">Position of the polygon</param>
         /// <param name="pt">Point to check</param>
         /// <returns>axis to go in, distance to go if pos is not in poly, otherwise null</returns>
-        public static Vector2 MinDistance(Polygon poly, Vector2 pos, Vector2 pt)
+        public static Vector2 MinDistance(PolygonShape poly, Vector2 pos, Vector2 pt)
         {
             return MinDistance(poly, pos, Rotation.Zero, pt);
         }
 
         /// <summary>
-        ///     Determines the shortest way for the first polygon at position 1 to touch the second polygon at
+        ///     Determines the shortest way for the first PolygonShape at position 1 to touch the second PolygonShape at
         ///     position 2, assuming the polygons do not intersect (not strictly) and are not rotated.
         /// </summary>
         /// <param name="poly1">First polygon</param>
@@ -836,7 +815,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos1">Position of first polygon</param>
         /// <param name="pos2">Position of second polygon</param>
         /// <returns>axis to go in, distance to go if poly1 does not intersect poly2, otherwise null</returns>
-        public static Vector2 MinDistance(Polygon poly1, Polygon poly2, Vector2 pos1, Vector2 pos2)
+        public static Vector2 MinDistance(PolygonShape poly1, PolygonShape poly2, Vector2 pos1, Vector2 pos2)
         {
             return MinDistance(poly1, poly2, pos1, pos2, Rotation.Zero, Rotation.Zero);
         }
@@ -849,8 +828,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         #region Shape
 
         /// <summary>
-        ///     Determines if polygon at position 1 intersects the rectangle at position 2. Polygon may
-        ///     be rotated, but the rectangle cannot (use a polygon if you want to rotate it).
+        ///     Determines if PolygonShape at position 1 intersects the rectangle at position 2. PolygonShape may
+        ///     be rotated, but the rectangle cannot (use a PolygonShape if you want to rotate it).
         /// </summary>
         /// <param name="poly">Polygon</param>
         /// <param name="rect">Rectangle</param>
@@ -859,10 +838,10 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="rot1">Rotation of the polygon.</param>
         /// <param name="strict">If overlapping is required for intersection</param>
         /// <returns>if poly at pos1 intersects rect at pos2</returns>
-        public static bool Intersects(Polygon poly, BoundingBox rect, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict)
+        public static bool Intersects(PolygonShape poly, AABB rect, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict)
         {
             bool checkedX = false, checkedY = false;
-            for (var i = 0; i < poly.Normals.Count; i++)
+            for (var i = 0; i < poly.Normals.Length; i++)
             {
                 var norm = MathUtils.Rotate(poly.Normals[i], Vector2.Zero, rot1);
                 if (!IntersectsAlongAxis(poly, rect, pos1, pos2, rot1, strict, norm))
@@ -894,14 +873,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">Origin of rectangle</param>
         /// <param name="rot1">Rotation of the polygon.</param>
         /// <returns>The vector to move pos1 by or null</returns>
-        public static Vector2 IntersectMtv(Polygon poly, BoundingBox rect, Vector2 pos1, Vector2 pos2, Rotation rot1)
+        public static Vector2 IntersectMtv(PolygonShape poly, AABB rect, Vector2 pos1, Vector2 pos2, Rotation rot1)
         {
             bool checkedX = false, checkedY = false;
 
             var bestAxis = Vector2.Zero;
             var bestMagn = float.MaxValue;
 
-            for (var i = 0; i < poly.Normals.Count; i++)
+            for (var i = 0; i < poly.Normals.Length; i++)
             {
                 var norm = MathUtils.Rotate(poly.Normals[i], Vector2.Zero, rot1);
                 var mtv = IntersectMtvAlongAxis(poly, rect, pos1, pos2, rot1, norm);
@@ -960,14 +939,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">Origin of </param>
         /// <param name="rot2">Rotation of the polygon</param>
         /// <returns>Offset of pos1 to get rect not to intersect poly</returns>
-        public static Vector2 IntersectMtv(BoundingBox rect, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2)
+        public static Vector2 IntersectMtv(AABB rect, PolygonShape poly, Vector2 pos1, Vector2 pos2, Rotation rot2)
         {
             var res = IntersectMtv(poly, rect, pos2, pos1, rot2);
             return -res;
         }
 
         /// <summary>
-        ///     Determines if the rectangle at pos1 intersects the polygon at pos2.
+        ///     Determines if the rectangle at pos1 intersects the PolygonShape at pos2.
         /// </summary>
         /// <param name="rect">The rectangle</param>
         /// <param name="poly">The polygon</param>
@@ -976,14 +955,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="rot2">Rotation of the polygon.</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If rect at pos1 intersects poly at pos2</returns>
-        public static bool Intersects(BoundingBox rect, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict)
+        public static bool Intersects(AABB rect, PolygonShape poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict)
         {
             return Intersects(poly, rect, pos2, pos1, rot2, strict);
         }
 
 
         /// <summary>
-        ///     Determines if the specified polygon and rectangle where poly is at pos1 and rect is at pos2 intersect
+        ///     Determines if the specified PolygonShape and rectangle where poly is at pos1 and rect is at pos2 intersect
         ///     along the specified axis.
         /// </summary>
         /// <param name="poly">polygon</param>
@@ -994,7 +973,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="strict">If overlap is required for intersection</param>
         /// <param name="axis">Axis to check</param>
         /// <returns>If poly at pos1 intersects rect at pos2 along axis</returns>
-        public static bool IntersectsAlongAxis(Polygon poly, BoundingBox rect, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict, Vector2 axis)
+        public static bool IntersectsAlongAxis(PolygonShape poly, AABB rect, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(poly, pos1, rot1, axis);
             var proj2 = ProjectAlongAxis(rect, pos2, axis);
@@ -1003,7 +982,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         }
 
         /// <summary>
-        ///     Determines if the specified rectangle and polygon where rect is at pos1 and poly is at pos2 intersect
+        ///     Determines if the specified rectangle and PolygonShape where rect is at pos1 and poly is at pos2 intersect
         ///     along the specified axis.
         /// </summary>
         /// <param name="rect">Rectangle</param>
@@ -1014,7 +993,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="strict"></param>
         /// <param name="axis"></param>
         /// <returns></returns>
-        public static bool IntersectsAlongAxis(BoundingBox rect, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict, Vector2 axis)
+        public static bool IntersectsAlongAxis(AABB rect, PolygonShape poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict, Vector2 axis)
         {
             return IntersectsAlongAxis(poly, rect, pos2, pos1, rot2, strict, axis);
         }
@@ -1026,10 +1005,10 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="rect">Rectangle</param>
         /// <param name="pos1">Origin of polygon</param>
         /// <param name="pos2">Origin of rectangle</param>
-        /// <param name="rot1">Rotation of polygon in radians</param>
+        /// <param name="rot1">Rotation of PolygonShape in radians</param>
         /// <param name="axis">Axis to check</param>
         /// <returns>Number if poly intersects rect along axis, null otherwise</returns>
-        public static float? IntersectMtvAlongAxis(Polygon poly, BoundingBox rect, Vector2 pos1, Vector2 pos2, Rotation rot1, Vector2 axis)
+        public static float? IntersectMtvAlongAxis(PolygonShape poly, AABB rect, Vector2 pos1, Vector2 pos2, Rotation rot1, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(poly, pos1, rot1, axis);
             var proj2 = ProjectAlongAxis(rect, pos2, axis);
@@ -1044,10 +1023,10 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="poly">polygon</param>
         /// <param name="pos1">Origin of rectangle</param>
         /// <param name="pos2">Origin of polygon</param>
-        /// <param name="rot2">Rotation of the polygon in radians</param>
+        /// <param name="rot2">Rotation of the PolygonShape in radians</param>
         /// <param name="axis">Axis to check</param>
         /// <returns>Number if rect intersects poly along axis, null otherwise</returns>
-        public static float? IntersectMtvAlongAxis(BoundingBox rect, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2, Vector2 axis)
+        public static float? IntersectMtvAlongAxis(AABB rect, PolygonShape poly, Vector2 pos1, Vector2 pos2, Rotation rot2, Vector2 axis)
         {
             var proj1 = ProjectAlongAxis(rect, pos1, axis);
             var proj2 = ProjectAlongAxis(poly, pos2, rot2, axis);
@@ -1056,7 +1035,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         }
 
         /// <summary>
-        ///     Determines if the specified polygon at the specified position and rotation
+        ///     Determines if the specified PolygonShape at the specified position and rotation
         ///     intersects the specified circle at it's respective position.
         /// </summary>
         /// <param name="poly">The polygon</param>
@@ -1066,7 +1045,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="rot1">The rotation of the polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If poly at pos1 with rotation rot1 intersects the circle at pos2</returns>
-        public static bool Intersects(Polygon poly, float radius, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict)
+        public static bool Intersects(PolygonShape poly, float radius, Vector2 pos1, Vector2 pos2, Rotation rot1, bool strict)
         {
             // look at pictures of https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection if you don't
             // believe this is true
@@ -1084,10 +1063,10 @@ namespace CollisionFloatTestNewMono.Engine.Collision
 
 
         /// <summary>
-        ///     Determines the minimum translation that must be applied the specified polygon (at the given position
+        ///     Determines the minimum translation that must be applied the specified PolygonShape (at the given position
         ///     and rotation) to prevent intersection with the circle (at its given rotation). If the two are not overlapping,
         ///     returns null.
-        ///     Returns a tuple of the axis to move the polygon in (unit vector) and the distance to move the polygon.
+        ///     Returns a tuple of the axis to move the PolygonShape in (unit vector) and the distance to move the polygon.
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="radius">The circle</param>
@@ -1095,24 +1074,24 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <param name="rot1">The rotation of the polygon</param>
         /// <returns></returns>
-        public static Vector2 IntersectMtv(Polygon poly, float radius, Vector2 pos1, Vector2 pos2, Rotation rot1)
+        public static Vector2 IntersectMtv(PolygonShape poly, float radius, Vector2 pos1, Vector2 pos2, Rotation rot1)
         {
             // We have two situations, either the circle is not strictly intersecting the polygon, or
-            // there exists at least one shortest line that you could push the polygon to prevent 
+            // there exists at least one shortest line that you could push the PolygonShape to prevent 
             // intersection with the circle.
 
-            // That line will either go from a vertix of the polygon to a point on the edge of the circle,
-            // or it will go from a point on a line of the polygon to the edge of the circle.
+            // That line will either go from a vertix of the PolygonShape to a point on the edge of the circle,
+            // or it will go from a point on a line of the PolygonShape to the edge of the circle.
 
             // If the line comes from a vertix of the polygon, the MTV will be along the line produced
             // by going from the center of the circle to the vertix, and the distance can be found by
-            // projecting the cirle on that axis and the polygon on that axis and doing 1D overlap.
+            // projecting the cirle on that axis and the PolygonShape on that axis and doing 1D overlap.
 
             // If the line comes from a point on the edge of the polygon, the MTV will be along the
             // normal of that line, and the distance can be found by projecting the circle on that axis
-            // and the polygon on that axis and doing 1D overlap.
+            // and the PolygonShape on that axis and doing 1D overlap.
 
-            // As with all SAT, if we find any axis that the circle and polygon do not overlap, we've
+            // As with all SAT, if we find any axis that the circle and PolygonShape do not overlap, we've
             // proven they do not intersect.
 
             // The worst case performance is related to 2x the number of vertices of the polygon, the same speed
@@ -1177,14 +1156,14 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="rot2">The rotation of the polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If circle at pos1 intersects poly at pos2 with rotation rot2</returns>
-        public static bool Intersects(float radius, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict)
+        public static bool Intersects(float radius, PolygonShape poly, Vector2 pos1, Vector2 pos2, Rotation rot2, bool strict)
         {
             return Intersects(poly, radius, pos2, pos1, rot2, strict);
         }
 
         /// <summary>
         ///     Determines the minimum translation vector that must be applied to the circle at the given position to
-        ///     prevent overlap with the polygon at the given position and rotation. If the circle and the polygon do
+        ///     prevent overlap with the PolygonShape at the given position and rotation. If the circle and the PolygonShape do
         ///     not overlap, returns null. Otherwise, returns a tuple of the unit axis to move the circle in, and the
         ///     distance to move the circle.
         /// </summary>
@@ -1194,44 +1173,12 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">The origin of the polygon</param>
         /// <param name="rot2">The rotation of the polygon</param>
         /// <returns>The mtv to move the circle at pos1 to prevent overlap with the poly at pos2 with rotation rot2</returns>
-        public static Vector2 IntersectMtv(float radius, Polygon poly, Vector2 pos1, Vector2 pos2, Rotation rot2)
+        public static Vector2 IntersectMtv(float radius, PolygonShape poly, Vector2 pos1, Vector2 pos2, Rotation rot2)
         {
             var res = IntersectMtv(poly, radius, pos2, pos1, rot2);
             return -res;
         }
 
-        /// <summary>
-        ///     Determines if the specified circle an rectangle intersect at their given positions.
-        /// </summary>
-        /// <param name="radius">The circle</param>
-        /// <param name="rect">The rectangle</param>
-        /// <param name="pos1">The top-left of the circles bounding box</param>
-        /// <param name="pos2">The origin of the rectangle</param>
-        /// <param name="strict">If overlap is required for intersection</param>
-        /// <returns>If circle at pos1 intersects rect at pos2</returns>
-        public static bool Intersects(float radius, BoundingBox rect, Vector2 pos1, Vector2 pos2, bool strict)
-        {
-            var circleCenter = new Vector2(pos1.X + radius, pos1.Y + radius);
-            return CircleIntersectsHorizontalLine(radius, new Line(rect.Min + pos2, rect.UpperRight + pos2), circleCenter, strict)
-                   || CircleIntersectsHorizontalLine(radius, new Line(rect.LowerLeft + pos2, rect.Max + pos2), circleCenter, strict)
-                   || CircleIntersectsVerticalLine(radius, new Line(rect.Min + pos2, rect.LowerLeft + pos2), circleCenter, strict)
-                   || CircleIntersectsVerticalLine(radius, new Line(rect.UpperRight + pos2, rect.Max + pos2), circleCenter, strict)
-                   || Contains(rect, pos2, new Vector2(pos1.X + radius, pos1.Y + radius), strict);
-        }
-
-        /// <summary>
-        ///     Determines if the specified rectangle and circle intersect at their given positions.
-        /// </summary>
-        /// <param name="rect">The rectangle</param>
-        /// <param name="radius">The circle</param>
-        /// <param name="pos1">The origin of the rectangle</param>
-        /// <param name="pos2">The top-left of the circles bounding box</param>
-        /// <param name="strict">If overlap is required for intersection</param>
-        /// <returns></returns>
-        public static bool Intersects(BoundingBox rect, float radius, Vector2 pos1, Vector2 pos2, bool strict)
-        {
-            return Intersects(radius, rect, pos2, pos1, strict);
-        }
 
         /// <summary>
         ///     Determines the minimum translation vector to be applied to the circle to
@@ -1242,9 +1189,9 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The rectangles origin</param>
         /// <returns>MTV for circle at pos1 to prevent overlap with rect at pos2</returns>
-        public static Vector2 IntersectMtv(float radius, BoundingBox rect, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(float radius, AABB rect, Vector2 pos1, Vector2 pos2)
         {
-            // Same as polygon rect, just converted to rects points
+            // Same as PolygonShape rect, just converted to rects points
             var checkedAxis = new HashSet<Vector2>();
 
             var bestAxis = Vector2.Zero;
@@ -1317,21 +1264,21 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos1">The origin of the rectangle</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <returns>MTV for rect at pos1 to prevent overlap with circle at pos2</returns>
-        public static Vector2 IntersectMtv(BoundingBox rect, float radius, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(AABB rect, float radius, Vector2 pos1, Vector2 pos2)
         {
             var res = IntersectMtv(radius, rect, pos2, pos1);
             return -res;
         }
 
         /// <summary>
-        ///     Projects the polygon from the given points with origin pos along the specified axis.
+        ///     Projects the PolygonShape from the given points with origin pos along the specified axis.
         /// </summary>
         /// <param name="axis">Axis to project onto</param>
         /// <param name="pos">Origin of polygon</param>
-        /// <param name="rot">Rotation of the polygon in radians</param>
+        /// <param name="rot">Rotation of the PolygonShape in radians</param>
         /// <param name="center">Center of the polygon</param>
         /// <param name="points">Points of polygon</param>
-        /// <returns>Projection of polygon of points at pos along axis</returns>
+        /// <returns>Projection of PolygonShape of points at pos along axis</returns>
         private static AxisAlignedLine ProjectAlongAxis(Vector2 axis, Vector2 pos, Rotation rot, Vector2 center, params Vector2[] points)
         {
             float min = 0;
@@ -1580,21 +1527,21 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         #region NoRotation
 
         /// <summary>
-        ///     Determines if the specified polygon at pos1 with no rotation and rectangle at pos2 intersect
+        ///     Determines if the specified PolygonShape at pos1 with no rotation and rectangle at pos2 intersect
         /// </summary>
-        /// <param name="poly">Polygon to check</param>
+        /// <param name="poly">PolygonShape to check</param>
         /// <param name="rect">Rectangle to check</param>
         /// <param name="pos1">Origin of polygon</param>
         /// <param name="pos2">Origin of rect</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If poly at pos1 intersects rect at pos2</returns>
-        public static bool Intersects(Polygon poly, BoundingBox rect, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(PolygonShape poly, AABB rect, Vector2 pos1, Vector2 pos2, bool strict)
         {
             return Intersects(poly, rect, pos1, pos2, Rotation.Zero, strict);
         }
 
         /// <summary>
-        ///     Determines if the specified rectangle at pos1 intersects the specified polygon at pos2 with
+        ///     Determines if the specified rectangle at pos1 intersects the specified PolygonShape at pos2 with
         ///     no rotation.
         /// </summary>
         /// <param name="rect">The rectangle</param>
@@ -1603,20 +1550,20 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">Origin of polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If rect at pos1 no rotation intersects poly at pos2</returns>
-        public static bool Intersects(BoundingBox rect, Polygon poly, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(AABB rect, PolygonShape poly, Vector2 pos1, Vector2 pos2, bool strict)
         {
             return Intersects(rect, poly, pos1, pos2, Rotation.Zero, strict);
         }
 
         /// <summary>
-        ///     Determines if the specified polygon at pos1 with no rotation intersects the specified
+        ///     Determines if the specified PolygonShape at pos1 with no rotation intersects the specified
         /// </summary>
         /// <param name="poly"></param>
         /// <param name="rect"></param>
         /// <param name="pos1"></param>
         /// <param name="pos2"></param>
         /// <returns></returns>
-        public static Vector2 IntersectMtv(Polygon poly, BoundingBox rect, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(PolygonShape poly, AABB rect, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMtv(poly, rect, pos1, pos2, Rotation.Zero);
         }
@@ -1630,13 +1577,13 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos1">The origin of the rect</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <returns>MTV to move rect at pos1 to prevent overlap with poly at pos2</returns>
-        public static Vector2 IntersectMtv(BoundingBox rect, Polygon poly, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(AABB rect, PolygonShape poly, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMtv(rect, poly, pos1, pos2, Rotation.Zero);
         }
 
         /// <summary>
-        ///     Determines if the polygon and circle intersect when at the given positions.
+        ///     Determines if the PolygonShape and circle intersect when at the given positions.
         /// </summary>
         /// <param name="poly">The polygon</param>
         /// <param name="radius">The circle</param>
@@ -1644,13 +1591,13 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If poly at pos1 intersects circle at pos2</returns>
-        public static bool Intersects(Polygon poly, float radius, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(PolygonShape poly, float radius, Vector2 pos1, Vector2 pos2, bool strict)
         {
             return Intersects(poly, radius, pos1, pos2, Rotation.Zero, strict);
         }
 
         /// <summary>
-        ///     Determines if the circle and polygon intersect when at the given positions.
+        ///     Determines if the circle and PolygonShape intersect when at the given positions.
         /// </summary>
         /// <param name="radius">The circle</param>
         /// <param name="poly">The polygon</param>
@@ -1658,13 +1605,13 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos2">The origin of the polygon</param>
         /// <param name="strict">If overlap is required for intersection</param>
         /// <returns>If circle at pos1 intersects poly at pos2</returns>
-        public static bool Intersects(float radius, Polygon poly, Vector2 pos1, Vector2 pos2, bool strict)
+        public static bool Intersects(float radius, PolygonShape poly, Vector2 pos1, Vector2 pos2, bool strict)
         {
             return Intersects(radius, poly, pos1, pos2, Rotation.Zero, strict);
         }
 
         /// <summary>
-        ///     Determines the minimum translation vector the be applied to the polygon to prevent
+        ///     Determines the minimum translation vector the be applied to the PolygonShape to prevent
         ///     intersection with the specified circle, when they are at the given positions.
         /// </summary>
         /// <param name="poly">The polygon</param>
@@ -1672,7 +1619,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos1">The position of the polygon</param>
         /// <param name="pos2">The top-left of the circles bounding box</param>
         /// <returns>MTV to move poly at pos1 to prevent overlap with circle at pos2</returns>
-        public static Vector2 IntersectMtv(Polygon poly, float radius, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(PolygonShape poly, float radius, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMtv(poly, radius, pos1, pos2, Rotation.Zero);
         }
@@ -1686,7 +1633,7 @@ namespace CollisionFloatTestNewMono.Engine.Collision
         /// <param name="pos1">The top-left of the circles bounding box</param>
         /// <param name="pos2">The origin of the polygon</param>
         /// <returns></returns>
-        public static Vector2 IntersectMtv(float radius, Polygon poly, Vector2 pos1, Vector2 pos2)
+        public static Vector2 IntersectMtv(float radius, PolygonShape poly, Vector2 pos1, Vector2 pos2)
         {
             return IntersectMtv(radius, poly, pos1, pos2, Rotation.Zero);
         }

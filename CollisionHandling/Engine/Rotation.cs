@@ -4,7 +4,7 @@ using System;
 
 #endregion
 
-namespace CollisionFloatTestNewMono.Engine.Math2
+namespace CollisionFloatTestNewMono.Engine
 {
     /// <summary>
     ///     Describes a rotation about the z axis, with sin and cos of theta

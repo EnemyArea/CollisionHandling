@@ -52,10 +52,8 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
             this.StartTilePosition = GameHelper.ConvertPositionToTilePosition(this.Start);
             this.EndTilePosition = GameHelper.ConvertPositionToTilePosition(this.End);
             
-            var aabb = AabbHelper.ComputeLineAabb(this.Start, this.End, Vector2.Zero, 0);
-            
-            var start = GameHelper.ConvertPositionToTilePosition(aabb.LowerBound);
-            var end = GameHelper.ConvertPositionToTilePositionCeiling(aabb.UpperBound);
+            var start = GameHelper.ConvertPositionToTilePosition(Vector2.Min(this.Start, this.End));
+            var end = GameHelper.ConvertPositionToTilePositionCeiling(Vector2.Max(this.Start, this.End));
             
             var boundingBoxTileMap = new Rectangle(Math.Min(start.X, end.X),
                 Math.Min(start.Y, end.Y),

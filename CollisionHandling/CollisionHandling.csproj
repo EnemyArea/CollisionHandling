@@ -41,8 +41,6 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Engine\Aabb.cs" />
-    <Compile Include="Engine\AabbHelper.cs" />
     <Compile Include="Engine\Camera2D.cs" />
     <Compile Include="Engine\Collision\CollisionCategory.cs" />
     <Compile Include="Engine\Collision\CollisionHandler.cs" />
@@ -52,13 +50,11 @@
     <Compile Include="Engine\Shapes\CircleShape.cs" />
     <Compile Include="Engine\Collision\CollisionManager.cs" />
     <Compile Include="Engine\GameHelper.cs" />
-    <Compile Include="Engine\Math2\AxisAlignedLine.cs" />
-    <Compile Include="Engine\Math2\Line.cs" />
+    <Compile Include="Engine\AxisAlignedLine.cs" />
+    <Compile Include="Engine\Line.cs" />
     <Compile Include="Engine\Collision\CollisionHelper.cs" />
-    <Compile Include="Engine\Math2\Polygon.cs" />
-    <Compile Include="Engine\Math2\BoundingBox.cs" />
-    <Compile Include="Engine\Math2\RelativeBoundingBox.cs" />
-    <Compile Include="Engine\Math2\Rotation.cs" />
+    <Compile Include="Engine\AABB.cs" />
+    <Compile Include="Engine\Rotation.cs" />
     <Compile Include="Engine\MathUtils.cs" />
     <Compile Include="Engine\Shapes\PolygonShape.cs" />
     <Compile Include="Engine\PrimitiveBatch.cs" />

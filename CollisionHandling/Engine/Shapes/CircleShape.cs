@@ -19,6 +19,10 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         /// </summary>
         public Point TilePosition { get; private set; }
 
+        /// <summary>
+        /// </summary>
+        public AABB AABB { get; private set; }
+
 
         /// <summary>
         /// </summary>
@@ -40,16 +44,16 @@ namespace CollisionFloatTestNewMono.Engine.Shapes
         {
             this.TilePosition = GameHelper.ConvertPositionToTilePosition(this.Position);
 
-            var aabb = AabbHelper.ComputeCircleAabb(this.Position, this.Radius);
+            this.AABB = new AABB(-new Vector2(this.Radius), new Vector2(this.Radius));
             this.BoundingBox = new Rectangle(
-                (int)aabb.LowerBound.X,
-                (int)aabb.LowerBound.Y,
-                (int)aabb.Width,
-                (int)aabb.Height);
+                (int)(this.Position.X + this.AABB.LowerLeft.X),
+                (int)(this.Position.Y + this.AABB.UpperRight.Y),
+                (int)this.AABB.Width,
+                (int)this.AABB.Height);
 
-            var start = GameHelper.ConvertPositionToTilePosition(aabb.LowerBound);
-            var end = GameHelper.ConvertPositionToTilePositionCeiling(aabb.UpperBound);
-            
+            var start = GameHelper.ConvertPositionToTilePosition(new Vector2(this.BoundingBox.Left, this.BoundingBox.Top));
+            var end = GameHelper.ConvertPositionToTilePositionCeiling(new Vector2(this.BoundingBox.Right, this.BoundingBox.Bottom));
+
             var boundingBoxTileMap = new Rectangle(Math.Min(start.X, end.X),
                 Math.Min(start.Y, end.Y),
                 Math.Abs(start.X - end.X),

@@ -5,12 +5,12 @@ using Microsoft.Xna.Framework;
 
 #endregion
 
-namespace CollisionFloatTestNewMono.Engine.Math2
+namespace CollisionFloatTestNewMono.Engine
 {
     /// <summary>
     ///     Describes a line. Does not have position and is meant to be reused.
     /// </summary>
-    public class Line
+    public sealed class Line
     {
         /// <summary>
         ///     Where the line begins
