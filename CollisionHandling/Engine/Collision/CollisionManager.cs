@@ -699,7 +699,6 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                 {
                     if (shapeA.IsStatic ||
                         shapeA == shapeB ||
-                        shapeA.IsStatic == shapeB.IsStatic ||
                         !shapeA.IsEnabled ||
                         !shapeB.IsEnabled ||
                         shapeA.IgnoredCollisions.Contains(shapeB) ||
@@ -890,7 +889,8 @@ namespace CollisionFloatTestNewMono.Engine.Collision
                     case CircleShape circleShape:
                         {
                             var oldPosition = circleShape.TilePosition;
-                            circleShape.MoveByVelocity(circleShape.Velocity);
+                            var result = circleShape.Velocity;
+                            circleShape.MoveByVelocity(new Vector2((int)Math.Round(result.X), (int)Math.Round(result.Y)));
                             this.spatialGrid.Move(oldPosition, circleShape.TilePosition, circleShape);
                         }
                         break;

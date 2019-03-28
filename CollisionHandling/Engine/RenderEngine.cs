@@ -213,6 +213,7 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.playerShape = new CircleShape("P", new Vector2(GameHelper.TileSize * 3, GameHelper.TileSize * 3) - new Vector2(GameHelper.TileSize) / 2, GameHelper.TileSize / 2f, false);
             this.collisionManager.AddShape(this.playerShape);
+            this.showTexture = true;
 
             //this.collisionManager.AddShape(new CircleShape("P1", new Vector2(232, 194), 15));
             //this.collisionManager.AddShape(new CircleShape("P2", new Vector2(192, 260), 15));
@@ -220,62 +221,62 @@ namespace CollisionFloatTestNewMono.Engine
             //this.collisionManager.AddShape(new CircleShape("P4", new Vector2(352, 260), 15));
 
 
-            //
-            // Test geometries
-            // 
+            ////
+            //// Test geometries
+            //// 
 
 
-            // Polygons
-            var sizePolygon = new Vector2(150, 250);
-            var polygonVertices = MathUtils.GetConvexHull(new[]
-            {
-                new Vector2(sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
-                new Vector2(-sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
-                new Vector2(-15, 0),
-                new Vector2(15, 0)
-            });
-            this.polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
-            this.collisionManager.AddShape(this.polygon);
+            //// Polygons
+            //var sizePolygon = new Vector2(150, 250);
+            //var polygonVertices = MathUtils.GetConvexHull(new[]
+            //{
+            //    new Vector2(sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
+            //    new Vector2(-sizePolygon.X, sizePolygon.Y) * MathUtils.AngleToVector(45),
+            //    new Vector2(-15, 0),
+            //    new Vector2(15, 0)
+            //});
+            //this.polygon = new PolygonShape("Polygon1", new Vector2(700, 200), polygonVertices, 45);
+            //this.collisionManager.AddShape(this.polygon);
             
-            var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), MathUtils.CreateRectangle(150, 150), 45);
-            this.collisionManager.AddShape(polygon2);
+            //var polygon2 = new PolygonShape("Polygon2", new Vector2(200, 450), MathUtils.CreateRectangle(150, 150), 45);
+            //this.collisionManager.AddShape(polygon2);
             
-            var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), MathUtils.CreateRectangle(150, 150));
-            this.collisionManager.AddShape(polygon3);
+            //var polygon3 = new PolygonShape("Polygon3", new Vector2(450, 450), MathUtils.CreateRectangle(150, 150));
+            //this.collisionManager.AddShape(polygon3);
 
 
-            // Circles
-            var circle1 = new CircleShape("C1", new Vector2(5 * GameHelper.TileSize, 5 * GameHelper.TileSize), GameHelper.TileSize * 2);
-            this.collisionManager.AddShape(circle1);
+            //// Circles
+            //var circle1 = new CircleShape("C1", new Vector2(5 * GameHelper.TileSize, 5 * GameHelper.TileSize), GameHelper.TileSize * 2);
+            //this.collisionManager.AddShape(circle1);
 
-            var circle2 = new CircleShape("C2", new Vector2(10 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize + 20), GameHelper.TileSize * 2);
-            this.collisionManager.AddShape(circle2);
+            //var circle2 = new CircleShape("C2", new Vector2(10 * GameHelper.TileSize + 15, 5 * GameHelper.TileSize + 20), GameHelper.TileSize * 2);
+            //this.collisionManager.AddShape(circle2);
 
 
-            // Lines
-            var offset = new Vector2(800, 100);
-            this.collisionManager.AddShape(new LineShape(
-                new Vector2(100 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 100 + offset.Y), name: "Line1"
-            ));
+            //// Lines
+            //var offset = new Vector2(800, 100);
+            //this.collisionManager.AddShape(new LineShape(
+            //    new Vector2(100 + offset.X, 100 + offset.Y),
+            //    new Vector2(200 + offset.X, 100 + offset.Y), name: "Line1"
+            //));
 
-            //offset += new Vector2(0, 80);
-            this.collisionManager.AddShape(new LineShape(
-                new Vector2(200 + offset.X, 100 + offset.Y),
-                new Vector2(200 + offset.X, 200 + offset.Y), name: "Line2"
-            ));
+            ////offset += new Vector2(0, 80);
+            //this.collisionManager.AddShape(new LineShape(
+            //    new Vector2(200 + offset.X, 100 + offset.Y),
+            //    new Vector2(200 + offset.X, 200 + offset.Y), name: "Line2"
+            //));
 
-            //offset += new Vector2(0, 80);
-            this.collisionManager.AddShape(new LineShape(
-                new Vector2(200 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 200 + offset.Y), name: "Line3"
-            ));
+            ////offset += new Vector2(0, 80);
+            //this.collisionManager.AddShape(new LineShape(
+            //    new Vector2(200 + offset.X, 200 + offset.Y),
+            //    new Vector2(100 + offset.X, 200 + offset.Y), name: "Line3"
+            //));
 
-            //offset += new Vector2(0, -50);
-            this.collisionManager.AddShape(new LineShape(
-                new Vector2(100 + offset.X, 200 + offset.Y),
-                new Vector2(100 + offset.X, 100 + offset.Y), name: "Line4"
-            ));
+            ////offset += new Vector2(0, -50);
+            //this.collisionManager.AddShape(new LineShape(
+            //    new Vector2(100 + offset.X, 200 + offset.Y),
+            //    new Vector2(100 + offset.X, 100 + offset.Y), name: "Line4"
+            //));
 
 
             //this.collisionManager.AddShape(new RectangleShape("EventKids", new Rectangle(1184, 1312, 352, 224)));
@@ -416,9 +417,9 @@ namespace CollisionFloatTestNewMono.Engine
 
             this.oldState = newState;
 
-            // Bewegen....
-            var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
-            this.polygon.SetRotation(MathHelper.ToRadians((int)MathHelper.Lerp(0, 360, time)));
+            //// Bewegen....
+            //var time = GameHelper.GetTotalSecondsFromGameTime(gameTime) * 0.25f;
+            //this.polygon.SetRotation(MathHelper.ToRadians((int)MathHelper.Lerp(0, 360, time)));
 
             this.playerShape.Color = Color.Fuchsia;
             this.playerShape.ResetVelocity();
